@@ -18,6 +18,10 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
+/**
+ * Class responsible for sending HTTP requests and parsing responses.
+ * Can be created by using {@link RequestBuilder#build()}
+ */
 public final class Request {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Request.class);
@@ -32,11 +36,28 @@ public final class Request {
         this.genericMapper = genericMapper;
     }
 
+    /**
+     * Sends current request asynchronously. If response status code
+     * matches provided status code then returns {@link CompletableFuture}
+     * with object of provided type. Otherwise returns {@link CompletableFuture}
+     * that finishes exceptionally with {@link UnexpectedResponseException}.
+     *
+     * @param type       type of object to convert response body.
+     * @param statusCode status code on which converting should be done
+     * @param <T>        type of object to convert response body
+     * @return {@link CompletableFuture} with object of provided type or {@link CompletableFuture}
+     * that finishes exceptionally with {@link UnexpectedResponseException}
+     */
     public <T> CompletableFuture<T> asyncAsObject(Class<T> type, int statusCode) {
         return this.httpClient.sendAsync(httpRequest, BodyHandlers.ofString())
                 .thenApply(response -> sendRequestForObject(type, statusCode));
     }
 
+    /**
+     * Sends current request asynchronously.
+     *
+     * @return {@link CompletableFuture} with returned response.
+     */
     public CompletableFuture<Response<String>> asyncAsString() {
         return this.httpClient.sendAsync(httpRequest, BodyHandlers.ofString())
                 .thenApply(response -> new Response<>(response.body(), response));
@@ -60,10 +81,29 @@ public final class Request {
         return sendRequestAndConvertResponseBody(JSONArray::new);
     }
 
+    /**
+     * Sends current request blocking if necessary to get
+     * the response. Converts response body to specified type if
+     * provided statusCode matches response status code and throws
+     * {@link UnexpectedResponseException} otherwise. Throws {@link RequestExecutionException}
+     * if some error happens on request sending.
+     *
+     * @param type       type of object to convert response body.
+     * @param statusCode status code on which converting should be done
+     * @param <T>        type of object to convert response body
+     * @return object of specified type
+     */
     public <T> T asObject(Class<T> type, int statusCode) {
         return sendRequestForObject(type, statusCode);
     }
 
+    /**
+     * Sends current request blocking if necessary to get
+     * the response.
+     *
+     * @return {@link Optional} with response if request no error happened during
+     * request sending or empty {@link Optional} otherwise.
+     */
     public Optional<Response<String>> asString() {
         return sendRequestAndConvertResponseBody(Function.identity());
     }

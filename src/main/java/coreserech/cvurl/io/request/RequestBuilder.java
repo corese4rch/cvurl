@@ -14,6 +14,11 @@ import java.util.Map;
 
 import static java.util.stream.Collectors.joining;
 
+/**
+ * Builder used to build {@link Request}
+ *
+ * @param <T>
+ */
 public class RequestBuilder<T extends RequestBuilder<T>> {
 
     protected GenericMapper genericMapper;
@@ -31,31 +36,68 @@ public class RequestBuilder<T extends RequestBuilder<T>> {
         this.httpClient = httpClient;
     }
 
+    /**
+     * Add request header.
+     *
+     * @param key   header key
+     * @param value header value
+     * @return this builder
+     */
     public T header(String key, String value) {
         this.headers.put(key, value);
         return (T) this;
     }
 
+    /**
+     * Add request headers.
+     *
+     * @param headers headers name/value map
+     * @return this builder
+     */
     public T headers(Map<String, String> headers) {
         this.headers.putAll(headers);
         return (T) this;
     }
 
+    /**
+     * Adds query parameter.
+     *
+     * @param name  query parameter name
+     * @param value query parameter value
+     * @return this builder
+     */
     public T queryParam(String name, String value) {
         this.queryParams.put(name, value);
         return (T) this;
     }
 
+    /**
+     * Adds query parameters.
+     *
+     * @param queryParams query parameters name/value map
+     * @return this builder
+     */
     public T queryParams(Map<String, String> queryParams) {
         this.queryParams.putAll(queryParams);
         return (T) this;
     }
 
+    /**
+     * Sets request timeout. Overlaps global timeout set for {@link CVurl}
+     *
+     * @param timeout request timeout
+     * @return this builder
+     */
     public T timeout(Duration timeout) {
         this.timeout = timeout;
         return (T) this;
     }
 
+    /**
+     * Builds new {@link Request}.
+     *
+     * @return new {@link Request}
+     */
     public Request build() {
         return new Request(setUpHttpRequestBuilder().build(), httpClient, genericMapper);
     }
