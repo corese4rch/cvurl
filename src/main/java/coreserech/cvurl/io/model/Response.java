@@ -10,14 +10,25 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Wrapper around Java 11 {@link HttpResponse}.
+ *
+ * @param <T>
+ */
 public class Response<T> {
 
     private T body;
 
     private HttpResponse<String> rawResponse;
 
-    public Response(T target, HttpResponse<String> rawResponse) {
-        this.body = target;
+    /**
+     * Creates new Response from specified body and raw {@link HttpResponse}.
+     *
+     * @param body        parsed response body
+     * @param rawResponse response
+     */
+    public Response(T body, HttpResponse<String> rawResponse) {
+        this.body = body;
         this.rawResponse = rawResponse;
     }
 
@@ -99,20 +110,42 @@ public class Response<T> {
         return rawResponse.version();
     }
 
+    /**
+     * Checks if response is successful (status code is 2XX)
+     *
+     * @return whether response is successful.
+     */
     public boolean isSuccessful() {
         return status() >= 200 && status() < 300;
     }
 
+    /**
+     * Returns headers names.
+     *
+     * @return headers names
+     */
     public Set<String> headersNames() {
         return headers().map().keySet();
     }
 
+    /**
+     * Returns value for specified header name.
+     *
+     * @param headerName
+     * @return optional of header value. Is empty if no header with such name exists.
+     */
     public Optional<String> getHeaderValue(String headerName) {
         List<String> headerValues = headers().map().get(headerName);
 
         return headerValues == null ? Optional.empty() : Optional.of(String.join(",", headerValues));
     }
 
+    /**
+     * Return header values as list.
+     *
+     * @param headerName
+     * @return header values as list.
+     */
     public List<String> getHeaderValuesAsList(String headerName) {
         return headers().allValues(headerName);
     }
