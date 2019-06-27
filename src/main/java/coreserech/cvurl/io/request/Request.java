@@ -4,8 +4,6 @@ import coreserech.cvurl.io.exception.RequestExecutionException;
 import coreserech.cvurl.io.exception.UnexpectedResponseException;
 import coreserech.cvurl.io.mapper.GenericMapper;
 import coreserech.cvurl.io.model.Response;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,22 +61,17 @@ public final class Request {
                 .thenApply(response -> new Response<>(response.body(), response));
     }
 
-    public CompletableFuture<Response<JSONObject>> asyncAsJsonObject() {
+    /**
+     * Sends current request asynchronously and maps response body using
+     * provided mapper function.
+     *
+     * @param bodyMapper function to map response body to some object
+     * @param <T>        type of the mapped object
+     * @return {@link CompletableFuture} with returned response with mapped body.
+     */
+    public <T> CompletableFuture<Response<T>> asyncMap(Function<String, T> bodyMapper) {
         return this.httpClient.sendAsync(httpRequest, BodyHandlers.ofString())
-                .thenApply(response -> new Response<>(new JSONObject(response.body()), response));
-    }
-
-    public CompletableFuture<Response<JSONArray>> asyncAsJsonArray() {
-        return this.httpClient.sendAsync(httpRequest, BodyHandlers.ofString())
-                .thenApply(response -> new Response<>(new JSONArray(response.body()), response));
-    }
-
-    public Optional<Response<JSONObject>> asJsonObject() {
-        return sendRequestAndConvertResponseBody(JSONObject::new);
-    }
-
-    public Optional<Response<JSONArray>> asJsonArray() {
-        return sendRequestAndConvertResponseBody(JSONArray::new);
+                .thenApply(response -> new Response<>(bodyMapper.apply(response.body()), response));
     }
 
     /**
@@ -106,6 +99,19 @@ public final class Request {
      */
     public Optional<Response<String>> asString() {
         return sendRequestAndConvertResponseBody(Function.identity());
+    }
+
+    /**
+     * Sends current request blocking if necessary to get
+     * the response. Maps response body using provided mapper function.
+     *
+     * @param bodyMapper function to map response body to some object
+     * @param <T>        type of the mapped object
+     * @return {@link Optional} with response with mapped body if request no error happened during
+     * request sending or empty {@link Optional} otherwise.
+     */
+    public <T> Optional<Response<T>> map(Function<String, T> bodyMapper) {
+        return sendRequestAndConvertResponseBody(bodyMapper);
     }
 
     private <T> Optional<Response<T>> sendRequestAndConvertResponseBody(Function<String, T> responseBodyConverter) {
