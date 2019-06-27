@@ -10,11 +10,11 @@ import coreserech.cvurl.io.helper.model.User;
 import coreserech.cvurl.io.model.Configuration;
 import coreserech.cvurl.io.model.Response;
 import coreserech.cvurl.io.util.HttpStatus;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
@@ -51,22 +51,6 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void asJsonObjectTest() {
-
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("bool", true);
-        jsonObject.put("int", 123);
-
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
-                        .withBody(jsonObject.toString())));
-
-        Response<JSONObject> response = cvurl.GET(url).build().asJsonObject().orElseThrow(RuntimeException::new);
-
-        assertEquals(jsonObject.toString(), response.getBody().toString());
-    }
-
-    @Test
     public void asObjectTest() throws JsonProcessingException {
         User user = ObjectGenerator.generateTestObject();
 
@@ -78,20 +62,6 @@ public class CVurlRequestTest extends AbstractRequestTest {
         User resultUser = cvurl.GET(url).build().asObject(User.class, HttpStatus.OK);
 
         assertEquals(user, resultUser);
-    }
-
-    @Test
-    public void asJsonArrayTest() {
-
-        JSONArray jsonArray = new JSONArray("[{\"lol\":\"bla\"}, {\"bla\":\"lol\"}]");
-
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
-                        .withBody(jsonArray.toString())));
-
-        Response<JSONArray> response = cvurl.GET(url).build().asJsonArray().orElseThrow(RuntimeException::new);
-
-        assertEquals(jsonArray.toString(), response.getBody().toString());
     }
 
     @Test
@@ -138,56 +108,6 @@ public class CVurlRequestTest extends AbstractRequestTest {
 
         assertTrue(isThenApplyInvoked[0]);
         assertEquals(user, resultUser);
-    }
-
-    @Test
-    public void asyncAsJsonObjectTest() throws ExecutionException, InterruptedException {
-
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("bool", true);
-        jsonObject.put("int", 123);
-
-        boolean[] isThenApplyInvoked = {false};
-
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
-                        .withBody(jsonObject.toString())));
-
-        Response<JSONObject> response = cvurl.GET(url).build().asyncAsJsonObject()
-                .thenApply(res ->
-                {
-                    isThenApplyInvoked[0] = true;
-                    return res;
-                })
-                .get();
-
-        assertTrue(isThenApplyInvoked[0]);
-        assertEquals(jsonObject.toString(), response.getBody().toString());
-    }
-
-
-    @Test
-    public void asyncAsJsonArrayTest() throws ExecutionException, InterruptedException {
-
-        JSONArray jsonArray = new JSONArray("[{\"lol\":\"bla\"}, {\"bla\":\"lol\"}]");
-
-        boolean[] isThenApplyInvoked = {false};
-
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
-                        .withBody(jsonArray.toString())));
-
-
-        Response<JSONArray> response = cvurl.GET(url).build().asyncAsJsonArray()
-                .thenApply(res ->
-                {
-                    isThenApplyInvoked[0] = true;
-                    return res;
-                })
-                .get();
-
-        assertTrue(isThenApplyInvoked[0]);
-        assertEquals(jsonArray.toString(), response.getBody().toString());
     }
 
     @Test
@@ -264,5 +184,47 @@ public class CVurlRequestTest extends AbstractRequestTest {
 
         //when
         cvurl.GET(url).build().asObject(User.class, HttpStatus.OK);
+    }
+
+    @Test
+    public void mapTest() {
+        //given
+        String body = "Test body for test";
+        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+
+        //when
+        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse()
+                        .withStatus(HttpStatus.OK)
+                        .withBody(body)));
+
+        Response<List<String>> response = cvurl.GET(url).build().map(List::of).orElseThrow(RuntimeException::new);
+
+        //then
+        Assert.assertTrue(response.isSuccessful());
+        Assert.assertEquals(HttpStatus.OK, response.status());
+        Assert.assertEquals(body, response.getBody().get(0));
+    }
+
+    @Test
+    public void asyncMapTest() throws ExecutionException, InterruptedException {
+        //
+        String body = "I am a string";
+        boolean[] isThenApplyInvoked = {false};
+
+        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse()
+                        .withBody(body)));
+
+        Response<List<String>> response = cvurl.GET(url).build().asyncMap(List::of)
+                .thenApply(res ->
+                {
+                    isThenApplyInvoked[0] = true;
+                    return res;
+                })
+                .get();
+
+        assertTrue(isThenApplyInvoked[0]);
+        assertEquals(body, response.getBody().get(0));
     }
 }

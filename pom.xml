@@ -16,7 +16,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- main -->
-        <org.json.version>20180813</org.json.version>
         <slf4j-api.version>1.8.0-beta4</slf4j-api.version>
         <jackson.core.version>2.9.9</jackson.core.version>
         <!-- test -->
@@ -27,11 +26,6 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>${org.json.version}</version>
-        </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>

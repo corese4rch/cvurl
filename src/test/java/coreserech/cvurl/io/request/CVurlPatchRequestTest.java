@@ -7,8 +7,6 @@ import coreserech.cvurl.io.helper.model.User;
 import coreserech.cvurl.io.model.Response;
 import coreserech.cvurl.io.util.HttpHeader;
 import coreserech.cvurl.io.util.HttpStatus;
-import coreserech.cvurl.io.util.MIMEType;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -269,36 +267,6 @@ public class CVurlPatchRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void sendPATCH_StringWithMediaTypeRequestBodyTest() {
-
-        //given
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("success", true);
-        jsonObject.put("status", 200);
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
-
-        //when
-        wiremock.stubFor(WireMock.patch(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .withRequestBody(WireMock.equalTo(jsonObject.toString()))
-                .withHeader(HttpHeader.CONTENT_TYPE, WireMock.equalTo(MIMEType.APPLICATION_JSON))
-                .willReturn(WireMock.aResponse()
-                        .withStatus(HttpStatus.OK)));
-
-        Response<String> response = cvurl.PATCH(url)
-                .body(jsonObject)
-                .build()
-                .asString()
-                .orElseThrow(RuntimeException::new);
-
-        //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.patchRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
-
-        Assert.assertTrue(response.isSuccessful());
-        Assert.assertEquals(HttpStatus.OK, response.status());
-    }
-
-    @Test
     public void sendPATCH_BytesRequestBodyTest() {
 
         //given
@@ -368,35 +336,6 @@ public class CVurlPatchRequestTest extends AbstractRequestTest {
 
         Response<String> response = cvurl.PATCH(url)
                 .body(user)
-                .build()
-                .asString()
-                .orElseThrow(RuntimeException::new);
-
-        //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.patchRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
-
-        Assert.assertTrue(response.isSuccessful());
-        Assert.assertEquals(HttpStatus.OK, response.status());
-    }
-
-    @Test
-    public void sendPATCH_JSONRequestBodyTest() {
-
-        //given
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("success", true);
-        jsonObject.put("status", 200);
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
-
-        //when
-        wiremock.stubFor(WireMock.patch(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .withRequestBody(WireMock.equalTo(jsonObject.toString()))
-                .willReturn(WireMock.aResponse()
-                        .withStatus(HttpStatus.OK)));
-
-        Response<String> response = cvurl.PATCH(url)
-                .body(jsonObject)
                 .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
