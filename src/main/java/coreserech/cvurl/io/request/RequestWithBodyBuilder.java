@@ -16,7 +16,7 @@ public class RequestWithBodyBuilder extends RequestBuilder<RequestWithBodyBuilde
 
     private HttpRequest.BodyPublisher bodyPublisher = HttpRequest.BodyPublishers.noBody();
 
-    public RequestWithBodyBuilder(String uri, HttpMethod method, GenericMapper genericMapper, HttpClient httpClient) {
+    RequestWithBodyBuilder(String uri, HttpMethod method, GenericMapper genericMapper, HttpClient httpClient) {
         super(uri, method, genericMapper, httpClient);
     }
 
