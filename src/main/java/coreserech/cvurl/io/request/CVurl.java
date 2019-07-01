@@ -224,10 +224,6 @@ public class CVurl {
         return createRequestWBody(url.toString(), HttpMethod.PATCH);
     }
 
-    public HttpClient getHttpClient() {
-        return httpClient;
-    }
-
     private HttpClient getHttpClient(Configuration configuration) {
         return configuration.getHttpClientMode() == HttpClientMode.PROTOTYPE ?
                 configuration.createHttpClient() : HttpClientSingleton.getClient(configuration);
