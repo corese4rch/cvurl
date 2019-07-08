@@ -40,3 +40,6 @@ buildNumber.properties
 .idea/
 .github
 /.idea/
+*.iml
+.idea/
+.github/
