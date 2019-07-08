@@ -11,6 +11,7 @@ d88' `"Y8    `888. .8'    `888  `888  `888""8P  888
 
  ## Requirements 
  **cVurl** is written in java11 and can be used with any jdk11.0.2 and higher
+ (mostly because of this [issue](https://bugs.openjdk.java.net/browse/JDK-8211437))
  
  ## Dependencies
  **cVurl** is made purely with Java 11 and one of our goals was to bring as less dependencies to your project as possible.
