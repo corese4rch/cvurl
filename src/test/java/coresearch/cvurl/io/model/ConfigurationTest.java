@@ -1,6 +1,6 @@
 package coresearch.cvurl.io.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
@@ -11,7 +11,7 @@ import java.net.http.HttpClient;
 import java.time.Duration;
 import java.util.concurrent.Executor;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 public class ConfigurationTest {

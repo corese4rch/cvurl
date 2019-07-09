@@ -2,12 +2,10 @@ package coresearch.cvurl.io.request;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import coresearch.cvurl.io.mapper.MapperFactory;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.*;
 
 public abstract class AbstractRequestTest {
 
@@ -15,18 +13,24 @@ public abstract class AbstractRequestTest {
     protected static String TEST_ENDPOINT = "/test/endpoint";
     protected static String TEST_TOKEN = "test-token";
     protected static int PORT = 8080;
-    @Rule
-    public WireMockClassRule wiremock = new WireMockClassRule(WireMockConfiguration.options().port(PORT));
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+
+    protected WireMockServer wiremock;
     protected ObjectMapper mapper;
     protected CVurl cvurl;
 
-    @Before
+    @BeforeEach
     public void setUp() {
+        wiremock = new WireMockServer(PORT);
+        wiremock.start();
+
         mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         cvurl = new CVurl(MapperFactory.from(mapper));
+    }
+
+    @AfterEach
+    public void tearDown() {
+        wiremock.stop();
     }
 }
