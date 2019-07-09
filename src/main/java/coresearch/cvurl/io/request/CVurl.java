@@ -249,11 +249,7 @@ public class CVurl {
                 try {
                     client = httpClient;
                     if (null == client) {
-                        if (configuration != null) {
-                            client = configuration.createHttpClient();
-                        } else {
-                            client = HttpClient.newHttpClient();
-                        }
+                        client = configuration.createHttpClient();
                         httpClient = client;
                     }
                 } finally {
