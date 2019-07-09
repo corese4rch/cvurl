@@ -109,4 +109,8 @@ public final class HttpStatus {
     public static final int HTTP_VERSION_NOT_SUPPORTED = 505;
     /** <tt>507 Insufficient Storage</tt> */
     public static final int INSUFFICIENT_STORAGE = 507;
+
+    private HttpStatus() {
+        throw new IllegalStateException("This constructor shouldn't be called");
+    }
 }

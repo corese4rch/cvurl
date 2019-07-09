@@ -111,4 +111,8 @@ public final class HttpHeader {
     public static final String WARNING = "Warning";
 
     public static final String WWW_AUTHENTICATE = "WWW-Authenticate";
+
+    private HttpHeader() {
+        throw new IllegalStateException("This constructor shouldn't be called");
+    }
 }
