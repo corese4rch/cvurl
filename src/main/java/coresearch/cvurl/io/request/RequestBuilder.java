@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.joining;
 
@@ -27,7 +28,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> {
     private HttpClient httpClient;
     private Map<String, String> queryParams = new HashMap<>();
     private Map<String, String> headers = new HashMap<>();
-    private Duration timeout = null;
+    private Optional<Duration> timeout = Optional.empty();
 
     RequestBuilder(String uri, HttpMethod method, GenericMapper genericMapper, HttpClient httpClient) {
         this.method = method;
@@ -89,7 +90,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> {
      * @return this builder
      */
     public T timeout(Duration timeout) {
-        this.timeout = timeout;
+        this.timeout = Optional.ofNullable(timeout);
         return (T) this;
     }
 
@@ -107,9 +108,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> {
                 .uri(prepareURI())
                 .method(method.name(), HttpRequest.BodyPublishers.noBody());
 
-        if (timeout != null) {
-            builder.timeout(timeout);
-        }
+        timeout.ifPresent(builder::timeout);
 
         headers.forEach(builder::header);
 
