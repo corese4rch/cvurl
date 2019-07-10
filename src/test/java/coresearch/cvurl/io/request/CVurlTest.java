@@ -1,13 +1,13 @@
 package coresearch.cvurl.io.request;
 
+import coresearch.cvurl.io.mapper.MapperFactory;
 import coresearch.cvurl.io.model.Configuration;
 import coresearch.cvurl.io.util.HttpClientMode;
 import org.junit.jupiter.api.Test;
 
 import java.net.http.HttpClient;
 
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CVurlTest {
 
@@ -35,6 +35,16 @@ public class CVurlTest {
 
         //then
         assertSame(getHttpClient(cvurl1), getHttpClient(cvurl2));
+    }
+
+    @Test
+    public void createCurlWithNullConfigShouldThrowNPE() {
+        //given
+        Configuration configuration = null;
+
+        //then
+        assertThrows(NullPointerException.class, () -> new CVurl(configuration));
+        assertThrows(NullPointerException.class, () -> new CVurl(MapperFactory.createDefault(), configuration));
     }
 
     private HttpClient getHttpClient(CVurl cvurl) {
