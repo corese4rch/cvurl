@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collector;
 
 import static java.util.stream.Collectors.joining;
 
@@ -121,7 +122,13 @@ public class RequestBuilder<T extends RequestBuilder<T>> {
                 URI.create(uri +
                         this.queryParams.entrySet().stream()
                                 .map(entry -> encode(entry.getKey()) + "=" + encode(entry.getValue()))
-                                .collect(joining("&", "?", "")));
+                                .collect(joiningWithUri(uri)));
+    }
+
+    private Collector<CharSequence, ?, String> joiningWithUri(String uri) {
+        return uri.contains("?") ?
+                joining("&", "&", "") :
+                joining("?", "&", "");
     }
 
     private String encode(String str) {
