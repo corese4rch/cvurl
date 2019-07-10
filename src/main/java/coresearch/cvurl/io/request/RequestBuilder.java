@@ -128,7 +128,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> {
     private Collector<CharSequence, ?, String> joiningWithUri(String uri) {
         return uri.contains("?") ?
                 joining("&", "&", "") :
-                joining("?", "&", "");
+                joining("&", "?", "");
     }
 
     private String encode(String str) {

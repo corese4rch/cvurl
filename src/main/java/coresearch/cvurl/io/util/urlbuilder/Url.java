@@ -67,16 +67,6 @@ public class Url {
         }
     }
 
-    /**
-     * Returns url as String. In case of malformed url throws {@link BadUrlException}.
-     *
-     * @return url as String
-     */
-    @Override
-    public String toString() {
-        return create().toString();
-    }
-
     private static String stripSlashesAndWhiteSpaces(String str) {
         return str.strip()
                 .replaceFirst("^/+", "")
