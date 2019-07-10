@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Class for building urls. Its only purpose is to build url endpoint and it doesn't handle query params.
  * If you want to add query params to your request use
- * {@link coresearch.cvurl.io.request.RequestBuilder#queryParam(String, String)} ur
+ * {@link coresearch.cvurl.io.request.RequestBuilder#queryParam(String, String)} or
  * {@link coresearch.cvurl.io.request.RequestBuilder#queryParams(Map)} method.
  */
 public class Url {
