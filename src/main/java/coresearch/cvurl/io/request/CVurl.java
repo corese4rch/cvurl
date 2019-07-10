@@ -44,9 +44,7 @@ public class CVurl {
      * @param genericMapper mapper with which CVurl will be created.
      */
     public CVurl(GenericMapper genericMapper) {
-        notNullParam(genericMapper, "genericMapper");
-
-        this.genericMapper = genericMapper;
+        this.genericMapper = notNullParam(genericMapper, "genericMapper");
         this.httpClient = HttpClient.newHttpClient();
         this.requestTimeout = null;
     }
@@ -58,10 +56,8 @@ public class CVurl {
      * @param configuration configuration with which CVurl will be created.
      */
     public CVurl(Configuration configuration) {
-        notNullParam(configuration, "configuration");
-
         this.genericMapper = MapperFactory.createDefault();
-        this.httpClient = getHttpClient(configuration);
+        this.httpClient = getHttpClient(notNullParam(configuration, "configuration"));
         this.requestTimeout = configuration.getRequestTimeout();
     }
 
@@ -72,11 +68,8 @@ public class CVurl {
      * @param configuration configuration with which CVurl will be created.
      */
     public CVurl(GenericMapper genericMapper, Configuration configuration) {
-        notNullParam(genericMapper, "genericMapper");
-        notNullParam(configuration, "configuration");
-
-        this.genericMapper = genericMapper;
-        this.httpClient = getHttpClient(configuration);
+        this.genericMapper = notNullParam(genericMapper, "genericMapper");
+        this.httpClient = getHttpClient(notNullParam(configuration, "configuration"));
         this.requestTimeout = configuration.getRequestTimeout();
     }
 
@@ -88,10 +81,9 @@ public class CVurl {
      * @param httpClient httpClient with which CVurl will be created.
      */
     public CVurl(HttpClient httpClient) {
-        notNullParam(httpClient, "httpClient");
-
         this.genericMapper = MapperFactory.createDefault();
-        this.httpClient = httpClient;
+        this.httpClient = notNullParam(httpClient, "httpClient");
+        ;
         this.requestTimeout = null;
     }
 
@@ -103,10 +95,8 @@ public class CVurl {
      * @param requestTimeout requestTimeout with which CVurl will be created.
      */
     public CVurl(HttpClient httpClient, Duration requestTimeout) {
-        notNullParam(httpClient, "httpClient");
-
         this.genericMapper = MapperFactory.createDefault();
-        this.httpClient = httpClient;
+        this.httpClient = notNullParam(httpClient, "httpClient");
         this.requestTimeout = requestTimeout;
     }
 
@@ -118,11 +108,8 @@ public class CVurl {
      * @param httpClient    httpClient with which CVurl will be created.
      */
     public CVurl(GenericMapper genericMapper, HttpClient httpClient) {
-        notNullParam(genericMapper, "genericMapper");
-        notNullParam(httpClient, "httpClient");
-
-        this.genericMapper = genericMapper;
-        this.httpClient = httpClient;
+        this.genericMapper = notNullParam(genericMapper, "genericMapper");
+        this.httpClient = notNullParam(httpClient, "httpClient");
         this.requestTimeout = null;
     }
 
@@ -135,11 +122,8 @@ public class CVurl {
      * @param requestTimeout requestTimeout with which CVurl will be created.
      */
     public CVurl(GenericMapper genericMapper, HttpClient httpClient, Duration requestTimeout) {
-        notNullParam(genericMapper, "genericMapper");
-        notNullParam(httpClient, "httpClient");
-
-        this.genericMapper = genericMapper;
-        this.httpClient = httpClient;
+        this.genericMapper = notNullParam(genericMapper, "genericMapper");
+        this.httpClient = notNullParam(httpClient, "httpClient");
         this.requestTimeout = requestTimeout;
     }
 
@@ -257,8 +241,8 @@ public class CVurl {
         return new RequestWithBodyBuilder(url, httpMethod, this.genericMapper, this.httpClient).timeout(requestTimeout);
     }
 
-    private void notNullParam(Object obj, String paramName) {
-        Objects.requireNonNull(format("%s parameter cannot be null", paramName));
+    private <T> T notNullParam(T obj, String paramName) {
+        return Objects.requireNonNull(obj, format("%s parameter cannot be null", paramName));
     }
 
     private static class HttpClientSingleton {
