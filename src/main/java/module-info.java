@@ -1,4 +1,4 @@
-module coresearch.curl.io {
+module coresearch.cvurl.io {
     exports coresearch.cvurl.io.mapper;
     exports coresearch.cvurl.io.exception;
     exports coresearch.cvurl.io.model;

@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
@@ -270,5 +269,18 @@ public class CVurlRequestTest extends AbstractRequestTest {
 
         //then
         assertEquals(response.status(), HttpStatus.OK);
+    }
+
+    @Test
+    public void responseWithStatusCode204AndNoContentLengthHeaderTest() {
+        //given
+        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse().withStatus(HttpStatus.NO_CONTENT)));
+
+        //when
+        var response = cvurl.GET(url).build().asString().orElseThrow(RuntimeException::new);
+
+        //then
+        assertEquals(response.status(), HttpStatus.NO_CONTENT);
     }
 }
