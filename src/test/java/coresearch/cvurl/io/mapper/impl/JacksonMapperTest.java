@@ -5,15 +5,16 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import coresearch.cvurl.io.helper.ObjectGenerator;
 import coresearch.cvurl.io.helper.model.User;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class JacksonMapperTest {
 
     private static JacksonMapper jacksonMapper;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -29,7 +30,7 @@ public class JacksonMapperTest {
 
         String expected = new ObjectMapper().writeValueAsString(user);
 
-        Assert.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -41,7 +42,7 @@ public class JacksonMapperTest {
 
         User actual = jacksonMapper.readValue(jsonString, User.class);
 
-        Assert.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
 }

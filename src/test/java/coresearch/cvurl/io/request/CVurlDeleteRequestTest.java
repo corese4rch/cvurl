@@ -8,14 +8,16 @@ import coresearch.cvurl.io.model.Response;
 import coresearch.cvurl.io.util.HttpHeader;
 import coresearch.cvurl.io.util.HttpStatus;
 import coresearch.cvurl.io.util.MIMEType;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CVurlDeleteRequestTest extends AbstractRequestTest {
 
@@ -35,8 +37,8 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
         WireMock.verify(WireMock.exactly(1),
                 WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
 
-        Assert.assertTrue(response.isSuccessful());
-        Assert.assertEquals(HttpStatus.OK, response.status());
+        assertTrue(response.isSuccessful());
+        assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
@@ -47,7 +49,7 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
         URL url = new URL(strURL);
 
         //when
-        wiremock.stubFor(WireMock.delete(WireMock.urlEqualTo(TEST_ENDPOINT))
+        WireMock.stubFor(WireMock.delete(WireMock.urlEqualTo(TEST_ENDPOINT))
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
@@ -57,8 +59,8 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
         WireMock.verify(WireMock.exactly(1),
                 WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
 
-        Assert.assertTrue(response.isSuccessful());
-        Assert.assertEquals(HttpStatus.OK, response.status());
+        assertTrue(response.isSuccessful());
+        assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
@@ -83,8 +85,8 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
         WireMock.verify(WireMock.exactly(1),
                 WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT + "?param=param")));
 
-        Assert.assertTrue(response.isSuccessful());
-        Assert.assertEquals(HttpStatus.OK, response.status());
+        assertTrue(response.isSuccessful());
+        assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
@@ -110,8 +112,8 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
                 WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT))
                         .withHeader(HttpHeader.AUTHORIZATION, WireMock.equalTo(TEST_TOKEN)));
 
-        Assert.assertTrue(response.isSuccessful());
-        Assert.assertEquals(HttpStatus.OK, response.status());
+        assertTrue(response.isSuccessful());
+        assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
@@ -139,8 +141,8 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
         WireMock.verify(WireMock.exactly(1),
                 WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT + "?param=param&param2=param2")));
 
-        Assert.assertTrue(response.isSuccessful());
-        Assert.assertEquals(HttpStatus.OK, response.status());
+        assertTrue(response.isSuccessful());
+        assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
@@ -169,8 +171,8 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
         WireMock.verify(WireMock.exactly(1),
                 WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
 
-        Assert.assertTrue(response.isSuccessful());
-        Assert.assertEquals(HttpStatus.OK, response.status());
+        assertTrue(response.isSuccessful());
+        assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
@@ -191,10 +193,10 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
         WireMock.verify(WireMock.exactly(1),
                 WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
 
-        Assert.assertTrue(response.isSuccessful());
-        Assert.assertEquals(HttpStatus.OK, response.status());
-        Assert.assertTrue(response.headersNames().contains(HttpHeader.AUTHORIZATION));
-        Assert.assertEquals(TEST_TOKEN, response.getHeaderValue(HttpHeader.AUTHORIZATION).get());
+        assertTrue(response.isSuccessful());
+        assertEquals(HttpStatus.OK, response.status());
+        assertTrue(response.headersNames().contains(HttpHeader.AUTHORIZATION));
+        assertEquals(TEST_TOKEN, response.getHeaderValue(HttpHeader.AUTHORIZATION).get());
     }
 
     @Test
@@ -216,9 +218,9 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
         WireMock.verify(WireMock.exactly(1),
                 WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
 
-        Assert.assertTrue(response.isSuccessful());
-        Assert.assertEquals(HttpStatus.OK, response.status());
-        Assert.assertEquals(body, response.getBody());
+        assertTrue(response.isSuccessful());
+        assertEquals(HttpStatus.OK, response.status());
+        assertEquals(body, response.getBody());
     }
 
     @Test
@@ -244,8 +246,8 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
         WireMock.verify(WireMock.exactly(1),
                 WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
 
-        Assert.assertTrue(response.isSuccessful());
-        Assert.assertEquals(HttpStatus.OK, response.status());
+        assertTrue(response.isSuccessful());
+        assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
@@ -271,8 +273,8 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
         WireMock.verify(WireMock.exactly(1),
                 WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
 
-        Assert.assertTrue(response.isSuccessful());
-        Assert.assertEquals(HttpStatus.OK, response.status());
+        assertTrue(response.isSuccessful());
+        assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
@@ -300,8 +302,8 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
         WireMock.verify(WireMock.exactly(1),
                 WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
 
-        Assert.assertTrue(response.isSuccessful());
-        Assert.assertEquals(HttpStatus.OK, response.status());
+        assertTrue(response.isSuccessful());
+        assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
@@ -328,7 +330,7 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
         WireMock.verify(WireMock.exactly(1),
                 WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
 
-        Assert.assertTrue(response.isSuccessful());
-        Assert.assertEquals(HttpStatus.OK, response.status());
+        assertTrue(response.isSuccessful());
+        assertEquals(HttpStatus.OK, response.status());
     }
 }

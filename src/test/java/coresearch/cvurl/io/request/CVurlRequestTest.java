@@ -10,16 +10,14 @@ import coresearch.cvurl.io.helper.model.User;
 import coresearch.cvurl.io.model.Configuration;
 import coresearch.cvurl.io.model.Response;
 import coresearch.cvurl.io.util.HttpStatus;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class CVurlRequestTest extends AbstractRequestTest {
@@ -39,7 +37,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
         assertEquals(EMPTY_STRING, response.getBody());
     }
 
-    @Test(expected = MappingException.class)
+    @Test
     public void mappingExceptionTest() {
 
         wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
@@ -47,7 +45,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withStatus(HttpStatus.OK)
                         .withBody("not a json string")));
 
-        cvurl.GET(url).build().asObject(User.class, HttpStatus.OK);
+        assertThrows(MappingException.class, () -> cvurl.GET(url).build().asObject(User.class, HttpStatus.OK));
     }
 
     @Test
@@ -176,14 +174,15 @@ public class CVurlRequestTest extends AbstractRequestTest {
         assertTrue(response.isEmpty());
     }
 
-    @Test(expected = UnexpectedResponseException.class)
+    @Test
     public void differentResponseStatusCodeTest() {
         //given
         wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
                 .willReturn(WireMock.aResponse().withStatus(HttpStatus.BAD_REQUEST)));
 
         //when
-        cvurl.GET(url).build().asObject(User.class, HttpStatus.OK);
+        assertThrows(UnexpectedResponseException.class,
+                () -> cvurl.GET(url).build().asObject(User.class, HttpStatus.OK));
     }
 
     @Test
@@ -201,9 +200,9 @@ public class CVurlRequestTest extends AbstractRequestTest {
         Response<List<String>> response = cvurl.GET(url).build().map(List::of).orElseThrow(RuntimeException::new);
 
         //then
-        Assert.assertTrue(response.isSuccessful());
-        Assert.assertEquals(HttpStatus.OK, response.status());
-        Assert.assertEquals(body, response.getBody().get(0));
+        assertTrue(response.isSuccessful());
+        assertEquals(HttpStatus.OK, response.status());
+        assertEquals(body, response.getBody().get(0));
     }
 
     @Test

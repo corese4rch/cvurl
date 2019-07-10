@@ -2,12 +2,12 @@ package coresearch.cvurl.io.request;
 
 import coresearch.cvurl.io.model.Configuration;
 import coresearch.cvurl.io.util.HttpClientMode;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.net.http.HttpClient;
 
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class CVurlTest {
 
