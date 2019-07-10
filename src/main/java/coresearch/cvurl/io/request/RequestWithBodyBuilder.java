@@ -14,8 +14,6 @@ import java.util.Collection;
  */
 public class RequestWithBodyBuilder extends RequestBuilder<RequestWithBodyBuilder> {
 
-    private HttpRequest.BodyPublisher bodyPublisher = HttpRequest.BodyPublishers.noBody();
-
     RequestWithBodyBuilder(String uri, HttpMethod method, GenericMapper genericMapper, HttpClient httpClient) {
         super(uri, method, genericMapper, httpClient);
     }
@@ -65,11 +63,4 @@ public class RequestWithBodyBuilder extends RequestBuilder<RequestWithBodyBuilde
         header(HttpHeader.CONTENT_TYPE, MIMEType.APPLICATION_JSON);
         return this;
     }
-
-    @Override
-    protected HttpRequest.Builder setUpHttpRequestBuilder() {
-        return super.setUpHttpRequestBuilder().method(method.name(), bodyPublisher);
-    }
-
-
 }

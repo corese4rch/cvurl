@@ -1,5 +1,7 @@
 package coresearch.cvurl.io.util;
 
+import static java.lang.String.format;
+
 public final class MIMEType {
 
     public static final String APPLICATION_JSON = "application/json; charset=UTF-8";
@@ -29,4 +31,8 @@ public final class MIMEType {
     public static final String TEXT_PLAIN = "text/plain";
 
     public static final String TEXT_XML = "text/xml";
+
+    private MIMEType(){
+        throw new IllegalStateException(format("Creating of class %s is forbidden", MIMEType.class.getName()));
+    }
 }

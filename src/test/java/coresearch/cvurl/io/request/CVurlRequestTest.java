@@ -226,4 +226,17 @@ public class CVurlRequestTest extends AbstractRequestTest {
         assertTrue(isThenApplyInvoked[0]);
         assertEquals(body, response.getBody().get(0));
     }
+
+    @Test
+    public void responseWithStatusCode204AndNoContentLengthHeaderTest() {
+        //given
+        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse().withStatus(HttpStatus.NO_CONTENT)));
+
+        //when
+        var response = cvurl.GET(url).build().asString().orElseThrow(RuntimeException::new);
+
+        //then
+        assertEquals(response.status(), HttpStatus.NO_CONTENT);
+    }
 }

@@ -1,5 +1,7 @@
 package coresearch.cvurl.io.util;
 
+import static java.lang.String.format;
+
 public final class HttpHeader {
 
     public static final String ACCEPT = "Accept";
@@ -111,4 +113,8 @@ public final class HttpHeader {
     public static final String WARNING = "Warning";
 
     public static final String WWW_AUTHENTICATE = "WWW-Authenticate";
+
+    private HttpHeader() {
+        throw new IllegalStateException(format("Creating of class %s is forbidden", HttpHeader.class.getName()));
+    }
 }
