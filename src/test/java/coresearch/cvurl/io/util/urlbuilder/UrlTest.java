@@ -26,7 +26,7 @@ public class UrlTest {
         var expectedResult = "http://www.google.com";
 
         //when
-        var resultUrl = Url.of(url).asString();
+        var resultUrl = Url.of(url).toString();
 
         //then
         assertEquals(expectedResult, resultUrl);
@@ -44,7 +44,7 @@ public class UrlTest {
         var expectedResult = "http://www.google.com";
 
         //when
-        var resultUrl = Url.of(schema, host).asString();
+        var resultUrl = Url.of(schema, host).toString();
 
         //then
         assertEquals(expectedResult, resultUrl);
@@ -58,7 +58,7 @@ public class UrlTest {
         var expectedResult = url + "/path";
 
         //when
-        var resultUrl = Url.of(url).path(path).asString();
+        var resultUrl = Url.of(url).path(path).toString();
 
         //then
         assertEquals(expectedResult, resultUrl);
@@ -72,7 +72,7 @@ public class UrlTest {
         var expectedUrl = url + "/" + path;
 
         //when
-        var resultUrl = Url.of(url).path(path).asString();
+        var resultUrl = Url.of(url).path(path).toString();
 
         //then
         assertEquals(expectedUrl, resultUrl);
@@ -85,7 +85,7 @@ public class UrlTest {
         var expectedUrl = new URL(url);
 
         //when
-        var resultUri = Url.of(url).asURL();
+        var resultUri = Url.of(url).create();
 
         //then
         assertEquals(expectedUrl, resultUri);
@@ -97,7 +97,7 @@ public class UrlTest {
         var badUrl = "shttp://www.google.com";
 
         //then
-        Assertions.assertThrows(BadUrlException.class, () -> Url.of(badUrl).asString());
+        Assertions.assertThrows(BadUrlException.class, () -> Url.of(badUrl).toString());
     }
 
     @Test
@@ -106,7 +106,7 @@ public class UrlTest {
         var badUrl = "shttp://www.google.com";
 
         //then
-        Assertions.assertThrows(BadUrlException.class, () -> Url.of(badUrl).asURL());
+        Assertions.assertThrows(BadUrlException.class, () -> Url.of(badUrl).create());
     }
 
     @Test
@@ -121,7 +121,7 @@ public class UrlTest {
 
         //then
         assertNotSame(url, urlWithPath);
-        assertEquals(url.asString(), urlStr);
-        assertEquals(urlWithPath.asString(), urlStr + "/" + path);
+        assertEquals(url.toString(), urlStr);
+        assertEquals(urlWithPath.toString(), urlStr + "/" + path);
     }
 }

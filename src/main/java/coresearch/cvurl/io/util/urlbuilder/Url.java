@@ -55,25 +55,26 @@ public class Url {
     }
 
     /**
-     * Returns url as String. In case of malformed url throws {@link BadUrlException}.
-     *
-     * @return url as String
-     */
-    public String asString() {
-        return asURL().toString();
-    }
-
-    /**
      * Returns url as {@link URL}. In case of malformed url throws {@link BadUrlException}.
      *
      * @return url as {@link URL}
      */
-    public URL asURL() {
+    public URL create() {
         try {
             return new URL(url);
         } catch (MalformedURLException e) {
             throw new BadUrlException(e.getMessage(), e);
         }
+    }
+
+    /**
+     * Returns url as String. In case of malformed url throws {@link BadUrlException}.
+     *
+     * @return url as String
+     */
+    @Override
+    public String toString() {
+        return create().toString();
     }
 
     private static String stripSlashesAndWhiteSpaces(String str) {
