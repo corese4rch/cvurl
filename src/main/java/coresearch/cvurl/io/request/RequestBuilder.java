@@ -24,6 +24,8 @@ public class RequestBuilder<T extends RequestBuilder<T>> {
 
     protected GenericMapper genericMapper;
     protected HttpMethod method;
+    protected HttpRequest.BodyPublisher bodyPublisher = HttpRequest.BodyPublishers.noBody();
+
     private String uri;
     private HttpClient httpClient;
     private Map<String, String> queryParams = new HashMap<>();
@@ -103,10 +105,10 @@ public class RequestBuilder<T extends RequestBuilder<T>> {
         return new Request(setUpHttpRequestBuilder().build(), httpClient, genericMapper);
     }
 
-    protected HttpRequest.Builder setUpHttpRequestBuilder() {
+    private HttpRequest.Builder setUpHttpRequestBuilder() {
         var builder = HttpRequest.newBuilder()
                 .uri(prepareURI())
-                .method(method.name(), HttpRequest.BodyPublishers.noBody());
+                .method(method.name(), bodyPublisher);
 
         timeout.ifPresent(builder::timeout);
 
