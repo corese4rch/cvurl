@@ -17,13 +17,12 @@ public class UrlTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "http://www.google.com",
             "http://www.google.com/",
-            "/http://www.google.com// "
+            "http://www.google.com// "
     })
     public void ofBasicUrlTest(String url) {
         //given
-        var expectedResult = "http://www.google.com";
+        var expectedResult = "http://www.google.com/";
 
         //when
         var resultUrl = Url.of(url).create().toString();
@@ -34,14 +33,13 @@ public class UrlTest {
 
     @ParameterizedTest
     @CsvSource(value = {
-            "http www.google.com",
+            "http www.google.com/",
             "http /www.google.com/",
-            "http:// /www.google.com/",
-            "http::/// /www.google.com// "
+            "http /www.google.com// "
     }, delimiter = ' ')
     public void ofSchemaAndHostTest(String schema, String host) {
         //given
-        var expectedResult = "http://www.google.com";
+        var expectedResult = "http://www.google.com/";
 
         //when
         var resultUrl = Url.of(schema, host).create().toString();
@@ -51,11 +49,11 @@ public class UrlTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"path", "/path", "/path/", " //path// "})
+    @ValueSource(strings = {"path/", " /path/", " //path// "})
     public void pathTest(String path) {
         //given
         var url = "http://www.google.com";
-        var expectedResult = url + "/path";
+        var expectedResult = url + "/path/";
 
         //when
         var resultUrl = Url.of(url).path(path).create().toString();
