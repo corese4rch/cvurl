@@ -131,7 +131,7 @@ public class Response<T> {
     /**
      * Returns value for specified header name.
      *
-     * @param headerName
+     * @param headerName header name.
      * @return optional of header value. Is empty if no header with such name exists.
      */
     public Optional<String> getHeaderValue(String headerName) {
@@ -143,7 +143,7 @@ public class Response<T> {
     /**
      * Return header values as list.
      *
-     * @param headerName
+     * @param headerName header name.
      * @return header values as list.
      */
     public List<String> getHeaderValuesAsList(String headerName) {

@@ -136,7 +136,6 @@ public final class Request {
             return genericMapper.readValue(response.body(), type);
 
         } catch (InterruptedException | IOException e) {
-            LOGGER.error("Error while sending request: {}", e.getMessage());
             throw new RequestExecutionException(e.getMessage(), e);
         }
     }

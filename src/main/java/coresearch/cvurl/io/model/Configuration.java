@@ -99,7 +99,7 @@ public class Configuration {
     /**
      * Creates {@link ConfigurationBuilder} used to build {@link Configuration} object.
      *
-     * @return
+     * @return new ConfigurationBuilder
      */
     public static ConfigurationBuilder builder() {
         return new ConfigurationBuilder();
@@ -361,7 +361,7 @@ public class Configuration {
          * that created from config with this mode will use the same {@link HttpClient}
          * configured on the first {@link coresearch.cvurl.io.request.CVurl} creation.
          *
-         * @param httpClientMode
+         * @param httpClientMode mode that defines scope of HttpClient.
          * @return this builder
          */
         public ConfigurationBuilder httpClientMode(HttpClientMode httpClientMode) {

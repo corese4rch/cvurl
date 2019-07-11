@@ -15,4 +15,8 @@ public class Validation {
     public static <T> T notNullParam(T obj, String paramName) {
         return Objects.requireNonNull(obj, format(ERROR_MESSAGE, paramName));
     }
+
+    private Validation() {
+        throw new IllegalStateException(format("Creating of class %s is forbidden", Validation.class.getName()));
+    }
 }

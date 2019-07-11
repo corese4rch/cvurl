@@ -7,7 +7,6 @@ import coresearch.cvurl.io.constant.MIMEType;
 
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.util.Collection;
 
 /**
  * Builder used to build {@link Request} with body. Used for all methods except GET.
