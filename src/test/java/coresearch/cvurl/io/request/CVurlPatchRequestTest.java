@@ -5,8 +5,8 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import coresearch.cvurl.io.helper.ObjectGenerator;
 import coresearch.cvurl.io.helper.model.User;
 import coresearch.cvurl.io.model.Response;
-import coresearch.cvurl.io.util.HttpHeader;
-import coresearch.cvurl.io.util.HttpStatus;
+import coresearch.cvurl.io.constant.HttpHeader;
+import coresearch.cvurl.io.constant.HttpStatus;
 import org.junit.jupiter.api.Test;
 
 import java.net.MalformedURLException;

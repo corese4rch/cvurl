@@ -2,7 +2,7 @@ package coresearch.cvurl.io.request;
 
 import coresearch.cvurl.io.mapper.MapperFactory;
 import coresearch.cvurl.io.model.Configuration;
-import coresearch.cvurl.io.util.HttpClientMode;
+import coresearch.cvurl.io.constant.HttpClientMode;
 import org.junit.jupiter.api.Test;
 
 import java.net.http.HttpClient;

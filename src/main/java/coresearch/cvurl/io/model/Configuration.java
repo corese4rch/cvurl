@@ -1,6 +1,6 @@
 package coresearch.cvurl.io.model;
 
-import coresearch.cvurl.io.util.HttpClientMode;
+import coresearch.cvurl.io.constant.HttpClientMode;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;

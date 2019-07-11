@@ -1,7 +1,7 @@
 package coresearch.cvurl.io.request;
 
 import coresearch.cvurl.io.mapper.GenericMapper;
-import coresearch.cvurl.io.util.HttpMethod;
+import coresearch.cvurl.io.constant.HttpMethod;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collector;
 import java.util.Optional;
 
 import static java.util.stream.Collectors.joining;
@@ -122,7 +123,13 @@ public class RequestBuilder<T extends RequestBuilder<T>> {
                 URI.create(uri +
                         this.queryParams.entrySet().stream()
                                 .map(entry -> encode(entry.getKey()) + "=" + encode(entry.getValue()))
-                                .collect(joining("&", "?", "")));
+                                .collect(joiningWithUri(uri)));
+    }
+
+    private Collector<CharSequence, ?, String> joiningWithUri(String uri) {
+        return uri.contains("?") ?
+                joining("&", "&", "") :
+                joining("&", "?", "");
     }
 
     private String encode(String str) {

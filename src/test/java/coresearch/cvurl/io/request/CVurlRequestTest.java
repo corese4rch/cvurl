@@ -3,15 +3,17 @@ package coresearch.cvurl.io.request;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.http.Fault;
+import coresearch.cvurl.io.constant.HttpStatus;
 import coresearch.cvurl.io.exception.MappingException;
 import coresearch.cvurl.io.exception.UnexpectedResponseException;
 import coresearch.cvurl.io.helper.ObjectGenerator;
 import coresearch.cvurl.io.helper.model.User;
 import coresearch.cvurl.io.model.Configuration;
 import coresearch.cvurl.io.model.Response;
-import coresearch.cvurl.io.util.HttpStatus;
 import org.junit.jupiter.api.Test;
 
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
@@ -225,6 +227,48 @@ public class CVurlRequestTest extends AbstractRequestTest {
 
         assertTrue(isThenApplyInvoked[0]);
         assertEquals(body, response.getBody().get(0));
+    }
+
+    @Test
+    public void urlWithParametersAsURLTest() throws MalformedURLException {
+        //given
+        var params = "?params=1";
+        var urlWithParameters = url + params;
+
+        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT + params + "&param2=2"))
+                .willReturn(WireMock.aResponse()
+                        .withStatus(HttpStatus.OK)));
+
+        //when
+        var response = cvurl.GET(URI.create(urlWithParameters).toURL())
+                .queryParam("param2", "2")
+                .build()
+                .asString()
+                .orElseThrow(RuntimeException::new);
+
+        //then
+        assertEquals(response.status(), HttpStatus.OK);
+    }
+
+    @Test
+    public void urlWithParametersAsStringTest() {
+        //given
+        var params = "?param1=1";
+        var urlWithParameters = url + params;
+
+        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT + params + "&param2=2"))
+                .willReturn(WireMock.aResponse()
+                        .withStatus(HttpStatus.OK)));
+
+        //when
+        var response = cvurl.GET(urlWithParameters)
+                .queryParam("param2", "2")
+                .build()
+                .asString()
+                .orElseThrow(RuntimeException::new);
+
+        //then
+        assertEquals(response.status(), HttpStatus.OK);
     }
 
     @Test
