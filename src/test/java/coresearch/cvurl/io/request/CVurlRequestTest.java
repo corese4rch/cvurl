@@ -3,13 +3,13 @@ package coresearch.cvurl.io.request;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.http.Fault;
+import coresearch.cvurl.io.constant.HttpStatus;
 import coresearch.cvurl.io.exception.MappingException;
 import coresearch.cvurl.io.exception.UnexpectedResponseException;
 import coresearch.cvurl.io.helper.ObjectGenerator;
 import coresearch.cvurl.io.helper.model.User;
 import coresearch.cvurl.io.model.Configuration;
 import coresearch.cvurl.io.model.Response;
-import coresearch.cvurl.io.util.HttpStatus;
 import org.junit.jupiter.api.Test;
 
 import java.net.MalformedURLException;

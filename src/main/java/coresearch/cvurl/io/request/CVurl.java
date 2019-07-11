@@ -3,8 +3,8 @@ package coresearch.cvurl.io.request;
 import coresearch.cvurl.io.mapper.GenericMapper;
 import coresearch.cvurl.io.mapper.MapperFactory;
 import coresearch.cvurl.io.model.Configuration;
-import coresearch.cvurl.io.util.HttpClientMode;
-import coresearch.cvurl.io.util.HttpMethod;
+import coresearch.cvurl.io.constant.HttpClientMode;
+import coresearch.cvurl.io.constant.HttpMethod;
 
 import java.net.URL;
 import java.net.http.HttpClient;

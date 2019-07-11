@@ -1,7 +1,7 @@
 package coresearch.cvurl.io.request;
 
 import coresearch.cvurl.io.mapper.GenericMapper;
-import coresearch.cvurl.io.util.HttpMethod;
+import coresearch.cvurl.io.constant.HttpMethod;
 
 import java.net.URI;
 import java.net.URLEncoder;

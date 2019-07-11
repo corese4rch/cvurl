@@ -1,9 +1,9 @@
 package coresearch.cvurl.io.request;
 
 import coresearch.cvurl.io.mapper.GenericMapper;
-import coresearch.cvurl.io.util.HttpHeader;
-import coresearch.cvurl.io.util.HttpMethod;
-import coresearch.cvurl.io.util.MIMEType;
+import coresearch.cvurl.io.constant.HttpHeader;
+import coresearch.cvurl.io.constant.HttpMethod;
+import coresearch.cvurl.io.constant.MIMEType;
 
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;

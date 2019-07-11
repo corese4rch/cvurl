@@ -139,7 +139,7 @@
                 <version>${jacoco-plugin.version}</version>
                 <configuration>
                     <excludes>
-                        <exclude>coresearch/cvurl/io/util/*</exclude>
+                        <exclude>coresearch/cvurl/io/constant/*</exclude>
                     </excludes>
                 </configuration>
                 <executions>
