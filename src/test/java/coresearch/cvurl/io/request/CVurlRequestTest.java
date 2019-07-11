@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.http.Fault;
 import coresearch.cvurl.io.constant.HttpStatus;
 import coresearch.cvurl.io.exception.MappingException;
+import coresearch.cvurl.io.exception.RequestExecutionException;
 import coresearch.cvurl.io.exception.UnexpectedResponseException;
 import coresearch.cvurl.io.helper.ObjectGenerator;
 import coresearch.cvurl.io.helper.model.User;
@@ -16,6 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
@@ -282,5 +284,31 @@ public class CVurlRequestTest extends AbstractRequestTest {
 
         //then
         assertEquals(response.status(), HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    public void queryParamsTest() {
+        //given
+        var queryParams = Map.of("param1", "val1", "param2", "val2");
+
+        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT + "?param1=val1&param2=val2"))
+                .willReturn(WireMock.ok()));
+
+        //when
+        var response = cvurl.GET(url).queryParams(queryParams).build().asString().orElseThrow(RuntimeException::new);
+
+        //then
+        assertEquals(HttpStatus.OK, response.status());
+
+    }
+
+    @Test
+    public void onSendErrorAsObjectShouldThrowRequestExecutionException() {
+        //given
+        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse().withFault(Fault.RANDOM_DATA_THEN_CLOSE)));
+
+        //then
+        assertThrows(RequestExecutionException.class, () -> cvurl.GET(url).build().asObject(User.class, 200));
     }
 }
