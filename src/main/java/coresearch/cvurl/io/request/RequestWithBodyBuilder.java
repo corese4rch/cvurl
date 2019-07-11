@@ -51,16 +51,4 @@ public class RequestWithBodyBuilder extends RequestBuilder<RequestWithBodyBuilde
         header(HttpHeader.CONTENT_TYPE, MIMEType.APPLICATION_JSON);
         return this;
     }
-
-    /**
-     * Sets request body.
-     *
-     * @param body request body
-     * @return this builder
-     */
-    public RequestWithBodyBuilder body(Collection<Object> body) {
-        bodyPublisher = HttpRequest.BodyPublishers.ofString(genericMapper.writeValue(body));
-        header(HttpHeader.CONTENT_TYPE, MIMEType.APPLICATION_JSON);
-        return this;
-    }
 }
