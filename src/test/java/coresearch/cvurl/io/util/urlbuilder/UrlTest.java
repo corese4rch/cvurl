@@ -1,19 +1,18 @@
 package coresearch.cvurl.io.util.urlbuilder;
 
 import coresearch.cvurl.io.exception.BadUrlException;
+import coresearch.cvurl.io.util.Url;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UrlTest {
+
+    private static final String VALIDATION_ERROR_MESSAGE = "%s parameter cannot be null";
 
     @ParameterizedTest
     @ValueSource(strings = {
@@ -99,5 +98,45 @@ public class UrlTest {
         assertNotSame(url, urlWithPath);
         assertEquals(url.create().toString(), urlStr);
         assertEquals(urlWithPath.create().toString(), urlStr + "/" + path);
+    }
+
+    @Test
+    public void ofWithNullUrlShouldThrowNPEWithMessage() {
+        //when
+        var nullPointerException = assertThrows(NullPointerException.class, () -> Url.of(null));
+
+        //then
+        assertEquals(nullPointerException.getMessage(), getValidationErrorMessage("url"));
+    }
+
+    @Test
+    public void ofWithNullSchemaShouldThrowNPEWithMessage() {
+        //when
+        var nullPointerException = assertThrows(NullPointerException.class, () -> Url.of(null, ""));
+
+        //then
+        assertEquals(nullPointerException.getMessage(), getValidationErrorMessage("schema"));
+    }
+
+    @Test
+    public void ofWithNullHostShouldThrowNPEWithMessage() {
+        //when
+        var nullPointerException = assertThrows(NullPointerException.class, () -> Url.of("", null));
+
+        //then
+        assertEquals(nullPointerException.getMessage(), getValidationErrorMessage("host"));
+    }
+
+    @Test
+    public void pathWithNullPathShouldThrowNPEWithMessage() {
+        //when
+        var nullPointerException = assertThrows(NullPointerException.class, () -> Url.of("url").path(null));
+
+        //then
+        assertEquals(nullPointerException.getMessage(), getValidationErrorMessage("path"));
+    }
+
+    private String getValidationErrorMessage(String paramName) {
+        return String.format(VALIDATION_ERROR_MESSAGE, paramName);
     }
 }

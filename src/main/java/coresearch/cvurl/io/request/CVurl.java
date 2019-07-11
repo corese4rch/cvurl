@@ -9,11 +9,10 @@ import coresearch.cvurl.io.util.HttpMethod;
 import java.net.URL;
 import java.net.http.HttpClient;
 import java.time.Duration;
-import java.util.Objects;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static java.lang.String.format;
+import static coresearch.cvurl.io.util.Validation.notNullParam;
 
 /**
  * Central part of the lib. Used to initiate {@link Request} creation with proper {@link GenericMapper} and
@@ -83,7 +82,6 @@ public class CVurl {
     public CVurl(HttpClient httpClient) {
         this.genericMapper = MapperFactory.createDefault();
         this.httpClient = notNullParam(httpClient);
-        ;
         this.requestTimeout = null;
     }
 
@@ -239,10 +237,6 @@ public class CVurl {
 
     private RequestWithBodyBuilder createRequestWBody(String url, HttpMethod httpMethod) {
         return new RequestWithBodyBuilder(url, httpMethod, this.genericMapper, this.httpClient).timeout(requestTimeout);
-    }
-
-    private <T> T notNullParam(T obj) {
-        return Objects.requireNonNull(obj, format("%s parameter cannot be null", obj.getClass().getSimpleName()));
     }
 
     private static class HttpClientSingleton {

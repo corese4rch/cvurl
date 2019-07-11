@@ -1,4 +1,4 @@
-package coresearch.cvurl.io.util.urlbuilder;
+package coresearch.cvurl.io.util;
 
 import coresearch.cvurl.io.exception.BadUrlException;
 
@@ -6,6 +6,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import static coresearch.cvurl.io.util.Validation.notNullParam;
 
 /**
  * Class for building urls. Its only purpose is to build url endpoint and it doesn't handle query params.
@@ -31,6 +33,7 @@ public class Url {
      * @return new Url object
      */
     public static Url of(String url) {
+        notNullParam(url, "url");
         return new Url(url);
     }
 
@@ -42,8 +45,9 @@ public class Url {
      * @return new Url object
      */
     public static Url of(String schema, String host) {
-        return new Url(
-                schema.strip() + "://" + host);
+        notNullParam(schema, "schema");
+        notNullParam(host, "host");
+        return new Url(schema.strip() + "://" + host);
     }
 
     /**
@@ -53,9 +57,8 @@ public class Url {
      * @return new Url object build out of current url + "/" + path
      */
     public Url path(String path) {
-        String newUrl = this.url + "/" + path;
-
-        return new Url(newUrl);
+        notNullParam(path, "path");
+        return new Url(this.url + "/" + path);
     }
 
     /**
@@ -76,7 +79,6 @@ public class Url {
         return DOUBLE_SLASHES_PATTERN
                 .matcher(WHITESPACES_PATTERN.matcher(str).replaceAll(""))
                 .replaceAll("/");
-
     }
 }
 
