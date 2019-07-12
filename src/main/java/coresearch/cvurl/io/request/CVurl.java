@@ -132,7 +132,7 @@ public class CVurl {
      * @return RequestBuilder
      */
     public RequestBuilder GET(String url) {
-        return createRequest(url, HttpMethod.GET);
+        return createGetRequest(url);
     }
 
     /**
@@ -143,7 +143,7 @@ public class CVurl {
      */
 
     public RequestBuilder GET(URL url) {
-        return createRequest(url.toString(), HttpMethod.GET);
+        return createGetRequest(url.toString());
     }
 
     /**
@@ -231,8 +231,8 @@ public class CVurl {
                 configuration.createHttpClient() : HttpClientSingleton.getClient(configuration);
     }
 
-    private RequestBuilder createRequest(String url, HttpMethod httpMethod) {
-        return new RequestBuilder(url, httpMethod, this.genericMapper, this.httpClient).timeout(requestTimeout);
+    private RequestBuilder createGetRequest(String url) {
+        return new RequestBuilder(url, HttpMethod.GET, this.genericMapper, this.httpClient).timeout(requestTimeout);
     }
 
     private RequestWithBodyBuilder createRequestWBody(String url, HttpMethod httpMethod) {

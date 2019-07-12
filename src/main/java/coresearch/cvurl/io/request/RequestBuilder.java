@@ -47,6 +47,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> {
      * @param value header value
      * @return this builder
      */
+    @SuppressWarnings("unchecked")
     public T header(String key, String value) {
         this.headers.put(key, value);
         return (T) this;
@@ -58,6 +59,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> {
      * @param headers headers name/value map
      * @return this builder
      */
+    @SuppressWarnings("unchecked")
     public T headers(Map<String, String> headers) {
         this.headers.putAll(headers);
         return (T) this;
@@ -70,6 +72,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> {
      * @param value query parameter value
      * @return this builder
      */
+    @SuppressWarnings("unchecked")
     public T queryParam(String name, String value) {
         this.queryParams.put(name, value);
         return (T) this;
@@ -81,6 +84,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> {
      * @param queryParams query parameters name/value map
      * @return this builder
      */
+    @SuppressWarnings("unchecked")
     public T queryParams(Map<String, String> queryParams) {
         this.queryParams.putAll(queryParams);
         return (T) this;
@@ -92,6 +96,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> {
      * @param timeout request timeout
      * @return this builder
      */
+    @SuppressWarnings("unchecked")
     public T timeout(Duration timeout) {
         this.timeout = Optional.ofNullable(timeout);
         return (T) this;

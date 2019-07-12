@@ -249,7 +249,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                 .orElseThrow(RuntimeException::new);
 
         //then
-        assertEquals(response.status(), HttpStatus.OK);
+        assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
@@ -270,7 +270,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                 .orElseThrow(RuntimeException::new);
 
         //then
-        assertEquals(response.status(), HttpStatus.OK);
+        assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
@@ -283,7 +283,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
         var response = cvurl.GET(url).build().asString().orElseThrow(RuntimeException::new);
 
         //then
-        assertEquals(response.status(), HttpStatus.NO_CONTENT);
+        assertEquals(HttpStatus.NO_CONTENT, response.status());
     }
 
     @Test
