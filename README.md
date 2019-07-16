@@ -210,25 +210,34 @@ public void cvurl() {
     }
 ```
 Simple as a pie.
-Interested? We encourage You to use cVurl on your own!
+Interested? We encourage You to try cVurl!
 
  ##How to get cVurl
  Well, simple as everything else about cVurl.
  
  **Maven**
- > //TODO;
- 
+ ```xml
+<dependecies>
+    <dependency>
+        <groupId>com.github.corese4rch</groupId>
+        <artifactId>cvurl-io</artifactId>
+        <version>0.9</version>
+    </dependency>
+</dependencies>
+```
  **Gradle**
- > //TODO:
+```groovy
+compile group: 'com.github.corese4rch', name: 'cvurl-io', version: '0.9'
+```
    
  ## Examples
- More can be found at [example repository](https://github.com/yorekKap/cvurl-examples)
+ More can be found at [example repository](https://github.com/corese4rch/cvurl-examples)
  
  Usage examples:
- * [spring-boot example](https://github.com/yorekKap/cvurl-examples/tree/master/cvurl-usage-spring-boot)
- * [plain java 11 example](https://github.com/yorekKap/cvurl-examples/tree/master/cvurl-usage-plain-java)
- * [micronaut example](https://github.com/yorekKap/cvurl-examples/tree/master/cvurl-usage-micronaut)
- * [quarkus example](https://github.com/yorekKap/cvurl-examples/tree/master/cvurl-usage-quarkus) 
+ * [spring-boot example](https://github.com/corese4rch/cvurl-examples/tree/master/cvurl-usage-spring-boot)
+ * [plain java 11 example](https://github.com/corese4rch/cvurl-examples/tree/master/cvurl-usage-plain-java)
+ * [micronaut example](https://github.com/corese4rch/cvurl-examples/tree/master/cvurl-usage-micronaut)
+ * [quarkus example](https://github.com/corese4rch/cvurl-examples/tree/master/cvurl-usage-quarkus) 
  
    
  ## License
