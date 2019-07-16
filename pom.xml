@@ -207,7 +207,7 @@
         </plugins>
     </build>
 
-    <!-- GPG Signature-->
+    <!-- OSSRH deployment-->
     <profiles>
         <profile>
             <id>ossrh</id>
