@@ -9,8 +9,6 @@ import coresearch.cvurl.io.constant.HttpMethod;
 import java.net.URL;
 import java.net.http.HttpClient;
 import java.time.Duration;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static coresearch.cvurl.io.util.Validation.notNullParam;
 
@@ -241,21 +239,16 @@ public class CVurl {
 
     private static class HttpClientSingleton {
 
-        private static final Lock lock = new ReentrantLock();
         private static volatile HttpClient httpClient;
 
         static HttpClient getClient(Configuration configuration) {
             HttpClient client = httpClient;
             if (null == client) {
-                lock.lock();
-                try {
+                synchronized (HttpClientSingleton.class) {
                     client = httpClient;
                     if (null == client) {
-                        client = configuration.createHttpClient();
-                        httpClient = client;
+                        httpClient = client = configuration.createHttpClient();
                     }
-                } finally {
-                    lock.unlock();
                 }
             }
             return client;
