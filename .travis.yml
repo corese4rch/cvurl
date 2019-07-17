@@ -6,4 +6,7 @@ jdk:
   - openjdk12
 
 after_success:
-  - mvn clean test jacoco:report coveralls:report
+  - |
+    if [ "${JAVA_HOME}" = "/home/travis/openjdk12" ]; then
+      mvn jacoco:report coveralls:report
+    fi
