@@ -39,8 +39,8 @@ d88' `"Y8    `888. .8'    `888  `888  `888""8P  888
             <scope>provided</scope>
         </dependency>
 ```
- So, there is nothing hidden from you or transitive. If you decide to use smth different from [Jackson](https://github.com/FasterXML/jackson), ou shouldn't be worried about the first dependency. 
- On the other hand, if yu do use Jackson  - just leave it as is, we will create default ObjectMapper for you under the hood.
+ So, there is nothing hidden from you or transitive. If you decide to use smth different from [Jackson](https://github.com/FasterXML/jackson), you shouldn't be worried about the first dependency. 
+ On the other hand, if you do use Jackson  - just leave it as is, we will create default ObjectMapper for you under the hood.
 And there is a high chance you will use some logging library so [Slf4j](https://github.com/qos-ch/slf4j) shouldn't be an unexpected resident in your build file.   
  
 ## Concept
