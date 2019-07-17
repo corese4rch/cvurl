@@ -4,3 +4,9 @@ jdk:
   - oraclejdk12
   - openjdk11
   - openjdk12
+
+after_success:
+  - |
+    if [ "${JAVA_HOME}" = "/home/travis/openjdk12" ]; then
+      mvn jacoco:report coveralls:report
+    fi

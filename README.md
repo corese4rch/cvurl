@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/github/corese4rch/cvurl/badge.svg?branch=dev)](https://coveralls.io/github/corese4rch/cvurl?branch=dev)
+[![Build Status](https://travis-ci.com/corese4rch/cvurl.svg?branch=dev)](https://travis-ci.com/corese4rch/cvurl)
 [![GNU License](https://img.shields.io/badge/license-GNU%20GPL%20v3-green.svg)](https://github.com/corese4rch/cvurl/blob/master/LICENSE)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.corese4rch/cvurl-io/badge.svg)](https://search.maven.org/search?q=g:com.github.corese4rch%20AND%20a:cvurl-io)
 
