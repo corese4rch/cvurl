@@ -4,3 +4,6 @@ jdk:
   - oraclejdk12
   - openjdk11
   - openjdk12
+
+after_success:
+  - mvn clean test jacoco:report coveralls:report
