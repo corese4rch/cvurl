@@ -1,7 +1,9 @@
+[![Coverage Status](https://coveralls.io/repos/github/corese4rch/cvurl/badge.svg?branch=code-coverage-and-builds-badges)](https://coveralls.io/github/corese4rch/cvurl?branch=code-coverage-and-builds-badges)
+[![Build Status](https://travis-ci.com/corese4rch/cvurl.svg?branch=dev)](https://travis-ci.com/corese4rch/cvurl)
 [![GNU License](https://img.shields.io/badge/license-GNU%20GPL%20v3-green.svg)](https://github.com/corese4rch/cvurl/blob/master/LICENSE)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.corese4rch/cvurl-io/badge.svg)](https://search.maven.org/search?q=g:com.github.corese4rch%20AND%20a:cvurl-io)
 
-## cVurl is an open-source wrapper for an [Java HTTP/2 Client](https://openjdk.java.net/groups/net/httpclient/intro.html). 
+## cVurl is an open-source wrapper for [Java HTTP/2 Client](https://openjdk.java.net/groups/net/httpclient/intro.html). 
 <pre>
 
           oooooo     oooo                      oooo  
@@ -19,8 +21,7 @@ d88' `"Y8    `888. .8'    `888  `888  `888""8P  888
  (mostly because of this [issue](https://bugs.openjdk.java.net/browse/JDK-8211437))
  
 ## Dependencies
- **cVurl** is made purely with Java 11 and one of our goals was to bring as less dependencies to your project as possible.
- The only dependencies that will be added to your project are:
+ **cVurl** is made purely with Java 11 and one of our goals was to bring as fewer dependencies to your project as possible. The only dependencies that will be added to your project are:
  
  ```java
         //(1)
@@ -38,17 +39,12 @@ d88' `"Y8    `888. .8'    `888  `888  `888""8P  888
             <scope>provided</scope>
         </dependency>
 ```
- So, there are nothing hidden from you or transitive. If You decide to use smth different from [Jackson](https://github.com/FasterXML/jackson),
- You shouldn't be worried about first dependency. 
- On the other hand, if You do use Jackson us should just leave it as a dependency, we will crete default ObjectMapper for You under the hood.
- And, with high chance, You, most likely, will use some logging library so [Slf4j](https://github.com/qos-ch/slf4j) shouldn't be an unexpected resident in your build file.   
+ So, there is nothing hidden from you or transitive. If you decide to use smth different from [Jackson](https://github.com/FasterXML/jackson), you shouldn't be worried about the first dependency. 
+ On the other hand, if you do use Jackson  - just leave it as is, we will create default ObjectMapper for you under the hood.
+And there is a high chance you will use some logging library so [Slf4j](https://github.com/qos-ch/slf4j) shouldn't be an unexpected resident in your build file.   
  
 ## Concept
- The idea behind this project is very simple - Make a life of developers a little bit easier.
- During our work we heavily use different HTTP clients: 
- Spring's RestTemplate, Feign, plain OkHttp3/OkHttp4, then (with switching to Java 11+) 
- we start using Java native HTTP/2 Client.
- Even though all of listed above are a great tools, every time we weren't totally happy :(.
+The idea behind this project is very simple - Make developers’ life a little bit easier. During our work we heavily use different HTTP clients: Spring's RestTemplate, Feign, plain OkHttp3/OkHttp4, then (with switching to Java 11+) we start using Java native HTTP/2 Client. Even though all the tools listed above are great, each time there was something we weren't totally happy with:(.
  
  Let's take a look at this simple example:
  
@@ -94,8 +90,7 @@ public void javaHttp() {
     }
 ``` 
 
-We, at [CoreValue](https://corevalue.com.ua/) didn't like checked Exceptions at all. What we didn't like even more, that's the null checks.
-So We come up with something like this:
+We, at [CoreValue](https://corevalue.com.ua/) didn't like checked Exceptions at all. What we didn't like even more, that's the null checks. So we have come up with something like this:
 
 ```java
 public void cvurl() {
@@ -110,11 +105,11 @@ public void cvurl() {
         System.out.println("CVurl GET: " + response.getBody());
     }
 ```    
-Looks much nicer, isn't it? :)
+Looks much better, doesn't it? ;)
 
-_What about something a little bit complicated, like a POST request?_
+_What about something a little bit more complicated, like a POST request?_
 
-For a simplicity of examples below we will use this data structure:
+To simplify the examples below, we will use the following data structure:
 ```java
     @Data //Lombok annotation
     public class Result {
@@ -214,11 +209,11 @@ public void cvurl() {
         System.out.println("CVurl POST: " + result);
     }
 ```
-Simple as a pie.
-Interested? We encourage You to try cVurl!
+Easy  as pie. 
+Interested? We encourage you to try cVurl!
 
 ## How to get cVurl
- Well, simple as everything else about cVurl.
+ Well, as simply as everything else about cVurl.
  
  **Maven**
  ```xml
@@ -236,7 +231,7 @@ compile group: 'com.github.corese4rch', name: 'cvurl-io', version: '0.9'
 ```
    
 ## Examples
- More can be found at [example repository](https://github.com/corese4rch/cvurl-examples)
+ More examples can be found at [example repository](https://github.com/corese4rch/cvurl-examples)
  
  Usage examples:
  * [spring-boot example](https://github.com/corese4rch/cvurl-examples/tree/master/cvurl-usage-spring-boot)
