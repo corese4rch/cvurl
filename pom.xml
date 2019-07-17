@@ -181,6 +181,13 @@
                 <version>${maven-failsafe-plugin.version}</version>
             </plugin>
 
+            <!--Coveralls plugin-->
+            <plugin>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>${coveralls-plugin.version}</version>
+            </plugin>
+
             <!-- jacoco plugin -->
             <plugin>
                 <groupId>org.jacoco</groupId>
@@ -277,13 +284,6 @@
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin>
-
-                    <!--Coveralls plugin-->
-                    <plugin>
-                        <groupId>org.eluder.coveralls</groupId>
-                        <artifactId>coveralls-maven-plugin</artifactId>
-                        <version>${coveralls-plugin.version}</version>
                     </plugin>
                 </plugins>
             </build>
