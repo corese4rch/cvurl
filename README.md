@@ -1,19 +1,24 @@
- ## cVurl is an open-source wrapper for an [Java HTTP/2 Client](https://openjdk.java.net/groups/net/httpclient/intro.html). 
+[![GNU License](https://img.shields.io/badge/license-GNU%20GPL%20v3-green.svg)](https://github.com/corese4rch/cvurl/blob/master/LICENSE)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.corese4rch/cvurl-io/badge.svg)](https://search.maven.org/search?q=g:com.github.corese4rch%20AND%20a:cvurl-io)
+
+## cVurl is an open-source wrapper for an [Java HTTP/2 Client](https://openjdk.java.net/groups/net/httpclient/intro.html). 
 <pre>
+
           oooooo     oooo                      oooo  
            `888.     .8'                       `888  
  .ooooo.    `888.   .8'   oooo  oooo  oooo d8b  888  
 d88' `"Y8    `888. .8'    `888  `888  `888""8P  888  
 888           `888.8'      888   888   888      888  
 888   .o8      `888'       888   888   888      888  
-`Y8bod8P'       `8'        `V88V"V8P' d888b    o888o                                                      
+`Y8bod8P'       `8'        `V88V"V8P' d888b    o888o    
+                                                  
 </pre>
 
- ## Requirements 
+## Requirements 
  **cVurl** is written in java11 and can be used with any jdk11.0.2 and higher
  (mostly because of this [issue](https://bugs.openjdk.java.net/browse/JDK-8211437))
  
- ## Dependencies
+## Dependencies
  **cVurl** is made purely with Java 11 and one of our goals was to bring as less dependencies to your project as possible.
  The only dependencies that will be added to your project are:
  
@@ -38,7 +43,7 @@ d88' `"Y8    `888. .8'    `888  `888  `888""8P  888
  On the other hand, if You do use Jackson us should just leave it as a dependency, we will crete default ObjectMapper for You under the hood.
  And, with high chance, You, most likely, will use some logging library so [Slf4j](https://github.com/qos-ch/slf4j) shouldn't be an unexpected resident in your build file.   
  
- ## Concept
+## Concept
  The idea behind this project is very simple - Make a life of developers a little bit easier.
  During our work we heavily use different HTTP clients: 
  Spring's RestTemplate, Feign, plain OkHttp3/OkHttp4, then (with switching to Java 11+) 
@@ -212,7 +217,7 @@ public void cvurl() {
 Simple as a pie.
 Interested? We encourage You to try cVurl!
 
- ## How to get cVurl
+## How to get cVurl
  Well, simple as everything else about cVurl.
  
  **Maven**
@@ -230,7 +235,7 @@ Interested? We encourage You to try cVurl!
 compile group: 'com.github.corese4rch', name: 'cvurl-io', version: '0.9'
 ```
    
- ## Examples
+## Examples
  More can be found at [example repository](https://github.com/corese4rch/cvurl-examples)
  
  Usage examples:
@@ -240,6 +245,6 @@ compile group: 'com.github.corese4rch', name: 'cvurl-io', version: '0.9'
  * [quarkus example](https://github.com/corese4rch/cvurl-examples/tree/master/cvurl-usage-quarkus) 
  
    
- ## License
+## License
  >  Copyright 2019 Core Value, Inc. Licensed under GNU GPLv3 
   
