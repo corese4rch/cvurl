@@ -45,6 +45,7 @@
         <maven-enforcer-plugin.version>3.0.0-M2</maven-enforcer-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <coveralls-plugin.version>4.3.0</coveralls-plugin.version>
+        <jaxb-api.version>2.3.1</jaxb-api.version>
     </properties>
 
     <dependencies>
@@ -60,7 +61,6 @@
             <version>${slf4j-api.version}</version>
             <scope>provided</scope>
         </dependency>
-
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.mockito</groupId>
@@ -186,6 +186,13 @@
                 <groupId>org.eluder.coveralls</groupId>
                 <artifactId>coveralls-maven-plugin</artifactId>
                 <version>${coveralls-plugin.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>javax.xml.bind</groupId>
+                        <artifactId>jaxb-api</artifactId>
+                        <version>${jaxb-api.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <!-- jacoco plugin -->
