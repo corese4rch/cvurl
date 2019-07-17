@@ -1,4 +1,5 @@
 [![Coverage Status](https://coveralls.io/repos/github/corese4rch/cvurl/badge.svg?branch=dev)](https://coveralls.io/github/corese4rch/cvurl?branch=dev)
+[![Build Status](https://travis-ci.com/corese4rch/cvurl.svg?branch=dev)](https://travis-ci.com/corese4rch/cvurl)
  ## cVurl is an open-source wrapper for an [Java HTTP/2 Client](https://openjdk.java.net/groups/net/httpclient/intro.html). 
 <pre>
           oooooo     oooo                      oooo  
