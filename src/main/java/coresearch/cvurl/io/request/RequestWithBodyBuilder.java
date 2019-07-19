@@ -4,6 +4,7 @@ import coresearch.cvurl.io.mapper.GenericMapper;
 import coresearch.cvurl.io.constant.HttpHeader;
 import coresearch.cvurl.io.constant.HttpMethod;
 import coresearch.cvurl.io.constant.MIMEType;
+import coresearch.cvurl.io.multipart.MultipartBody;
 
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -48,6 +49,12 @@ public class RequestWithBodyBuilder extends RequestBuilder<RequestWithBodyBuilde
     public RequestWithBodyBuilder body(Object body) {
         bodyPublisher = HttpRequest.BodyPublishers.ofString(genericMapper.writeValue(body));
         header(HttpHeader.CONTENT_TYPE, MIMEType.APPLICATION_JSON);
+        return this;
+    }
+
+    public RequestWithBodyBuilder body(MultipartBody multipartBody) {
+        bodyPublisher = HttpRequest.BodyPublishers.ofByteArrays(multipartBody.asByteArrays());
+        header(HttpHeader.CONTENT_TYPE, "multipart/" + multipartBody.getMultipartType() + ";boundary=" + multipartBody.getBoundary());
         return this;
     }
 }

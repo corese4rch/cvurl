@@ -38,6 +38,8 @@ public final class HttpHeader {
 
     public static final String CONTENT_TYPE = "Content-Type";
 
+    public static final String CONTENT_DISPOSITION = "Content-Disposition";
+
     public static final String DATE = "Date";
 
     public static final String DAV = "Dav";
