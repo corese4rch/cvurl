@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -48,7 +49,7 @@ public final class Request {
      */
     public <T> CompletableFuture<T> asyncAsObject(Class<T> type, int statusCode) {
         return this.httpClient.sendAsync(httpRequest, BodyHandlers.ofString())
-                .thenApply(response -> sendRequestForObject(type, statusCode));
+                .thenApply((response -> parseResponse(response, type, statusCode)));
     }
 
     /**
@@ -58,7 +59,7 @@ public final class Request {
      */
     public CompletableFuture<Response<String>> asyncAsString() {
         return this.httpClient.sendAsync(httpRequest, BodyHandlers.ofString())
-                .thenApply(response -> new Response<>(response.body(), response));
+                .thenApply(Response::new);
     }
 
     /**
@@ -70,8 +71,8 @@ public final class Request {
      * @return {@link CompletableFuture} with returned response with mapped body.
      */
     public <T> CompletableFuture<Response<T>> asyncMap(Function<String, T> bodyMapper) {
-        return this.httpClient.sendAsync(httpRequest, BodyHandlers.ofString())
-                .thenApply(response -> new Response<>(bodyMapper.apply(response.body()), response));
+        return this.httpClient.sendAsync(httpRequest, new StringMappingBodyHandler<>(bodyMapper))
+                .thenApply(Response::new);
     }
 
     /**
@@ -98,7 +99,11 @@ public final class Request {
      * request sending or empty {@link Optional} otherwise.
      */
     public Optional<Response<String>> asString() {
-        return sendRequestAndConvertResponseBody(Function.identity());
+        return sendRequestAndHandleExceptions(BodyHandlers.ofString());
+    }
+
+    public Optional<Response<InputStream>> asInputStream() {
+        return sendRequestAndHandleExceptions(BodyHandlers.ofInputStream());
     }
 
     /**
@@ -111,13 +116,13 @@ public final class Request {
      * request sending or empty {@link Optional} otherwise.
      */
     public <T> Optional<Response<T>> map(Function<String, T> bodyMapper) {
-        return sendRequestAndConvertResponseBody(bodyMapper);
+        return sendRequestAndHandleExceptions(new StringMappingBodyHandler<>(bodyMapper));
     }
 
-    private <T> Optional<Response<T>> sendRequestAndConvertResponseBody(Function<String, T> responseBodyConverter) {
+    private <T> Optional<Response<T>> sendRequestAndHandleExceptions(HttpResponse.BodyHandler<T> bodyHandler) {
         try {
-            HttpResponse<String> response = sendRequest();
-            return Optional.of(new Response<>(responseBodyConverter.apply(response.body()), response));
+            HttpResponse<T> response = sendRequest(bodyHandler);
+            return Optional.of(new Response<>(response));
 
         } catch (InterruptedException | IOException e) {
             LOGGER.error("Error while sending request: {}", e.getMessage());
@@ -127,21 +132,25 @@ public final class Request {
 
     private <T> T sendRequestForObject(Class<T> type, int statusCode) {
         try {
-            HttpResponse<String> response = sendRequest();
-            if (response.statusCode() != statusCode) {
-                throw new UnexpectedResponseException("Received response with status code: " + response.statusCode() +
-                        ",expected: " + statusCode + ";Response: " + response.body(),
-                        new Response<>(response.body(), response));
-            }
-            return genericMapper.readValue(response.body(), type);
+            HttpResponse<String> response = sendRequest(BodyHandlers.ofString());
+            return parseResponse(response, type, statusCode);
 
         } catch (InterruptedException | IOException e) {
             throw new RequestExecutionException(e.getMessage(), e);
         }
     }
 
-    private HttpResponse<String> sendRequest() throws IOException, InterruptedException {
+    private <T> T parseResponse(HttpResponse<String> response, Class<T> type, int statusCode) {
+        if (response.statusCode() != statusCode) {
+            throw new UnexpectedResponseException("Received response with status code: " + response.statusCode() +
+                    ",expected: " + statusCode + ";Response: " + response.body(),
+                    new Response<>(response));
+        }
+        return genericMapper.readValue(response.body(), type);
+    }
+
+    private <T> HttpResponse<T> sendRequest(HttpResponse.BodyHandler<T> bodyHandler) throws IOException, InterruptedException {
         LOGGER.info("Sending request {}", this.httpRequest);
-        return this.httpClient.send(this.httpRequest, BodyHandlers.ofString());
+        return this.httpClient.send(this.httpRequest, bodyHandler);
     }
 }
