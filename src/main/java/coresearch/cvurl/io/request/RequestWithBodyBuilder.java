@@ -9,10 +9,14 @@ import coresearch.cvurl.io.multipart.MultipartBody;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 
+import static java.lang.String.format;
+
 /**
  * Builder used to build {@link Request} with body. Used for all methods except GET.
  */
 public class RequestWithBodyBuilder extends RequestBuilder<RequestWithBodyBuilder> {
+
+    private static final String MULTIPART_HEADER_TEMPLATE = "multipart/%s;boundary=%s";
 
     RequestWithBodyBuilder(String uri, HttpMethod method, GenericMapper genericMapper, HttpClient httpClient) {
         super(uri, method, genericMapper, httpClient);
@@ -54,7 +58,8 @@ public class RequestWithBodyBuilder extends RequestBuilder<RequestWithBodyBuilde
 
     public RequestWithBodyBuilder body(MultipartBody multipartBody) {
         bodyPublisher = HttpRequest.BodyPublishers.ofByteArrays(multipartBody.asByteArrays());
-        header(HttpHeader.CONTENT_TYPE, "multipart/" + multipartBody.getMultipartType() + ";boundary=" + multipartBody.getBoundary());
+        header(HttpHeader.CONTENT_TYPE,
+                format(MULTIPART_HEADER_TEMPLATE, multipartBody.getMultipartType(), multipartBody.getBoundary()));
         return this;
     }
 }

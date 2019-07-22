@@ -12,12 +12,14 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static coresearch.cvurl.io.util.Validation.notNullParam;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class MultipartBody {
 
-    private static final String CONTENT_DISPOSITION_HEADER = "form-data; name=\"%s\"";
-    private static final String CONTENT_DISPOSITION_HEADER_WITH_FILENAME = CONTENT_DISPOSITION_HEADER + "; filename=\"%s\"";
+    private static final String CONTENT_DISPOSITION_TEMPLATE = "form-data; name=\"%s\"";
+    private static final String CONTENT_DISPOSITION_WITH_FILENAME_TEMPLATE = CONTENT_DISPOSITION_TEMPLATE + "; filename=\"%s\"";
+    private static final String BOUNDARY_DELIMITER = "--";
 
     private String boundary;
     private String multipartType;
@@ -34,6 +36,8 @@ public class MultipartBody {
     }
 
     public static MultipartBody create(String boundary) {
+        notNullParam(boundary, "boundary");
+
         return new MultipartBody(boundary, MultipartType.MIXED, new ArrayList<>());
     }
 
@@ -42,7 +46,7 @@ public class MultipartBody {
                 .flatMap(part -> (Stream<byte[]>) part.asByteArrays(boundary).stream())
                 .collect(Collectors.toList());
 
-        result.add(("--" + boundary + "--").getBytes(UTF_8));
+        result.add((BOUNDARY_DELIMITER + boundary + BOUNDARY_DELIMITER).getBytes(UTF_8));
 
         return result;
     }
@@ -55,27 +59,40 @@ public class MultipartBody {
         return boundary;
     }
 
-    public MultipartBody multipartType(String multipartType) {
-        this.multipartType = multipartType;
+    public MultipartBody type(String multipartType) {
+        notNullParam(multipartType, "multipartType");
 
+        this.multipartType = multipartType;
         return this;
     }
 
     public MultipartBody part(Part part) {
+        notNullParam(part, "part");
+
         this.parts.add(part);
         return this;
     }
 
     public MultipartBody formPart(String name, Part part) {
+        notNullParam(name, "name");
+        notNullParam(part, "part");
+
         this.parts.add(part.header(HttpHeader.CONTENT_DISPOSITION, getContentDispositionHeader(name)));
         return this;
     }
 
     public MultipartBody formPart(String name, PartWithFileContent part) {
+        notNullParam(name, "name");
+        notNullParam(part, "part");
+
         return formPart(name, part.getFilePath().getFileName().toString(), part);
     }
 
     public MultipartBody formPart(String name, String filename, PartWithFileContent part) {
+        notNullParam(name, "name");
+        notNullParam(filename, "filename");
+        notNullParam(part, "part");
+
         var path = part.getFilePath();
         part.header(HttpHeader.CONTENT_DISPOSITION, getContentDispositionHeader(name, filename));
 
@@ -92,11 +109,11 @@ public class MultipartBody {
     }
 
     private String getContentDispositionHeader(String name) {
-        return String.format(CONTENT_DISPOSITION_HEADER, name);
+        return String.format(CONTENT_DISPOSITION_TEMPLATE, name);
     }
 
     private String getContentDispositionHeader(String name, String filename) {
-        return String.format(CONTENT_DISPOSITION_HEADER_WITH_FILENAME, name, filename);
+        return String.format(CONTENT_DISPOSITION_WITH_FILENAME_TEMPLATE, name, filename);
     }
 }
 
