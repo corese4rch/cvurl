@@ -1,7 +1,7 @@
 package coresearch.cvurl.io.multipart;
 
 import coresearch.cvurl.io.constant.HttpHeader;
-import coresearch.cvurl.io.exception.BadFileException;
+import coresearch.cvurl.io.exception.MultipartFileFormException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -45,7 +45,7 @@ public class Part<T extends Part<T>> {
         try {
             return new PartWithFileContent(filePath, Files.readAllBytes(filePath));
         } catch (IOException e) {
-            throw new BadFileException(e.getMessage(), e);
+            throw new MultipartFileFormException(e.getMessage(), e);
         }
     }
 
