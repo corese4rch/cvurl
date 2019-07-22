@@ -6,6 +6,7 @@ import com.github.tomakehurst.wiremock.http.Fault;
 import coresearch.cvurl.io.constant.HttpHeader;
 import coresearch.cvurl.io.constant.HttpStatus;
 import coresearch.cvurl.io.constant.MIMEType;
+import coresearch.cvurl.io.constant.MultipartType;
 import coresearch.cvurl.io.exception.MappingException;
 import coresearch.cvurl.io.exception.RequestExecutionException;
 import coresearch.cvurl.io.exception.UnexpectedResponseException;
@@ -13,10 +14,18 @@ import coresearch.cvurl.io.helper.ObjectGenerator;
 import coresearch.cvurl.io.helper.model.User;
 import coresearch.cvurl.io.model.Configuration;
 import coresearch.cvurl.io.model.Response;
+import coresearch.cvurl.io.multipart.MultipartBody;
+import coresearch.cvurl.io.multipart.Part;
+import coresearch.cvurl.io.utils.Resources;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,14 +33,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
 
 
 public class CVurlRequestTest extends AbstractRequestTest {
 
     private static final String EMPTY_STRING = "";
-    private static String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+    private static final String MULTIPART_BODY_TEST_JSON = "multipart-body-test.json";
+    private static final String MULTIPART_HEADER_TEMPLATE = "multipart/%s;boundary=%s";
+    private static String url = format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
     @Test
     public void emptyResponseTest() {
@@ -197,7 +209,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
     public void mapTest() {
         //given
         String body = "Test body for test";
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        String url = format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
         //when
         wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
@@ -314,6 +326,113 @@ public class CVurlRequestTest extends AbstractRequestTest {
 
         //then
         assertThrows(RequestExecutionException.class, () -> cvurl.GET(url).build().asObject(User.class, 200));
+    }
+
+    @Test
+    public void sendWithSimpleMultipartBodyTest() {
+        //given
+        var plainTextPartName = "name1";
+        var filePartName = "name2";
+
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .withMultipartRequestBody(aMultipart()
+                        .withName(plainTextPartName)
+                        .withHeader(HttpHeader.CONTENT_TYPE, equalTo(MIMEType.TEXT_PLAIN))
+                        .withBody(equalTo("content")))
+                .withMultipartRequestBody(aMultipart()
+                        .withName(filePartName)
+                        .withHeader(HttpHeader.CONTENT_TYPE, equalTo(MIMEType.APPLICATION_JSON))
+                        .withBody(equalTo("{}")))
+                .willReturn(aResponse().withStatus(HttpStatus.OK)));
+
+        //when
+        var response = cvurl.POST(url)
+                .body(MultipartBody.create()
+                        .type(MultipartType.FORM)
+                        .formPart(plainTextPartName, Part.of("content").contentType(MIMEType.TEXT_PLAIN))
+                        .formPart(filePartName, Part.of("{}").contentType(MIMEType.APPLICATION_JSON)))
+                .build()
+                .asString()
+                .orElseThrow(RuntimeException::new);
+
+        //then
+        assertEquals(HttpStatus.OK, response.status());
+    }
+
+    @Test
+    public void sendWithFileMultipartBody() throws IOException {
+        //given
+        Path jsonPath = Resources.get(MULTIPART_BODY_TEST_JSON);
+        var partName = "name1";
+
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .withMultipartRequestBody(aMultipart()
+                        .withName(partName)
+                        .withHeader(HttpHeader.CONTENT_TYPE, equalTo("application/json"))
+                        .withBody(equalTo(Files.readString(jsonPath))))
+                .willReturn(aResponse().withStatus(HttpStatus.OK)));
+
+        //when
+        var response = cvurl.POST(url)
+                .body(MultipartBody.create()
+                        .type(MultipartType.FORM)
+                        .formPart(partName, Part.of(jsonPath)))
+                .build()
+                .asString()
+                .orElseThrow(RuntimeException::new);
+
+        //then
+        assertEquals(HttpStatus.OK, response.status());
+    }
+
+    @Test
+    public void sendWithFileMultipartBodyCustomTypeShouldOverwriteAutodetectedTest() throws IOException {
+        //given
+        Path jsonPath = Resources.get(MULTIPART_BODY_TEST_JSON);
+        var partName = "name1";
+
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .withMultipartRequestBody(aMultipart()
+                        .withName(partName)
+                        .withHeader(HttpHeader.CONTENT_TYPE, equalTo(MIMEType.APPLICATION_XML))
+                        .withBody(equalTo(Files.readString(jsonPath))))
+                .willReturn(aResponse().withStatus(HttpStatus.OK)));
+
+        //when
+        var response = cvurl.POST(url)
+                .body(MultipartBody.create()
+                        .type(MultipartType.FORM)
+                        .formPart(partName, Part.of(jsonPath).contentType(MIMEType.APPLICATION_XML)))
+                .build()
+                .asString()
+                .orElseThrow(RuntimeException::new);
+
+        //then
+        assertEquals(HttpStatus.OK, response.status());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {MultipartType.FORM, MultipartType.MIXED,
+            MultipartType.ALTERNATIVE, MultipartType.DIGEST, MultipartType.PARALLEL})
+    public void settingMultipartBodyShouldGenerateProperHeader(String multipartType) {
+        //given
+        var boundary = "BOUNDARY";
+        var contentType = format(MULTIPART_HEADER_TEMPLATE, multipartType, boundary);
+
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .withHeader(HttpHeader.CONTENT_TYPE, equalTo(contentType))
+                .willReturn(aResponse().withStatus(HttpStatus.OK)));
+
+        //when
+        var response = cvurl.POST(url).body(MultipartBody
+                .create(boundary)
+                .type(multipartType))
+                .build()
+                .asString()
+                .orElseThrow(RuntimeException::new);
+
+        //then
+        assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
