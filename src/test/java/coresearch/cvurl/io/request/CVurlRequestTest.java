@@ -3,7 +3,9 @@ package coresearch.cvurl.io.request;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.http.Fault;
+import coresearch.cvurl.io.constant.HttpHeader;
 import coresearch.cvurl.io.constant.HttpStatus;
+import coresearch.cvurl.io.constant.MIMEType;
 import coresearch.cvurl.io.exception.MappingException;
 import coresearch.cvurl.io.exception.RequestExecutionException;
 import coresearch.cvurl.io.exception.UnexpectedResponseException;
@@ -16,11 +18,13 @@ import org.junit.jupiter.api.Test;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.time.Duration;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -311,4 +315,40 @@ public class CVurlRequestTest extends AbstractRequestTest {
         //then
         assertThrows(RequestExecutionException.class, () -> cvurl.GET(url).build().asObject(User.class, 200));
     }
+
+    @Test
+    public void bodyAsUrlEncodedFormDataTest() {
+        //given
+        var paramName1 = "paramName1";
+        var paramName2 = "paramName2";
+        var value1 = "value1";
+        var value2 = "value2";
+        var expectedBody = paramName1 + "=" + value1 + "&" + paramName2 + "=" + value2;
+        var paramsMap = new LinkedHashMap<>() {{
+            put(paramName1, value1);
+            put(paramName2, value2);
+        }};
+
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .withHeader(HttpHeader.CONTENT_TYPE, equalTo(MIMEType.APPLICATION_FORM))
+                .withRequestBody(equalTo(expectedBody))
+                .willReturn(WireMock.aResponse()));
+
+        //when
+        var response = cvurl.POST(url)
+                .body(paramsMap)
+                .build()
+                .asString()
+                .orElseThrow(RuntimeException::new);
+
+        //then
+        assertEquals(HttpStatus.OK, response.status());
+    }
+
+    @Test
+    public void bodyAsUrlEncodedFormDataWithEmptyMapTest() {
+        assertThrows(IllegalStateException.class, () -> cvurl.POST(url).body(Map.of()));
+    }
+
+
 }
