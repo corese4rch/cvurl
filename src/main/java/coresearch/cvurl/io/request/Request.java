@@ -106,6 +106,10 @@ public final class Request {
         return sendRequestAndHandleExceptions(BodyHandlers.ofInputStream());
     }
 
+    public <T> Optional<Response<T>> as(HttpResponse.BodyHandler<T> bodyHandler) {
+        return sendRequestAndHandleExceptions(bodyHandler);
+    }
+
     /**
      * Sends current request blocking if necessary to get
      * the response. Maps response body using provided mapper function.
