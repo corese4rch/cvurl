@@ -27,6 +27,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -433,4 +434,40 @@ public class CVurlRequestTest extends AbstractRequestTest {
         //then
         assertEquals(HttpStatus.OK, response.status());
     }
+
+    @Test
+    public void bodyAsUrlEncodedFormDataTest() {
+        //given
+        var paramName1 = "paramName1";
+        var paramName2 = "paramName2";
+        var value1 = "value1";
+        var value2 = "value2";
+        var expectedBody = paramName1 + "=" + value1 + "&" + paramName2 + "=" + value2;
+        var paramsMap = new LinkedHashMap<>() {{
+            put(paramName1, value1);
+            put(paramName2, value2);
+        }};
+
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .withHeader(HttpHeader.CONTENT_TYPE, equalTo(MIMEType.APPLICATION_FORM))
+                .withRequestBody(equalTo(expectedBody))
+                .willReturn(WireMock.aResponse()));
+
+        //when
+        var response = cvurl.POST(url)
+                .formData(paramsMap)
+                .build()
+                .asString()
+                .orElseThrow(RuntimeException::new);
+
+        //then
+        assertEquals(HttpStatus.OK, response.status());
+    }
+
+    @Test
+    public void bodyAsUrlEncodedFormDataWithEmptyMapTest() {
+        assertThrows(IllegalStateException.class, () -> cvurl.POST(url).formData(Map.of()));
+    }
+
+
 }
