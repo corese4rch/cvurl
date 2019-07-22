@@ -63,7 +63,7 @@ public class RequestWithBodyBuilder extends RequestBuilder<RequestWithBodyBuilde
      * @param body request body
      * @return this builder
      */
-    public RequestWithBodyBuilder body(Map<Object, Object> body) {
+    public RequestWithBodyBuilder formData(Map<Object, Object> body) {
         if (body.isEmpty()) {
             throw new IllegalStateException("Form data map shouldn't be empty");
         }

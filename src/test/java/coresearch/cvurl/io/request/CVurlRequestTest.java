@@ -336,7 +336,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
 
         //when
         var response = cvurl.POST(url)
-                .body(paramsMap)
+                .formData(paramsMap)
                 .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
@@ -347,7 +347,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
 
     @Test
     public void bodyAsUrlEncodedFormDataWithEmptyMapTest() {
-        assertThrows(IllegalStateException.class, () -> cvurl.POST(url).body(Map.of()));
+        assertThrows(IllegalStateException.class, () -> cvurl.POST(url).formData(Map.of()));
     }
 
 
