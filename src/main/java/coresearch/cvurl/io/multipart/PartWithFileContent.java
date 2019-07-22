@@ -2,6 +2,9 @@ package coresearch.cvurl.io.multipart;
 
 import java.nio.file.Path;
 
+/**
+ * Represent part with file content of multipart data.
+ */
 public class PartWithFileContent extends Part<PartWithFileContent> {
     private Path filePath;
 
@@ -10,6 +13,11 @@ public class PartWithFileContent extends Part<PartWithFileContent> {
         this.filePath = filePath;
     }
 
+    /**
+     * Returns file path.
+     *
+     * @return file path.
+     */
     public Path getFilePath() {
         return filePath;
     }

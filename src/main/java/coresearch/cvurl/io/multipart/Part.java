@@ -16,6 +16,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;
 
+/**
+ * Represent part of multipart data.
+ */
 public class Part<T extends Part<T>> {
     public static final String CRLF = "\r\n";
     public static final String BOUNDARY_DELIMITER = "--";
@@ -27,18 +30,35 @@ public class Part<T extends Part<T>> {
         this.content = content;
     }
 
+    /**
+     * Creates new instance of {@link Part}
+     * @param content content part
+     * @return this {@link Part}
+     */
     public static Part of(byte[] content) {
         notNullParam(content, "content");
 
         return new Part(content);
     }
 
+    /**
+     * Creates new instance of {@link Part}
+     * @param content content part
+     * @return this {@link Part}
+     */
     public static Part of(String content) {
         notNullParam(content, "content");
 
         return new Part(content.getBytes());
     }
 
+    /**
+     * Creates new instance of {@link Part} using file from provided filePath
+     * Throws {@link MultipartFileFormException} in case {@link IOException} happens
+     * while reading from the file.
+     * @param filePath path to file that will be used as content.
+     * @return this {@link Part}
+     */
     public static PartWithFileContent of(Path filePath) {
         notNullParam(filePath, "filePath");
 
@@ -49,15 +69,28 @@ public class Part<T extends Part<T>> {
         }
     }
 
+    /**
+     * Add a header to the part.
+     *
+     * @param name header name
+     * @param value header value
+     * @return this {@link Part}
+     */
     @SuppressWarnings("unchecked")
-    public T header(String key, String value) {
-        notNullParam(key, "key");
+    public T header(String name, String value) {
+        notNullParam(name, "key");
         notNullParam(value, "value");
 
-        this.headers.put(key.toLowerCase(), value);
+        this.headers.put(name.toLowerCase(), value);
         return (T) this;
     }
 
+    /**
+     * Add headers to the part.
+     *
+     * @param headers headers to add
+     * @return this {@link Part}
+     */
     @SuppressWarnings("unchecked")
     public T headers(Map<String, String> headers) {
         notNullParam(headers, "headers");
@@ -70,6 +103,12 @@ public class Part<T extends Part<T>> {
         return (T) this;
     }
 
+    /**
+     * Set a content-type header of the part.
+     *
+     * @param mimeType value to be set as content-type header.
+     * @return this {@link Part}
+     */
     @SuppressWarnings("unchecked")
     public T contentType(String mimeType) {
         notNullParam(mimeType, "mimeType");

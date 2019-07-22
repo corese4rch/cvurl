@@ -56,6 +56,12 @@ public class RequestWithBodyBuilder extends RequestBuilder<RequestWithBodyBuilde
         return this;
     }
 
+    /**
+     * Sets request body as multipart data. Sets content-type header as multipart/{multipartType}
+     *
+     * @param multipartBody request body
+     * @return this builder
+     */
     public RequestWithBodyBuilder body(MultipartBody multipartBody) {
         bodyPublisher = HttpRequest.BodyPublishers.ofByteArrays(multipartBody.asByteArrays());
         header(HttpHeader.CONTENT_TYPE,
