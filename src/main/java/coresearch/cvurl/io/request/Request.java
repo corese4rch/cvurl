@@ -63,6 +63,26 @@ public final class Request {
     }
 
     /**
+     * Sends current request asynchronously. Returns response with body as {@link InputStream}
+     *
+     * @return {@link CompletableFuture} with returned response.
+     */
+    public CompletableFuture<Response<InputStream>> asyncAsStream() {
+        return this.httpClient.sendAsync(httpRequest, BodyHandlers.ofInputStream())
+                .thenApply(Response::new);
+    }
+
+    /**
+     * Sends current request asynchronously. Applies provided bodyHandler to the response body.
+     *
+     * @return {@link CompletableFuture} with returned response.
+     */
+    public <T> CompletableFuture<Response<T>> asyncAs(HttpResponse.BodyHandler<T> bodyHandler) {
+        return this.httpClient.sendAsync(httpRequest, bodyHandler)
+                .thenApply(Response::new);
+    }
+
+    /**
      * Sends current request asynchronously and maps response body using
      * provided mapper function.
      *
@@ -71,7 +91,7 @@ public final class Request {
      * @return {@link CompletableFuture} with returned response with mapped body.
      */
     public <T> CompletableFuture<Response<T>> asyncMap(Function<String, T> bodyMapper) {
-        return this.httpClient.sendAsync(httpRequest, new StringMappingBodyHandler<>(bodyMapper))
+        return this.httpClient.sendAsync(httpRequest, new ResponseStringMappingBodyHandler<>(bodyMapper))
                 .thenApply(Response::new);
     }
 
@@ -102,10 +122,25 @@ public final class Request {
         return sendRequestAndHandleExceptions(BodyHandlers.ofString());
     }
 
-    public Optional<Response<InputStream>> asInputStream() {
+    /**
+     * Sends current request blocking if necessary to get
+     * the response as {@link InputStream}
+     *
+     * @return {@link Optional} with response if request no error happened during
+     * request sending or empty {@link Optional} otherwise.
+     */
+    public Optional<Response<InputStream>> asStream() {
         return sendRequestAndHandleExceptions(BodyHandlers.ofInputStream());
     }
 
+    /**
+     * Sends current request blocking if necessary to get
+     * the response with body parsed by provided bodyHandler.
+     *
+     * @param bodyHandler used to parse response body
+     * @return {@link Optional} with response if request no error happened during
+     * request sending or empty {@link Optional} otherwise.
+     */
     public <T> Optional<Response<T>> as(HttpResponse.BodyHandler<T> bodyHandler) {
         return sendRequestAndHandleExceptions(bodyHandler);
     }
@@ -120,7 +155,7 @@ public final class Request {
      * request sending or empty {@link Optional} otherwise.
      */
     public <T> Optional<Response<T>> map(Function<String, T> bodyMapper) {
-        return sendRequestAndHandleExceptions(new StringMappingBodyHandler<>(bodyMapper));
+        return sendRequestAndHandleExceptions(new ResponseStringMappingBodyHandler<>(bodyMapper));
     }
 
     private <T> Optional<Response<T>> sendRequestAndHandleExceptions(HttpResponse.BodyHandler<T> bodyHandler) {

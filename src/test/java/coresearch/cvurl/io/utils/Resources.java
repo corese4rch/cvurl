@@ -9,5 +9,4 @@ public class Resources {
     public static Path get(String resource) {
         return Path.of(RESOURCE_PATH, resource);
     }
-
 }
