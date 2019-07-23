@@ -17,18 +17,14 @@ import java.util.Set;
  */
 public class Response<T> {
 
-    private T body;
-
-    private HttpResponse<String> rawResponse;
+    private HttpResponse<T> rawResponse;
 
     /**
      * Creates new Response from specified body and raw {@link HttpResponse}.
      *
-     * @param body        parsed response body
      * @param rawResponse response
      */
-    public Response(T body, HttpResponse<String> rawResponse) {
-        this.body = body;
+    public Response(HttpResponse<T> rawResponse) {
         this.rawResponse = rawResponse;
     }
 
@@ -65,7 +61,7 @@ public class Response<T> {
      *
      * @return an Optional containing the HttpResponse, if any.
      */
-    public Optional<HttpResponse<String>> previousResponse() {
+    public Optional<HttpResponse<T>> previousResponse() {
         return rawResponse.previousResponse();
     }
 
@@ -151,7 +147,7 @@ public class Response<T> {
     }
 
     public T getBody() {
-        return body;
+        return rawResponse.body();
     }
 
     @Override

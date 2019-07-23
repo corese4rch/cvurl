@@ -22,8 +22,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -32,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.lang.String.format;
@@ -43,6 +47,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
     private static final String EMPTY_STRING = "";
     private static final String MULTIPART_BODY_TEST_JSON = "multipart-body-test.json";
     private static final String MULTIPART_HEADER_TEMPLATE = "multipart/%s;boundary=%s";
+    public static final String BODY_AS_INPUT_STREAM_TXT = "body-as-input-stream-test.txt";
     private static String url = format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
     @Test
@@ -467,6 +472,91 @@ public class CVurlRequestTest extends AbstractRequestTest {
     @Test
     public void bodyAsUrlEncodedFormDataWithEmptyMapTest() {
         assertThrows(IllegalStateException.class, () -> cvurl.POST(url).formData(Map.of()));
+    }
+
+    @Test
+    public void bodyAsInputStreamTest() throws IOException {
+        //given
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse().withBodyFile(BODY_AS_INPUT_STREAM_TXT)));
+
+        //when
+        Response<InputStream> response = cvurl.POST(url).build().asStream().orElseThrow(RuntimeException::new);
+
+        //then
+        assertEquals(HttpStatus.OK, response.status());
+        assertArrayEquals(Files.readAllBytes(Resources.get("__files/" + BODY_AS_INPUT_STREAM_TXT)),
+                response.getBody().readAllBytes());
+
+        response.getBody().close();
+    }
+
+    @Test
+    public void responseBodyHandlingWithArbitraryBodyHandlerTest() throws IOException {
+        //given
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse().withBodyFile(BODY_AS_INPUT_STREAM_TXT)));
+
+        //when
+        Response<Stream<String>> response = cvurl.POST(url)
+                .build()
+                .as(HttpResponse.BodyHandlers.ofLines())
+                .orElseThrow(RuntimeException::new);
+
+        //then
+        assertEquals(HttpStatus.OK, response.status());
+        assertLinesMatch(Files.readAllLines(Resources.get("__files/" + BODY_AS_INPUT_STREAM_TXT)),
+                response.getBody().collect(Collectors.toList()));
+    }
+
+    @Test
+    public void asyncBodyAsInputStreamTest() throws IOException, ExecutionException, InterruptedException {
+        //given
+        boolean[] isThenApplyInvoked = {false};
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse().withBodyFile(BODY_AS_INPUT_STREAM_TXT)));
+
+        //when
+        Response<InputStream> response = cvurl.POST(url).build().asyncAsStream()
+                .thenApply(res ->
+                {
+                    isThenApplyInvoked[0] = true;
+                    return res;
+                })
+                .get();
+
+        //then
+        assertEquals(HttpStatus.OK, response.status());
+        assertArrayEquals(Files.readAllBytes(Resources.get("__files/" + BODY_AS_INPUT_STREAM_TXT)),
+                response.getBody().readAllBytes());
+        assertTrue(isThenApplyInvoked[0]);
+
+        response.getBody().close();
+    }
+
+    @Test
+    public void asyncResponseBodyHandlingWithArbitraryBodyHandlerTest() throws IOException, ExecutionException, InterruptedException {
+        //given
+        boolean[] isThenApplyInvoked = {false};
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse().withBodyFile(BODY_AS_INPUT_STREAM_TXT)));
+
+        //when
+        Response<Stream<String>> response = cvurl.POST(url)
+                .build()
+                .asyncAs(HttpResponse.BodyHandlers.ofLines())
+                .thenApply(res ->
+                {
+                    isThenApplyInvoked[0] = true;
+                    return res;
+                })
+                .get();
+
+        //then
+        assertEquals(HttpStatus.OK, response.status());
+        assertLinesMatch(Files.readAllLines(Resources.get("__files/" + BODY_AS_INPUT_STREAM_TXT)),
+                response.getBody().collect(Collectors.toList()));
+        assertTrue(isThenApplyInvoked[0]);
     }
 
 
