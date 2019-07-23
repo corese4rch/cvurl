@@ -119,7 +119,7 @@ public final class Request {
      * request sending or empty {@link Optional} otherwise.
      */
     public Optional<Response<String>> asString() {
-        return sendRequestAndHandleExceptions(BodyHandlers.ofString());
+        return sendRequestAndHandleExceptions(new EncodedStringBodyHandler());
     }
 
     /**
@@ -130,7 +130,7 @@ public final class Request {
      * request sending or empty {@link Optional} otherwise.
      */
     public Optional<Response<InputStream>> asStream() {
-        return sendRequestAndHandleExceptions(BodyHandlers.ofInputStream());
+        return sendRequestAndHandleExceptions(new EncodedInputStreamBodyHandler());
     }
 
     /**

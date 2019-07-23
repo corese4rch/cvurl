@@ -12,7 +12,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static coresearch.cvurl.io.util.Validation.notNullParam;
+import static coresearch.cvurl.io.internal.utils.Validation.notNullParam;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**

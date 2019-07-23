@@ -1,4 +1,4 @@
-package coresearch.cvurl.io.util;
+package coresearch.cvurl.io.internal.utils;
 
 import java.util.Objects;
 

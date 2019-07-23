@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static coresearch.cvurl.io.util.Validation.notNullParam;
+import static coresearch.cvurl.io.internal.utils.Validation.notNullParam;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;

@@ -17,12 +17,12 @@ import coresearch.cvurl.io.model.Response;
 import coresearch.cvurl.io.multipart.MultipartBody;
 import coresearch.cvurl.io.multipart.Part;
 import coresearch.cvurl.io.utils.Resources;
+import org.eclipse.jetty.servlets.gzip.GzipOutputStream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.http.HttpResponse;
@@ -36,6 +36,8 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.lang.String.format;
@@ -559,5 +561,48 @@ public class CVurlRequestTest extends AbstractRequestTest {
         assertTrue(isThenApplyInvoked[0]);
     }
 
+    @Test
+    public void gzipEncodedResponseBodyAsStringTest() throws IOException {
+        //given
+        var body = "Test body";
+
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse()
+                        .withBody(compressWithGZIP(body))
+                        .withHeader(HttpHeader.CONTENT_ENCODING, "gzip")));
+
+        //when
+        var response = cvurl.POST(url).build().asString().orElseThrow(RuntimeException::new);
+
+        //then
+        assertEquals(HttpStatus.OK, response.status());
+        assertEquals(body, response.getBody());
+    }
+
+    @Test
+    public void gzipEncodedResponseBodyAsStreamTest() throws IOException {
+        //given
+        var body = "Test body";
+
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse()
+                        .withBody(compressWithGZIP(body))
+                        .withHeader(HttpHeader.CONTENT_ENCODING, "gzip")));
+
+        //when
+        var response = cvurl.POST(url).build().asStream().orElseThrow(RuntimeException::new);
+
+        //then
+        assertEquals(HttpStatus.OK, response.status());
+        assertEquals(body, new String(response.getBody().readAllBytes()));
+    }
+
+    private byte[] compressWithGZIP(String str) throws IOException {
+        var out = new ByteArrayOutputStream();
+        try (var gzipOutputStream = new GZIPOutputStream(out)) {
+            gzipOutputStream.write(str.getBytes());
+        }
+        return out.toByteArray();
+    }
 
 }

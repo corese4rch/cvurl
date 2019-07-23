@@ -7,7 +7,7 @@ import java.net.URL;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import static coresearch.cvurl.io.util.Validation.notNullParam;
+import static coresearch.cvurl.io.internal.utils.Validation.notNullParam;
 
 /**
  * Class for building urls. Its only purpose is to build url endpoint and it doesn't handle query params.
