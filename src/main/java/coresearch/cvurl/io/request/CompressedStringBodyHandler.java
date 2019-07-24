@@ -1,5 +1,6 @@
 package coresearch.cvurl.io.request;
 
+import coresearch.cvurl.io.constant.HttpContentEncoding;
 import coresearch.cvurl.io.constant.HttpHeader;
 import coresearch.cvurl.io.exception.ResponseBodyHandlingException;
 
@@ -13,23 +14,20 @@ import java.util.zip.GZIPInputStream;
 
 import static coresearch.cvurl.io.internal.utils.ResponseInfoUtils.getEncoding;
 
-public class EncodedStringBodyHandler implements HttpResponse.BodyHandler<String> {
+public class CompressedStringBodyHandler implements HttpResponse.BodyHandler<String> {
 
-    EncodedStringBodyHandler() {
+    CompressedStringBodyHandler() {
     }
 
     @Override
     public HttpResponse.BodySubscriber<String> apply(HttpResponse.ResponseInfo responseInfo) {
-        Optional<String> encoding = getEncoding(responseInfo);
-        if (encoding.isEmpty()) {
-            return HttpResponse.BodyHandlers.ofString().apply(responseInfo);
-        }
+        Optional<String> encoding = responseInfo.headers().firstValue(HttpHeader.CONTENT_ENCODING);
 
-        if (encoding.get().equals("gzip")) {
+        if (encoding.isPresent() && encoding.get().equals(HttpContentEncoding.GZIP)) {
             return HttpResponse.BodySubscribers.mapping(HttpResponse.BodySubscribers.ofByteArray(), this::decompressGZIP);
         }
 
-        throw new ResponseBodyHandlingException("Unknown content encoding: " + encoding);
+        return HttpResponse.BodyHandlers.ofString().apply(responseInfo);
     }
 
     private String decompressGZIP(byte[] bytes) {
@@ -41,7 +39,6 @@ public class EncodedStringBodyHandler implements HttpResponse.BodyHandler<String
             throw new ResponseBodyHandlingException(e.getMessage(), e);
         }
 
-        //TODO: add response body character encoding detection
         return new String(outputStream.toByteArray());
     }
 }

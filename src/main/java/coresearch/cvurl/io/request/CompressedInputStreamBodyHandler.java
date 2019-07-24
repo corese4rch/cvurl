@@ -1,5 +1,6 @@
 package coresearch.cvurl.io.request;
 
+import coresearch.cvurl.io.constant.HttpContentEncoding;
 import coresearch.cvurl.io.exception.ResponseBodyHandlingException;
 
 import java.io.ByteArrayInputStream;
@@ -12,21 +13,17 @@ import java.util.zip.GZIPInputStream;
 
 import static coresearch.cvurl.io.internal.utils.ResponseInfoUtils.getEncoding;
 
-public class EncodedInputStreamBodyHandler implements HttpResponse.BodyHandler<InputStream> {
+public class CompressedInputStreamBodyHandler implements HttpResponse.BodyHandler<InputStream> {
 
     @Override
     public HttpResponse.BodySubscriber<InputStream> apply(HttpResponse.ResponseInfo responseInfo) {
         Optional<String> encoding = getEncoding(responseInfo);
 
-        if (encoding.isEmpty()) {
-            return HttpResponse.BodySubscribers.ofInputStream();
-        }
-
-        if (encoding.get().equals("gzip")) {
+        if (encoding.isPresent() && encoding.get().equals(HttpContentEncoding.GZIP)) {
             return HttpResponse.BodySubscribers.mapping(HttpResponse.BodySubscribers.ofByteArray(), this::getGZIPInputStream);
         }
 
-        throw new ResponseBodyHandlingException("Unknown content encoding: " + encoding);
+        return HttpResponse.BodySubscribers.ofInputStream();
     }
 
     private InputStream getGZIPInputStream(byte[] bytes) {

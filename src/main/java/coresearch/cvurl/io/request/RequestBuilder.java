@@ -1,5 +1,8 @@
 package coresearch.cvurl.io.request;
 
+import coresearch.cvurl.io.constant.HttpContentEncoding;
+import coresearch.cvurl.io.constant.HttpHeader;
+import coresearch.cvurl.io.constant.HttpStatus;
 import coresearch.cvurl.io.mapper.GenericMapper;
 import coresearch.cvurl.io.constant.HttpMethod;
 
@@ -27,6 +30,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> {
     protected HttpMethod method;
     protected HttpRequest.BodyPublisher bodyPublisher = HttpRequest.BodyPublishers.noBody();
 
+    private boolean compressedResponse;
     private String uri;
     private HttpClient httpClient;
     private Map<String, String> queryParams = new HashMap<>();
@@ -102,13 +106,21 @@ public class RequestBuilder<T extends RequestBuilder<T>> {
         return (T) this;
     }
 
+    @SuppressWarnings("unchecked")
+    public T compressedResponse() {
+        this.compressedResponse = true;
+        this.header(HttpHeader.ACCEPT_ENCODING, HttpContentEncoding.GZIP);
+
+        return (T) this;
+    }
+
     /**
      * Builds new {@link Request}.
      *
      * @return new {@link Request}
      */
     public Request build() {
-        return new Request(setUpHttpRequestBuilder().build(), httpClient, genericMapper);
+        return new Request(setUpHttpRequestBuilder().build(), httpClient, genericMapper, compressedResponse);
     }
 
     private HttpRequest.Builder setUpHttpRequestBuilder() {

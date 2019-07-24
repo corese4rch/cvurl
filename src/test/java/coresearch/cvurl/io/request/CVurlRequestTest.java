@@ -3,10 +3,7 @@ package coresearch.cvurl.io.request;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.http.Fault;
-import coresearch.cvurl.io.constant.HttpHeader;
-import coresearch.cvurl.io.constant.HttpStatus;
-import coresearch.cvurl.io.constant.MIMEType;
-import coresearch.cvurl.io.constant.MultipartType;
+import coresearch.cvurl.io.constant.*;
 import coresearch.cvurl.io.exception.MappingException;
 import coresearch.cvurl.io.exception.RequestExecutionException;
 import coresearch.cvurl.io.exception.UnexpectedResponseException;
@@ -567,12 +564,13 @@ public class CVurlRequestTest extends AbstractRequestTest {
         var body = "Test body";
 
         wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .withHeader(HttpHeader.ACCEPT_ENCODING, equalTo(HttpContentEncoding.GZIP))
                 .willReturn(WireMock.aResponse()
                         .withBody(compressWithGZIP(body))
-                        .withHeader(HttpHeader.CONTENT_ENCODING, "gzip")));
+                        .withHeader(HttpHeader.CONTENT_ENCODING, HttpContentEncoding.GZIP)));
 
         //when
-        var response = cvurl.POST(url).build().asString().orElseThrow(RuntimeException::new);
+        var response = cvurl.POST(url).compressedResponse().build().asString().orElseThrow(RuntimeException::new);
 
         //then
         assertEquals(HttpStatus.OK, response.status());
@@ -585,12 +583,13 @@ public class CVurlRequestTest extends AbstractRequestTest {
         var body = "Test body";
 
         wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .withHeader(HttpHeader.ACCEPT_ENCODING, equalTo(HttpContentEncoding.GZIP))
                 .willReturn(WireMock.aResponse()
                         .withBody(compressWithGZIP(body))
-                        .withHeader(HttpHeader.CONTENT_ENCODING, "gzip")));
+                        .withHeader(HttpHeader.CONTENT_ENCODING, HttpContentEncoding.GZIP)));
 
         //when
-        var response = cvurl.POST(url).build().asStream().orElseThrow(RuntimeException::new);
+        var response = cvurl.POST(url).compressedResponse().build().asStream().orElseThrow(RuntimeException::new);
 
         //then
         assertEquals(HttpStatus.OK, response.status());
