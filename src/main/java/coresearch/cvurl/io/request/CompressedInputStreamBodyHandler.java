@@ -17,7 +17,6 @@ public class CompressedInputStreamBodyHandler implements HttpResponse.BodyHandle
     public HttpResponse.BodySubscriber<InputStream> apply(HttpResponse.ResponseInfo responseInfo) {
         Optional<String> encoding = responseInfo.headers().firstValue(HttpHeader.CONTENT_ENCODING);
 
-
         if (encoding.isPresent() && encoding.get().equals(HttpContentEncoding.GZIP)) {
             return HttpResponse.BodySubscribers.mapping(HttpResponse.BodySubscribers.ofByteArray(), this::getGZIPInputStream);
         }
