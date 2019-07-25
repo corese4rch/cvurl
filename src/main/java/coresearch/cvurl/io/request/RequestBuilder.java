@@ -109,8 +109,6 @@ public class RequestBuilder<T extends RequestBuilder<T>> {
     @SuppressWarnings("unchecked")
     public T compressedResponse() {
         this.compressedResponse = true;
-        this.header(HttpHeader.ACCEPT_ENCODING, HttpContentEncoding.GZIP);
-
         return (T) this;
     }
 
@@ -128,9 +126,14 @@ public class RequestBuilder<T extends RequestBuilder<T>> {
                 .uri(prepareURI())
                 .method(method.name(), bodyPublisher);
 
+        if (compressedResponse) {
+            this.header(HttpHeader.ACCEPT_ENCODING, HttpContentEncoding.GZIP);
+        }
+
         timeout.ifPresent(builder::timeout);
 
         headers.forEach(builder::header);
+
 
         return builder;
     }
