@@ -3,10 +3,7 @@ package coresearch.cvurl.io.request;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.http.Fault;
-import coresearch.cvurl.io.constant.HttpHeader;
-import coresearch.cvurl.io.constant.HttpStatus;
-import coresearch.cvurl.io.constant.MIMEType;
-import coresearch.cvurl.io.constant.MultipartType;
+import coresearch.cvurl.io.constant.*;
 import coresearch.cvurl.io.exception.MappingException;
 import coresearch.cvurl.io.exception.RequestExecutionException;
 import coresearch.cvurl.io.exception.UnexpectedResponseException;
@@ -17,10 +14,12 @@ import coresearch.cvurl.io.model.Response;
 import coresearch.cvurl.io.multipart.MultipartBody;
 import coresearch.cvurl.io.multipart.Part;
 import coresearch.cvurl.io.utils.Resources;
+import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -36,6 +35,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.zip.GZIPOutputStream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.lang.String.format;
@@ -559,5 +559,99 @@ public class CVurlRequestTest extends AbstractRequestTest {
         assertTrue(isThenApplyInvoked[0]);
     }
 
+    @Test
+    public void gzipEncodedResponseBodyAsStringTest() throws IOException {
+        //given
+        var body = "Test body";
+
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .withHeader(HttpHeader.ACCEPT_ENCODING, equalTo(HttpContentEncoding.GZIP))
+                .willReturn(WireMock.aResponse()
+                        .withBody(compressWithGZIP(body))
+                        .withHeader(HttpHeader.CONTENT_ENCODING, HttpContentEncoding.GZIP)));
+
+        //when
+        var response = cvurl.POST(url).acceptCompressed().build().asString().orElseThrow(RuntimeException::new);
+
+        //then
+        assertEquals(HttpStatus.OK, response.status());
+        assertEquals(body, response.getBody());
+    }
+
+    @Test
+    public void gzipEncodedResponseBodyAsStreamTest() throws IOException {
+        //given
+        var body = "Test body";
+
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .withHeader(HttpHeader.ACCEPT_ENCODING, equalTo(HttpContentEncoding.GZIP))
+                .willReturn(WireMock.aResponse()
+                        .withBody(compressWithGZIP(body))
+                        .withHeader(HttpHeader.CONTENT_ENCODING, HttpContentEncoding.GZIP)));
+
+        //when
+        var response = cvurl.POST(url).acceptCompressed().build().asStream().orElseThrow(RuntimeException::new);
+
+        //then
+        assertEquals(HttpStatus.OK, response.status());
+        assertEquals(body, new String(response.getBody().readAllBytes()));
+    }
+
+    @Test
+    public void responseWithUnknownEncodingWithAcceptCompressedAsStringTest() throws IOException {
+        //given
+        var body = "Test body";
+
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse()
+                        .withBody(body)
+                        .withHeader(HttpHeaders.CONTENT_ENCODING, "unknown")));
+
+        //when
+        var response = cvurl.POST(url).acceptCompressed().build().asString().orElseThrow(RuntimeException::new);
+
+        //then
+        assertEquals(HttpStatus.OK, response.status());
+        assertEquals(body, response.getBody());
+    }
+
+    @Test
+    public void responseWithUnknownEncodingWithAcceptCompressedAsStreamTest() throws IOException {
+        //given
+        var body = "Test body";
+
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse()
+                        .withBody(body)
+                        .withHeader(HttpHeaders.CONTENT_ENCODING, "unknown")));
+
+        //when
+        var response = cvurl.POST(url).acceptCompressed().build().asStream().orElseThrow(RuntimeException::new);
+
+        //then
+        assertEquals(HttpStatus.OK, response.status());
+        assertEquals(body, new String(response.getBody().readAllBytes()));
+    }
+
+    @Test
+    public void requestWithAcceptCompressedFaultTest() throws IOException {
+        //given
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse()
+                        .withFault(Fault.RANDOM_DATA_THEN_CLOSE)));
+
+        //then
+        var response = cvurl.POST(url).acceptCompressed().build().asStream();
+
+        assertTrue(response.isEmpty());
+    }
+
+    private byte[] compressWithGZIP(String str) throws IOException {
+        var out = new ByteArrayOutputStream();
+        try (var gzipOutputStream = new GZIPOutputStream(out)) {
+            gzipOutputStream.write(str.getBytes());
+        }
+        return out.toByteArray();
+    }
 
 }

@@ -1,9 +1,12 @@
 package coresearch.cvurl.io.request;
 
 import coresearch.cvurl.io.exception.RequestExecutionException;
+import coresearch.cvurl.io.exception.ResponseBodyHandlingException;
 import coresearch.cvurl.io.exception.UnexpectedResponseException;
 import coresearch.cvurl.io.mapper.GenericMapper;
 import coresearch.cvurl.io.model.Response;
+import coresearch.cvurl.io.request.handler.CompressedInputStreamBodyHandler;
+import coresearch.cvurl.io.request.handler.CompressedStringBodyHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,11 +31,13 @@ public final class Request {
     private HttpClient httpClient;
     private HttpRequest httpRequest;
     private GenericMapper genericMapper;
+    private boolean acceptCompressed;
 
-    Request(HttpRequest httpRequest, HttpClient httpClient, GenericMapper genericMapper) {
+    Request(HttpRequest httpRequest, HttpClient httpClient, GenericMapper genericMapper, boolean acceptCompressed) {
         this.httpRequest = httpRequest;
         this.httpClient = httpClient;
         this.genericMapper = genericMapper;
+        this.acceptCompressed = acceptCompressed;
     }
 
     /**
@@ -48,7 +53,7 @@ public final class Request {
      * that finishes exceptionally with {@link UnexpectedResponseException}
      */
     public <T> CompletableFuture<T> asyncAsObject(Class<T> type, int statusCode) {
-        return this.httpClient.sendAsync(httpRequest, BodyHandlers.ofString())
+        return this.httpClient.sendAsync(httpRequest, getStringBodyHandler())
                 .thenApply((response -> parseResponse(response, type, statusCode)));
     }
 
@@ -58,7 +63,7 @@ public final class Request {
      * @return {@link CompletableFuture} with returned response.
      */
     public CompletableFuture<Response<String>> asyncAsString() {
-        return this.httpClient.sendAsync(httpRequest, BodyHandlers.ofString())
+        return this.httpClient.sendAsync(httpRequest, getStringBodyHandler())
                 .thenApply(Response::new);
     }
 
@@ -68,7 +73,7 @@ public final class Request {
      * @return {@link CompletableFuture} with returned response.
      */
     public CompletableFuture<Response<InputStream>> asyncAsStream() {
-        return this.httpClient.sendAsync(httpRequest, BodyHandlers.ofInputStream())
+        return this.httpClient.sendAsync(httpRequest, getStreamBodyHandler())
                 .thenApply(Response::new);
     }
 
@@ -119,7 +124,7 @@ public final class Request {
      * request sending or empty {@link Optional} otherwise.
      */
     public Optional<Response<String>> asString() {
-        return sendRequestAndHandleExceptions(BodyHandlers.ofString());
+        return sendRequestAndHandleExceptions(getStringBodyHandler());
     }
 
     /**
@@ -130,7 +135,7 @@ public final class Request {
      * request sending or empty {@link Optional} otherwise.
      */
     public Optional<Response<InputStream>> asStream() {
-        return sendRequestAndHandleExceptions(BodyHandlers.ofInputStream());
+        return sendRequestAndHandleExceptions(getStreamBodyHandler());
     }
 
     /**
@@ -158,12 +163,24 @@ public final class Request {
         return sendRequestAndHandleExceptions(new ResponseStringMappingBodyHandler<>(bodyMapper));
     }
 
+    private HttpResponse.BodyHandler<String> getStringBodyHandler() {
+        return acceptCompressed ?
+                new CompressedStringBodyHandler() :
+                BodyHandlers.ofString();
+    }
+
+    private HttpResponse.BodyHandler<InputStream> getStreamBodyHandler() {
+        return acceptCompressed ?
+                new CompressedInputStreamBodyHandler() :
+                BodyHandlers.ofInputStream();
+    }
+
     private <T> Optional<Response<T>> sendRequestAndHandleExceptions(HttpResponse.BodyHandler<T> bodyHandler) {
         try {
             HttpResponse<T> response = sendRequest(bodyHandler);
             return Optional.of(new Response<>(response));
 
-        } catch (InterruptedException | IOException e) {
+        } catch (InterruptedException | IOException | ResponseBodyHandlingException e) {
             LOGGER.error("Error while sending request: {}", e.getMessage());
             return Optional.empty();
         }
@@ -171,7 +188,7 @@ public final class Request {
 
     private <T> T sendRequestForObject(Class<T> type, int statusCode) {
         try {
-            HttpResponse<String> response = sendRequest(BodyHandlers.ofString());
+            HttpResponse<String> response = sendRequest(getStringBodyHandler());
             return parseResponse(response, type, statusCode);
 
         } catch (InterruptedException | IOException e) {

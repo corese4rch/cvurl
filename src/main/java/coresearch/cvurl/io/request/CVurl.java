@@ -10,7 +10,7 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.time.Duration;
 
-import static coresearch.cvurl.io.util.Validation.notNullParam;
+import static coresearch.cvurl.io.internal.util.Validation.notNullParam;
 
 /**
  * Central part of the lib. Used to initiate {@link Request} creation with proper {@link GenericMapper} and

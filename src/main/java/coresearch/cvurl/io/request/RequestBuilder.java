@@ -1,5 +1,7 @@
 package coresearch.cvurl.io.request;
 
+import coresearch.cvurl.io.constant.HttpContentEncoding;
+import coresearch.cvurl.io.constant.HttpHeader;
 import coresearch.cvurl.io.mapper.GenericMapper;
 import coresearch.cvurl.io.constant.HttpMethod;
 
@@ -27,6 +29,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> {
     protected HttpMethod method;
     protected HttpRequest.BodyPublisher bodyPublisher = HttpRequest.BodyPublishers.noBody();
 
+    private boolean acceptCompressed;
     private String uri;
     private HttpClient httpClient;
     private Map<String, String> queryParams = new HashMap<>();
@@ -102,13 +105,19 @@ public class RequestBuilder<T extends RequestBuilder<T>> {
         return (T) this;
     }
 
+    @SuppressWarnings("unchecked")
+    public T acceptCompressed() {
+        this.acceptCompressed = true;
+        return (T) this;
+    }
+
     /**
      * Builds new {@link Request}.
      *
      * @return new {@link Request}
      */
     public Request build() {
-        return new Request(setUpHttpRequestBuilder().build(), httpClient, genericMapper);
+        return new Request(setUpHttpRequestBuilder().build(), httpClient, genericMapper, acceptCompressed);
     }
 
     private HttpRequest.Builder setUpHttpRequestBuilder() {
@@ -116,9 +125,14 @@ public class RequestBuilder<T extends RequestBuilder<T>> {
                 .uri(prepareURI())
                 .method(method.name(), bodyPublisher);
 
+        if (acceptCompressed) {
+            this.header(HttpHeader.ACCEPT_ENCODING, HttpContentEncoding.GZIP);
+        }
+
         timeout.ifPresent(builder::timeout);
 
         headers.forEach(builder::header);
+
 
         return builder;
     }

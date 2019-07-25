@@ -2,12 +2,14 @@ package coresearch.cvurl.io.multipart;
 
 import coresearch.cvurl.io.constant.HttpHeader;
 import coresearch.cvurl.io.constant.MIMEType;
+import coresearch.cvurl.io.exception.MultipartFileFormException;
 import coresearch.cvurl.io.utils.Resources;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MultipartBodyTest {
 
@@ -156,6 +159,15 @@ public class MultipartBodyTest {
         assertEquals(expectedResult, convertToString(multipartBody));
     }
 
+    @Test
+    public void filePartIOErrorTest() {
+        //given
+        Path path = Paths.get("non-existing-file");
+
+        //then
+        assertThrows(MultipartFileFormException.class,
+                () -> MultipartBody.create().formPart("name", Part.of(path)));
+    }
 
     private String convertToString(MultipartBody multipartBody) {
         return multipartBody.asByteArrays().stream().map(String::new).collect(Collectors.joining(""));
