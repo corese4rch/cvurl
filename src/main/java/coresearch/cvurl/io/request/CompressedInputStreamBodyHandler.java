@@ -13,6 +13,9 @@ import java.util.zip.GZIPInputStream;
 
 public class CompressedInputStreamBodyHandler implements HttpResponse.BodyHandler<InputStream> {
 
+    CompressedInputStreamBodyHandler() {
+    }
+
     @Override
     public HttpResponse.BodySubscriber<InputStream> apply(HttpResponse.ResponseInfo responseInfo) {
         Optional<String> encoding = responseInfo.headers().firstValue(HttpHeader.CONTENT_ENCODING);
