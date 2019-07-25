@@ -12,8 +12,6 @@ import java.net.http.HttpResponse;
 import java.util.Optional;
 import java.util.zip.GZIPInputStream;
 
-import static coresearch.cvurl.io.internal.utils.ResponseInfoUtils.getEncoding;
-
 public class CompressedStringBodyHandler implements HttpResponse.BodyHandler<String> {
 
     CompressedStringBodyHandler() {
