@@ -32,7 +32,7 @@ public class CVurlPutRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.PUT(url)
+        Response<String> response = cvurl.put(url)
                 .body("")
                 .build()
                 .asString()
@@ -58,7 +58,7 @@ public class CVurlPutRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.PUT(url)
+        Response<String> response = cvurl.put(url)
                 .body("")
                 .build()
                 .asString()
@@ -84,7 +84,7 @@ public class CVurlPutRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.PUT(url)
+        Response<String> response = cvurl.put(url)
                 .queryParam(testParam, testParam)
                 .body("")
                 .build()
@@ -112,7 +112,7 @@ public class CVurlPutRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.PUT(url)
+        Response<String> response = cvurl.put(url)
                 .queryParam(testParam, testParam)
                 .queryParam(testParam2, testParam2)
                 .body("")
@@ -140,7 +140,7 @@ public class CVurlPutRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.PUT(url)
+        Response<String> response = cvurl.put(url)
                 .header(HttpHeader.AUTHORIZATION, TEST_TOKEN)
                 .body("")
                 .build()
@@ -172,7 +172,7 @@ public class CVurlPutRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.PUT(url)
+        Response<String> response = cvurl.put(url)
                 .headers(headers)
                 .body("")
                 .build()
@@ -199,7 +199,7 @@ public class CVurlPutRequestTest extends AbstractRequestTest {
                         .withHeader(HttpHeader.AUTHORIZATION, TEST_TOKEN)
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.PUT(url)
+        Response<String> response = cvurl.put(url)
                 .body("")
                 .build()
                 .asString()
@@ -228,7 +228,7 @@ public class CVurlPutRequestTest extends AbstractRequestTest {
                         .withStatus(HttpStatus.OK)
                         .withBody(body)));
 
-        Response<String> response = cvurl.PUT(url)
+        Response<String> response = cvurl.put(url)
                 .body("")
                 .build()
                 .asString()
@@ -256,7 +256,7 @@ public class CVurlPutRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.PUT(url)
+        Response<String> response = cvurl.put(url)
                 .body(body)
                 .build()
                 .asString()
@@ -283,7 +283,7 @@ public class CVurlPutRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.PUT(url)
+        Response<String> response = cvurl.put(url)
                 .body(body.getBytes())
                 .build()
                 .asString()
@@ -312,7 +312,7 @@ public class CVurlPutRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.PUT(url)
+        Response<String> response = cvurl.put(url)
                 .body(users)
                 .build()
                 .asString()
@@ -340,7 +340,7 @@ public class CVurlPutRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.PUT(url)
+        Response<String> response = cvurl.put(url)
                 .body(user)
                 .build()
                 .asString()

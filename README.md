@@ -97,7 +97,7 @@ public void cvurl() {
         CVurl cvurl = new CVurl();
 
         //GET
-        Response<String> response = cvurl.GET("https://api.imgflip.com/get_memes")
+        Response<String> response = cvurl.get("https://api.imgflip.com/get_memes")
                         .build()
                         .asString()
                         .orElseThrow(RuntimeException::new);
@@ -195,7 +195,7 @@ public void cvurl() {
         CVurl cvurl = new CVurl();
 
         //POST
-        Result result = cvurl.POST("https://api.imgflip.com/caption_image")
+        Result result = cvurl.post("https://api.imgflip.com/caption_image")
                 .queryParams(Map.of(
                         "template_id", "112126428",
                         "username", "test-user",
