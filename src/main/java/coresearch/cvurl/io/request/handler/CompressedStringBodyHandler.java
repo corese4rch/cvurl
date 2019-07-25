@@ -1,4 +1,4 @@
-package coresearch.cvurl.io.request;
+package coresearch.cvurl.io.request.handler;
 
 import coresearch.cvurl.io.constant.HttpContentEncoding;
 import coresearch.cvurl.io.constant.HttpHeader;
@@ -12,9 +12,6 @@ import java.util.Optional;
 import java.util.zip.GZIPInputStream;
 
 public class CompressedStringBodyHandler implements HttpResponse.BodyHandler<String> {
-
-    CompressedStringBodyHandler() {
-    }
 
     @Override
     public HttpResponse.BodySubscriber<String> apply(HttpResponse.ResponseInfo responseInfo) {

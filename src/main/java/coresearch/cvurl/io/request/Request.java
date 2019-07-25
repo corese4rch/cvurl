@@ -5,6 +5,8 @@ import coresearch.cvurl.io.exception.ResponseBodyHandlingException;
 import coresearch.cvurl.io.exception.UnexpectedResponseException;
 import coresearch.cvurl.io.mapper.GenericMapper;
 import coresearch.cvurl.io.model.Response;
+import coresearch.cvurl.io.request.handler.CompressedInputStreamBodyHandler;
+import coresearch.cvurl.io.request.handler.CompressedStringBodyHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
