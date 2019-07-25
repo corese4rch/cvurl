@@ -7,7 +7,6 @@ import coresearch.cvurl.io.exception.ResponseBodyHandlingException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.http.HttpResponse;
 import java.util.Optional;
 import java.util.zip.GZIPInputStream;
@@ -29,14 +28,15 @@ public class CompressedStringBodyHandler implements HttpResponse.BodyHandler<Str
     }
 
     private String decompressGZIP(byte[] bytes) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try (var gzipInputStream = new GZIPInputStream(new ByteArrayInputStream(bytes));
+             var outputStream = new ByteArrayOutputStream()) {
 
-        try (InputStream gzipInputStream = new GZIPInputStream(new ByteArrayInputStream(bytes)); var autoCloseOutputStream = outputStream) {
-            gzipInputStream.transferTo(autoCloseOutputStream);
+            gzipInputStream.transferTo(outputStream);
+            return new String(outputStream.toByteArray());
+
         } catch (IOException e) {
             throw new ResponseBodyHandlingException(e.getMessage(), e);
         }
 
-        return new String(outputStream.toByteArray());
     }
 }
