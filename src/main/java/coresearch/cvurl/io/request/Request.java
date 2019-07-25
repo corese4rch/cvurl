@@ -29,13 +29,13 @@ public final class Request {
     private HttpClient httpClient;
     private HttpRequest httpRequest;
     private GenericMapper genericMapper;
-    private boolean compressedResponse;
+    private boolean acceptCompressed;
 
-    Request(HttpRequest httpRequest, HttpClient httpClient, GenericMapper genericMapper, boolean compressedResponse) {
+    Request(HttpRequest httpRequest, HttpClient httpClient, GenericMapper genericMapper, boolean acceptCompressed) {
         this.httpRequest = httpRequest;
         this.httpClient = httpClient;
         this.genericMapper = genericMapper;
-        this.compressedResponse = compressedResponse;
+        this.acceptCompressed = acceptCompressed;
     }
 
     /**
@@ -162,13 +162,13 @@ public final class Request {
     }
 
     private HttpResponse.BodyHandler<String> getStringBodyHandler() {
-        return compressedResponse ?
+        return acceptCompressed ?
                 new CompressedStringBodyHandler() :
                 BodyHandlers.ofString();
     }
 
     private HttpResponse.BodyHandler<InputStream> getStreamBodyHandler() {
-        return compressedResponse ?
+        return acceptCompressed ?
                 new CompressedInputStreamBodyHandler() :
                 BodyHandlers.ofInputStream();
     }

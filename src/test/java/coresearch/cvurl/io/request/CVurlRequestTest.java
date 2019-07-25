@@ -14,7 +14,6 @@ import coresearch.cvurl.io.model.Response;
 import coresearch.cvurl.io.multipart.MultipartBody;
 import coresearch.cvurl.io.multipart.Part;
 import coresearch.cvurl.io.utils.Resources;
-import org.eclipse.jetty.servlets.gzip.GzipOutputStream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -33,7 +32,6 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -570,7 +568,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withHeader(HttpHeader.CONTENT_ENCODING, HttpContentEncoding.GZIP)));
 
         //when
-        var response = cvurl.POST(url).compressedResponse().build().asString().orElseThrow(RuntimeException::new);
+        var response = cvurl.POST(url).acceptCompressed().build().asString().orElseThrow(RuntimeException::new);
 
         //then
         assertEquals(HttpStatus.OK, response.status());
@@ -589,7 +587,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withHeader(HttpHeader.CONTENT_ENCODING, HttpContentEncoding.GZIP)));
 
         //when
-        var response = cvurl.POST(url).compressedResponse().build().asStream().orElseThrow(RuntimeException::new);
+        var response = cvurl.POST(url).acceptCompressed().build().asStream().orElseThrow(RuntimeException::new);
 
         //then
         assertEquals(HttpStatus.OK, response.status());
