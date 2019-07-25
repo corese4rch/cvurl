@@ -1,6 +1,7 @@
 package coresearch.cvurl.io.request;
 
 import coresearch.cvurl.io.exception.RequestExecutionException;
+import coresearch.cvurl.io.exception.ResponseBodyHandlingException;
 import coresearch.cvurl.io.exception.UnexpectedResponseException;
 import coresearch.cvurl.io.mapper.GenericMapper;
 import coresearch.cvurl.io.model.Response;
@@ -177,7 +178,7 @@ public final class Request {
             HttpResponse<T> response = sendRequest(bodyHandler);
             return Optional.of(new Response<>(response));
 
-        } catch (InterruptedException | IOException e) {
+        } catch (InterruptedException | IOException | ResponseBodyHandlingException e) {
             LOGGER.error("Error while sending request: {}", e.getMessage());
             return Optional.empty();
         }
