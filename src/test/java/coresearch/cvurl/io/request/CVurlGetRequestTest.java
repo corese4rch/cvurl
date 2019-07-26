@@ -27,7 +27,7 @@ public class CVurlGetRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.GET(url).build().asString().orElseThrow(RuntimeException::new);
+        Response<String> response = cvurl.get(url).build().asString().orElseThrow(RuntimeException::new);
 
         //then
         WireMock.verify(WireMock.exactly(1),
@@ -49,7 +49,7 @@ public class CVurlGetRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.GET(url).build().asString().orElseThrow(RuntimeException::new);
+        Response<String> response = cvurl.get(url).build().asString().orElseThrow(RuntimeException::new);
 
         //then
         WireMock.verify(WireMock.exactly(1),
@@ -71,7 +71,7 @@ public class CVurlGetRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.GET(url)
+        Response<String> response = cvurl.get(url)
                 .queryParam(testParam, testParam)
                 .build()
                 .asString()
@@ -97,7 +97,7 @@ public class CVurlGetRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.GET(url)
+        Response<String> response = cvurl.get(url)
                 .queryParam(testParam, testParam)
                 .queryParam(testParam2, testParam2)
                 .build()
@@ -124,7 +124,7 @@ public class CVurlGetRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.GET(url)
+        Response<String> response = cvurl.get(url)
                 .header(HttpHeader.AUTHORIZATION, TEST_TOKEN)
                 .build()
                 .asString()
@@ -155,7 +155,7 @@ public class CVurlGetRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.GET(url)
+        Response<String> response = cvurl.get(url)
                 .headers(headers)
                 .build()
                 .asString()
@@ -181,7 +181,7 @@ public class CVurlGetRequestTest extends AbstractRequestTest {
                         .withHeader(HttpHeader.AUTHORIZATION, TEST_TOKEN)
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.GET(url).build().asString().orElseThrow(RuntimeException::new);
+        Response<String> response = cvurl.get(url).build().asString().orElseThrow(RuntimeException::new);
 
         //then
         WireMock.verify(WireMock.exactly(1),
@@ -206,7 +206,7 @@ public class CVurlGetRequestTest extends AbstractRequestTest {
                         .withStatus(HttpStatus.OK)
                         .withBody(body)));
 
-        Response<String> response = cvurl.GET(url).build().asString().orElseThrow(RuntimeException::new);
+        Response<String> response = cvurl.get(url).build().asString().orElseThrow(RuntimeException::new);
 
         //then
         WireMock.verify(WireMock.exactly(1),
