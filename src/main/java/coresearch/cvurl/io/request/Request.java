@@ -1,7 +1,5 @@
 package coresearch.cvurl.io.request;
 
-import coresearch.cvurl.io.exception.RequestExecutionException;
-import coresearch.cvurl.io.exception.ResponseBodyHandlingException;
 import coresearch.cvurl.io.exception.UnexpectedResponseException;
 import coresearch.cvurl.io.mapper.GenericMapper;
 import coresearch.cvurl.io.model.Response;
@@ -10,7 +8,6 @@ import coresearch.cvurl.io.request.handler.CompressedStringBodyHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -87,9 +84,8 @@ public final class Request {
     /**
      * Sends current request blocking if necessary to get
      * the response. Converts response body to specified type if
-     * provided statusCode matches response status code and throws
-     * {@link UnexpectedResponseException} otherwise. Throws {@link RequestExecutionException}
-     * if some error happens on request sending.
+     * provided statusCode matches response status code and returns empty optional otherwise.
+     * Is some error happens during request sending or response body conversion returns empty optional.
      *
      * @param type       type of object to convert response body.
      * @param statusCode status code on which converting should be done
