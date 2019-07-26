@@ -151,7 +151,7 @@ public final class Request {
             return Optional.of(responseMapper.apply(response));
 
         } catch (Exception e) {
-            LOGGER.error("Error while sending request: {}", e.getMessage());
+            LOGGER.error("Error while sending request: {} exception happened with message {}", e.toString(), e.getMessage());
             return Optional.empty();
         }
     }
