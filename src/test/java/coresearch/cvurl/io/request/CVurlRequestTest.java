@@ -4,9 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.http.Fault;
 import coresearch.cvurl.io.constant.*;
-import coresearch.cvurl.io.exception.MappingException;
-import coresearch.cvurl.io.exception.RequestExecutionException;
-import coresearch.cvurl.io.exception.UnexpectedResponseException;
 import coresearch.cvurl.io.helper.ObjectGenerator;
 import coresearch.cvurl.io.helper.model.User;
 import coresearch.cvurl.io.model.Configuration;
@@ -29,7 +26,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -63,14 +59,18 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void mappingExceptionTest() {
-
+    public void asObjectOnUnparseableBodyShouldReturnEmptyOptional() {
+        //given
         wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)
                         .withBody("not a json string")));
 
-        assertThrows(MappingException.class, () -> cvurl.get(url).build().asObject(User.class, HttpStatus.OK));
+        //when
+        Optional<User> user = cvurl.get(url).build().asObject(User.class, HttpStatus.OK);
+
+        //then
+        assertTrue(user.isEmpty());
     }
 
     @Test
@@ -82,7 +82,9 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withStatus(HttpStatus.OK)
                         .withBody(mapper.writeValueAsString(user))));
 
-        User resultUser = cvurl.get(url).build().asObject(User.class, HttpStatus.OK);
+        User resultUser = cvurl.get(url).build()
+                .asObject(User.class, HttpStatus.OK)
+                .orElseThrow(RuntimeException::new);
 
         assertEquals(user, resultUser);
     }
@@ -206,50 +208,10 @@ public class CVurlRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse().withStatus(HttpStatus.BAD_REQUEST)));
 
         //when
-        assertThrows(UnexpectedResponseException.class,
-                () -> cvurl.get(url).build().asObject(User.class, HttpStatus.OK));
-    }
-
-    @Test
-    public void mapTest() {
-        //given
-        String body = "Test body for test";
-        String url = format(URL_PATTERN, PORT, TEST_ENDPOINT);
-
-        //when
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
-                        .withStatus(HttpStatus.OK)
-                        .withBody(body)));
-
-        Response<List<String>> response = cvurl.get(url).build().map(List::of).orElseThrow(RuntimeException::new);
+        Optional<User> user = cvurl.get(url).build().asObject(User.class, HttpStatus.OK);
 
         //then
-        assertTrue(response.isSuccessful());
-        assertEquals(HttpStatus.OK, response.status());
-        assertEquals(body, response.getBody().get(0));
-    }
-
-    @Test
-    public void asyncMapTest() throws ExecutionException, InterruptedException {
-        //
-        String body = "I am a string";
-        boolean[] isThenApplyInvoked = {false};
-
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
-                        .withBody(body)));
-
-        Response<List<String>> response = cvurl.get(url).build().asyncMap(List::of)
-                .thenApply(res ->
-                {
-                    isThenApplyInvoked[0] = true;
-                    return res;
-                })
-                .get();
-
-        assertTrue(isThenApplyInvoked[0]);
-        assertEquals(body, response.getBody().get(0));
+        assertTrue(user.isEmpty());
     }
 
     @Test
@@ -324,13 +286,16 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void onSendErrorAsObjectShouldThrowRequestExecutionException() {
+    public void onSendErrorAsObjectShouldReturnEmptyOptionalTest() {
         //given
         wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
                 .willReturn(WireMock.aResponse().withFault(Fault.RANDOM_DATA_THEN_CLOSE)));
 
+        //when
+        Optional<User> user = cvurl.get(url).build().asObject(User.class, HttpStatus.OK);
+
         //then
-        assertThrows(RequestExecutionException.class, () -> cvurl.get(url).build().asObject(User.class, 200));
+        assertTrue(user.isEmpty());
     }
 
     @Test

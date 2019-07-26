@@ -33,7 +33,6 @@
         <mockito.version>2.28.2</mockito.version>
         <wiremock.version>2.23.2</wiremock.version>
         <hamcrest.version>2.1</hamcrest.version>
-        <podam.version>7.2.3.RELEASE</podam.version>
         <junit-jupiter.version>5.5.0</junit-jupiter.version>
         <!-- plugins -->
         <maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
@@ -88,12 +87,6 @@
                     <artifactId>junit</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>uk.co.jemos.podam</groupId>
-            <artifactId>podam</artifactId>
-            <version>${podam.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

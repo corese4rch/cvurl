@@ -1,15 +1,18 @@
 package coresearch.cvurl.io.helper;
 
 import coresearch.cvurl.io.helper.model.User;
-import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 public class ObjectGenerator {
 
+    private static Random random = new Random();
+
     public static User generateTestObject() {
-        return new PodamFactoryImpl().manufacturePojo(User.class);
+        return new User(UUID.randomUUID().toString(), random.nextInt(100));
     }
 
     public static List<User> generateListOfTestObjects() {
