@@ -1,11 +1,23 @@
 package coresearch.cvurl.io.mapper;
 
+import coresearch.cvurl.io.exception.MappingException;
+import coresearch.cvurl.io.exception.ResponseMappingException;
+import coresearch.cvurl.io.model.Response;
+
 /**
  * Mapper from/to String to/from some custom type. Used by {@link coresearch.cvurl.io.request.Request}
  * to map body from response to object of some type and by {@link coresearch.cvurl.io.request.RequestBuilder}
  * to convert objects to String request body.
  */
-public interface GenericMapper {
+public abstract class GenericMapper {
+
+    public final <T> T readResponseBody(Response<String> response, Class<T> type) {
+        try {
+            return readValue(response.getBody(), type);
+        } catch (MappingException e) {
+            throw new ResponseMappingException(e.getMessage(), e, response);
+        }
+    }
 
     /**
      * Deserialize String value to object of specified type.
@@ -15,7 +27,7 @@ public interface GenericMapper {
      * @param <T>       concrete type
      * @return converted object
      */
-    <T> T readValue(String value, Class<T> valueType);
+    public abstract <T> T readValue(String value, Class<T> valueType);
 
     /**
      * Serialize object to String.
@@ -23,5 +35,5 @@ public interface GenericMapper {
      * @param value object to be serialized
      * @return resulted String value.
      */
-    String writeValue(Object value);
+    public abstract String writeValue(Object value);
 }

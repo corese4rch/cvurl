@@ -7,7 +7,7 @@ import coresearch.cvurl.io.mapper.GenericMapper;
 
 import java.io.IOException;
 
-public class JacksonMapper implements GenericMapper {
+public class JacksonMapper extends GenericMapper {
 
     private ObjectMapper objectMapper;
 

@@ -1,5 +1,6 @@
 package coresearch.cvurl.io.request;
 
+import coresearch.cvurl.io.exception.RequestExecutionException;
 import coresearch.cvurl.io.exception.UnexpectedResponseException;
 import coresearch.cvurl.io.mapper.GenericMapper;
 import coresearch.cvurl.io.model.Response;
@@ -8,6 +9,7 @@ import coresearch.cvurl.io.request.handler.CompressedStringBodyHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -57,6 +59,20 @@ public final class Request {
     /**
      * Sends current request asynchronously.
      *
+     * @param type type of object to convert response body.
+     * @param <T>  type of object to convert response body
+     * @return {@link CompletableFuture} with object of provided type or {@link CompletableFuture}
+     * that finishes exceptionally with {@link coresearch.cvurl.io.exception.ResponseMappingException} or
+     * {@link RequestExecutionException}
+     */
+    public <T> CompletableFuture<T> asyncAsObject(Class<T> type) {
+        return this.httpClient.sendAsync(httpRequest, getStringBodyHandler())
+                .thenApply((response -> genericMapper.readResponseBody(new Response<>(response), type)));
+    }
+
+    /**
+     * Sends current request asynchronously.
+     *
      * @return {@link CompletableFuture} with returned response.
      */
     public CompletableFuture<Response<String>> asyncAsString() {
@@ -93,8 +109,26 @@ public final class Request {
      * @return object of specified type
      */
     public <T> Optional<T> asObject(Class<T> type, int statusCode) {
-        return sendRequestAndMapResponse(getStringBodyHandler(),
+        return sendRequestAndWrapInOptional(getStringBodyHandler(),
                 (response) -> parseResponse(response, type, statusCode));
+    }
+
+    /**
+     * Sends current request blocking if necessary to get
+     * the response. Converts response body to specified type, if error happens during conversion
+     * throws {@link coresearch.cvurl.io.exception.ResponseMappingException}.
+     *
+     * @param type type of object to convert response body.
+     * @param <T>  type of object to convert response body
+     * @return object of specified type
+     */
+    public <T> T asObject(Class<T> type) {
+        try {
+            return sendRequest(getStringBodyHandler(),
+                    response -> genericMapper.readResponseBody(new Response<>(response), type));
+        } catch (IOException | InterruptedException e) {
+            throw new RequestExecutionException(e.getMessage(), e);
+        }
     }
 
     /**
@@ -105,7 +139,7 @@ public final class Request {
      * request sending or empty {@link Optional} otherwise.
      */
     public Optional<Response<String>> asString() {
-        return sendRequestAndMapResponse(getStringBodyHandler(), Response::new);
+        return sendRequestAndWrapInOptional(getStringBodyHandler(), Response::new);
     }
 
     /**
@@ -116,7 +150,7 @@ public final class Request {
      * request sending or empty {@link Optional} otherwise.
      */
     public Optional<Response<InputStream>> asStream() {
-        return sendRequestAndMapResponse(getStreamBodyHandler(), Response::new);
+        return sendRequestAndWrapInOptional(getStreamBodyHandler(), Response::new);
     }
 
     /**
@@ -128,7 +162,7 @@ public final class Request {
      * request sending or empty {@link Optional} otherwise.
      */
     public <T> Optional<Response<T>> as(HttpResponse.BodyHandler<T> bodyHandler) {
-        return sendRequestAndMapResponse(bodyHandler, Response::new);
+        return sendRequestAndWrapInOptional(bodyHandler, Response::new);
     }
 
     private HttpResponse.BodyHandler<String> getStringBodyHandler() {
@@ -139,13 +173,10 @@ public final class Request {
         return acceptCompressed ? new CompressedInputStreamBodyHandler() : BodyHandlers.ofInputStream();
     }
 
-    private <T, U> Optional<T> sendRequestAndMapResponse(HttpResponse.BodyHandler<U> bodyHandler,
-                                                         Function<HttpResponse<U>, T> responseMapper) {
-        LOGGER.info("Sending request {}", this.httpRequest);
+    private <T, U> Optional<T> sendRequestAndWrapInOptional(HttpResponse.BodyHandler<U> bodyHandler,
+                                                            Function<HttpResponse<U>, T> responseMapper) {
         try {
-            HttpResponse<U> response = this.httpClient.send(this.httpRequest, bodyHandler);
-            return Optional.of(responseMapper.apply(response));
-
+            return Optional.of(sendRequest(bodyHandler, responseMapper));
         } catch (Exception e) {
             LOGGER.error("Error while sending request: {} exception happened with message {}", e.toString(), e.getMessage());
             return Optional.empty();
@@ -158,6 +189,14 @@ public final class Request {
                     ",expected: " + statusCode + ";Response: " + response.body(),
                     new Response<>(response));
         }
+
         return genericMapper.readValue(response.body(), type);
+    }
+
+    private <T, U> T sendRequest(HttpResponse.BodyHandler<U> bodyHandler,
+                                 Function<HttpResponse<U>, T> responseMapper) throws IOException, InterruptedException {
+        LOGGER.info("Sending request {}", this.httpRequest);
+        HttpResponse<U> response = this.httpClient.send(this.httpRequest, bodyHandler);
+        return responseMapper.apply(response);
     }
 }
