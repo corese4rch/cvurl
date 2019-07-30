@@ -4,15 +4,19 @@ import coresearch.cvurl.io.constant.HttpContentEncoding;
 import coresearch.cvurl.io.constant.HttpHeader;
 import coresearch.cvurl.io.mapper.GenericMapper;
 import coresearch.cvurl.io.constant.HttpMethod;
+import coresearch.cvurl.io.model.Response;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collector;
 import java.util.Optional;
 
@@ -23,7 +27,7 @@ import static java.util.stream.Collectors.joining;
  *
  * @param <T>
  */
-public class RequestBuilder<T extends RequestBuilder<T>> {
+public class RequestBuilder<T extends RequestBuilder<T>> implements Request {
 
     protected GenericMapper genericMapper;
     protected HttpMethod method;
@@ -116,8 +120,8 @@ public class RequestBuilder<T extends RequestBuilder<T>> {
      *
      * @return new {@link Request}
      */
-    public Request build() {
-        return new Request(setUpHttpRequestBuilder().build(), httpClient, genericMapper, acceptCompressed);
+    public Request create() {
+        return new CVurlRequest(setUpHttpRequestBuilder().build(), httpClient, genericMapper, acceptCompressed);
     }
 
     private HttpRequest.Builder setUpHttpRequestBuilder() {
@@ -153,5 +157,55 @@ public class RequestBuilder<T extends RequestBuilder<T>> {
 
     private String encode(String str) {
         return URLEncoder.encode(str, StandardCharsets.UTF_8);
+    }
+
+    @Override
+    public <U> CompletableFuture<U> asyncAsObject(Class<U> type, int statusCode) {
+        return create().asyncAsObject(type, statusCode);
+    }
+
+    @Override
+    public <U> CompletableFuture<U> asyncAsObject(Class<U> type) {
+        return create().asyncAsObject(type);
+    }
+
+    @Override
+    public CompletableFuture<Response<String>> asyncAsString() {
+        return create().asyncAsString();
+    }
+
+    @Override
+    public CompletableFuture<Response<InputStream>> asyncAsStream() {
+        return create().asyncAsStream();
+    }
+
+    @Override
+    public <U> CompletableFuture<Response<U>> asyncAs(HttpResponse.BodyHandler<U> bodyHandler) {
+        return create().asyncAs(bodyHandler);
+    }
+
+    @Override
+    public <U> Optional<U> asObject(Class<U> type, int statusCode) {
+        return create().asObject(type, statusCode);
+    }
+
+    @Override
+    public <U> U asObject(Class<U> type) {
+        return create().asObject(type);
+    }
+
+    @Override
+    public Optional<Response<String>> asString() {
+        return create().asString();
+    }
+
+    @Override
+    public Optional<Response<InputStream>> asStream() {
+        return create().asStream();
+    }
+
+    @Override
+    public <U> Optional<Response<U>> as(HttpResponse.BodyHandler<U> bodyHandler) {
+        return create().as(bodyHandler);
     }
 }

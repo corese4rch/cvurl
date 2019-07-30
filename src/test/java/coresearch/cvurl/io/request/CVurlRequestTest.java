@@ -17,12 +17,16 @@ import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,6 +42,7 @@ import java.util.zip.GZIPOutputStream;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.times;
 
 
 public class CVurlRequestTest extends AbstractRequestTest {
@@ -55,7 +60,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withBody(EMPTY_STRING)));
 
-        Response<String> response = cvurl.get(url).build().asString().orElseThrow(RuntimeException::new);
+        Response<String> response = cvurl.get(url).asString().orElseThrow(RuntimeException::new);
 
         assertEquals(EMPTY_STRING, response.getBody());
     }
@@ -69,7 +74,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withBody("not a json string")));
 
         //when
-        Optional<User> user = cvurl.get(url).build().asObject(User.class, HttpStatus.OK);
+        Optional<User> user = cvurl.get(url).asObject(User.class, HttpStatus.OK);
 
         //then
         assertTrue(user.isEmpty());
@@ -84,7 +89,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withStatus(HttpStatus.OK)
                         .withBody(mapper.writeValueAsString(user))));
 
-        User resultUser = cvurl.get(url).build()
+        User resultUser = cvurl.get(url)
                 .asObject(User.class, HttpStatus.OK)
                 .orElseThrow(RuntimeException::new);
 
@@ -101,7 +106,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withBody(body)));
 
-        Response<String> response = cvurl.get(url).build().asyncAsString()
+        Response<String> response = cvurl.get(url).asyncAsString()
                 .thenApply(res ->
                 {
                     isThenApplyInvoked[0] = true;
@@ -125,7 +130,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withStatus(HttpStatus.OK)
                         .withBody(mapper.writeValueAsString(user))));
 
-        User resultUser = cvurl.get(url).build().asyncAsObject(User.class, HttpStatus.OK)
+        User resultUser = cvurl.get(url).asyncAsObject(User.class, HttpStatus.OK)
                 .thenApply(res ->
                 {
                     isThenApplyInvoked[0] = true;
@@ -150,7 +155,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withBody(EMPTY_STRING)));
 
         //when
-        Optional<Response<String>> response = cvurl.get(url).build().asString();
+        Optional<Response<String>> response = cvurl.get(url).asString();
 
         //then
         assertTrue(response.isEmpty());
@@ -165,7 +170,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withBody(EMPTY_STRING)));
 
         //when
-        Optional<Response<String>> response = cvurl.get(url).timeout(Duration.ofMillis(100)).build().asString();
+        Optional<Response<String>> response = cvurl.get(url).timeout(Duration.ofMillis(100)).asString();
 
         //then
         assertTrue(response.isEmpty());
@@ -184,7 +189,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withBody(EMPTY_STRING)));
 
         //when
-        Optional<Response<String>> response = cvurl.get(url).timeout(Duration.ofMillis(100)).build().asString();
+        Optional<Response<String>> response = cvurl.get(url).timeout(Duration.ofMillis(100)).asString();
 
         //then
         assertTrue(response.isEmpty());
@@ -197,7 +202,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse().withFault(Fault.RANDOM_DATA_THEN_CLOSE)));
 
         //when
-        Optional<Response<String>> response = cvurl.get(url).build().asString();
+        Optional<Response<String>> response = cvurl.get(url).asString();
 
         //then
         assertTrue(response.isEmpty());
@@ -210,7 +215,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse().withStatus(HttpStatus.BAD_REQUEST)));
 
         //when
-        Optional<User> user = cvurl.get(url).build().asObject(User.class, HttpStatus.OK);
+        Optional<User> user = cvurl.get(url).asObject(User.class, HttpStatus.OK);
 
         //then
         assertTrue(user.isEmpty());
@@ -229,7 +234,6 @@ public class CVurlRequestTest extends AbstractRequestTest {
         //when
         var response = cvurl.get(URI.create(urlWithParameters).toURL())
                 .queryParam("param2", "2")
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -250,7 +254,6 @@ public class CVurlRequestTest extends AbstractRequestTest {
         //when
         var response = cvurl.get(urlWithParameters)
                 .queryParam("param2", "2")
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -265,7 +268,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse().withStatus(HttpStatus.NO_CONTENT)));
 
         //when
-        var response = cvurl.get(url).build().asString().orElseThrow(RuntimeException::new);
+        var response = cvurl.get(url).asString().orElseThrow(RuntimeException::new);
 
         //then
         assertEquals(HttpStatus.NO_CONTENT, response.status());
@@ -280,11 +283,10 @@ public class CVurlRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.ok()));
 
         //when
-        var response = cvurl.get(url).queryParams(queryParams).build().asString().orElseThrow(RuntimeException::new);
+        var response = cvurl.get(url).queryParams(queryParams).asString().orElseThrow(RuntimeException::new);
 
         //then
         assertEquals(HttpStatus.OK, response.status());
-
     }
 
     @Test
@@ -294,7 +296,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse().withFault(Fault.RANDOM_DATA_THEN_CLOSE)));
 
         //when
-        Optional<User> user = cvurl.get(url).build().asObject(User.class, HttpStatus.OK);
+        Optional<User> user = cvurl.get(url).asObject(User.class, HttpStatus.OK);
 
         //then
         assertTrue(user.isEmpty());
@@ -323,7 +325,6 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .type(MultipartType.FORM)
                         .formPart(plainTextPartName, Part.of("content").contentType(MIMEType.TEXT_PLAIN))
                         .formPart(filePartName, Part.of("{}").contentType(MIMEType.APPLICATION_JSON)))
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -349,7 +350,6 @@ public class CVurlRequestTest extends AbstractRequestTest {
                 .body(MultipartBody.create()
                         .type(MultipartType.FORM)
                         .formPart(partName, Part.of(jsonPath)))
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -375,7 +375,6 @@ public class CVurlRequestTest extends AbstractRequestTest {
                 .body(MultipartBody.create()
                         .type(MultipartType.FORM)
                         .formPart(partName, Part.of(jsonPath).contentType(MIMEType.APPLICATION_XML)))
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -399,7 +398,6 @@ public class CVurlRequestTest extends AbstractRequestTest {
         var response = cvurl.post(url).body(MultipartBody
                 .create(boundary)
                 .type(multipartType))
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -428,7 +426,6 @@ public class CVurlRequestTest extends AbstractRequestTest {
         //when
         var response = cvurl.post(url)
                 .formData(paramsMap)
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -448,7 +445,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse().withBodyFile(BODY_AS_INPUT_STREAM_TXT)));
 
         //when
-        Response<InputStream> response = cvurl.post(url).build().asStream().orElseThrow(RuntimeException::new);
+        Response<InputStream> response = cvurl.post(url).asStream().orElseThrow(RuntimeException::new);
 
         //then
         assertEquals(HttpStatus.OK, response.status());
@@ -466,7 +463,6 @@ public class CVurlRequestTest extends AbstractRequestTest {
 
         //when
         Response<Stream<String>> response = cvurl.post(url)
-                .build()
                 .as(HttpResponse.BodyHandlers.ofLines())
                 .orElseThrow(RuntimeException::new);
 
@@ -484,7 +480,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse().withBodyFile(BODY_AS_INPUT_STREAM_TXT)));
 
         //when
-        Response<InputStream> response = cvurl.post(url).build().asyncAsStream()
+        Response<InputStream> response = cvurl.post(url).asyncAsStream()
                 .thenApply(res ->
                 {
                     isThenApplyInvoked[0] = true;
@@ -510,7 +506,6 @@ public class CVurlRequestTest extends AbstractRequestTest {
 
         //when
         Response<Stream<String>> response = cvurl.post(url)
-                .build()
                 .asyncAs(HttpResponse.BodyHandlers.ofLines())
                 .thenApply(res ->
                 {
@@ -538,7 +533,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withHeader(HttpHeader.CONTENT_ENCODING, HttpContentEncoding.GZIP)));
 
         //when
-        var response = cvurl.post(url).acceptCompressed().build().asString().orElseThrow(RuntimeException::new);
+        var response = cvurl.post(url).acceptCompressed().asString().orElseThrow(RuntimeException::new);
 
         //then
         assertEquals(HttpStatus.OK, response.status());
@@ -557,7 +552,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withHeader(HttpHeader.CONTENT_ENCODING, HttpContentEncoding.GZIP)));
 
         //when
-        var response = cvurl.post(url).acceptCompressed().build().asStream().orElseThrow(RuntimeException::new);
+        var response = cvurl.post(url).acceptCompressed().asStream().orElseThrow(RuntimeException::new);
 
         //then
         assertEquals(HttpStatus.OK, response.status());
@@ -575,7 +570,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withHeader(HttpHeaders.CONTENT_ENCODING, "unknown")));
 
         //when
-        var response = cvurl.post(url).acceptCompressed().build().asString().orElseThrow(RuntimeException::new);
+        var response = cvurl.post(url).acceptCompressed().asString().orElseThrow(RuntimeException::new);
 
         //then
         assertEquals(HttpStatus.OK, response.status());
@@ -593,7 +588,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withHeader(HttpHeaders.CONTENT_ENCODING, "unknown")));
 
         //when
-        var response = cvurl.post(url).acceptCompressed().build().asStream().orElseThrow(RuntimeException::new);
+        var response = cvurl.post(url).acceptCompressed().asStream().orElseThrow(RuntimeException::new);
 
         //then
         assertEquals(HttpStatus.OK, response.status());
@@ -608,7 +603,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withFault(Fault.RANDOM_DATA_THEN_CLOSE)));
 
         //then
-        var response = cvurl.post(url).acceptCompressed().build().asStream();
+        var response = cvurl.post(url).acceptCompressed().asStream();
 
         assertTrue(response.isEmpty());
     }
@@ -622,7 +617,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withStatus(HttpStatus.OK)
                         .withBody(mapper.writeValueAsString(user))));
 
-        User resultUser = cvurl.get(url).build()
+        User resultUser = cvurl.get(url)
                 .asObject(User.class);
 
         assertEquals(user, resultUser);
@@ -635,7 +630,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse().withFault(Fault.RANDOM_DATA_THEN_CLOSE)));
 
         //then
-        assertThrows(RequestExecutionException.class, () -> cvurl.get(url).build().asObject(User.class));
+        assertThrows(RequestExecutionException.class, () -> cvurl.get(url).asObject(User.class));
     }
 
     @Test
@@ -649,7 +644,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
 
         //when
         ResponseMappingException responseMappingException = assertThrows(ResponseMappingException.class,
-                () -> cvurl.get(url).build().asObject(User.class));
+                () -> cvurl.get(url).asObject(User.class));
 
         //then
         assertEquals(HttpStatus.OK, responseMappingException.getResponse().status());
@@ -668,7 +663,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withBody(mapper.writeValueAsString(user))));
 
         //when
-        User resultUser = cvurl.get(url).build().asyncAsObject(User.class)
+        User resultUser = cvurl.get(url).asyncAsObject(User.class)
                 .thenApply(res ->
                 {
                     isThenApplyInvoked[0] = true;
@@ -693,7 +688,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withBody(body)));
 
         //then
-        cvurl.get(url).build().asyncAsObject(User.class)
+        cvurl.get(url).asyncAsObject(User.class)
                 .exceptionally(exception ->
                 {
                     assertTrue(exception.getCause() instanceof ResponseMappingException);
@@ -707,6 +702,28 @@ public class CVurlRequestTest extends AbstractRequestTest {
                 .get();
 
         assertTrue(isExceptionallyInvoked[0]);
+    }
+
+    @Test
+    public void reusableRequestCreationTest() throws IOException, InterruptedException {
+        //given
+        HttpClient httpClient = Mockito.mock(HttpClient.class);
+        Request request = new CVurl(httpClient).get(url).create();
+
+        ArgumentCaptor<HttpRequest> httpRequestArgumentCaptor = ArgumentCaptor.forClass(HttpRequest.class);
+
+        //when
+        request.asString();
+        request.asString();
+
+        //then both executions are done on the same request
+        Mockito.verify(httpClient, times(2)).send(
+                httpRequestArgumentCaptor.capture(), Mockito.any(HttpResponse.BodyHandler.class));
+
+        HttpRequest httpRequest1 = httpRequestArgumentCaptor.getAllValues().get(0);
+        HttpRequest httpRequest2 = httpRequestArgumentCaptor.getAllValues().get(1);
+
+        assertSame(httpRequest1, httpRequest2);
     }
 
     private byte[] compressWithGZIP(String str) throws IOException {

@@ -34,7 +34,6 @@ public class CVurlPostRequestTest extends AbstractRequestTest {
 
         Response<String> response = cvurl.post(url)
                 .body("")
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -60,7 +59,6 @@ public class CVurlPostRequestTest extends AbstractRequestTest {
 
         Response<String> response = cvurl.post(url)
                 .body("")
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -87,7 +85,6 @@ public class CVurlPostRequestTest extends AbstractRequestTest {
         Response<String> response = cvurl.post(url)
                 .queryParam(testParam, testParam)
                 .body("")
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -116,7 +113,6 @@ public class CVurlPostRequestTest extends AbstractRequestTest {
                 .queryParam(testParam, testParam)
                 .queryParam(testParam2, testParam2)
                 .body("")
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -143,7 +139,6 @@ public class CVurlPostRequestTest extends AbstractRequestTest {
         Response<String> response = cvurl.post(url)
                 .header(HttpHeader.AUTHORIZATION, TEST_TOKEN)
                 .body("")
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -175,7 +170,6 @@ public class CVurlPostRequestTest extends AbstractRequestTest {
         Response<String> response = cvurl.post(url)
                 .headers(headers)
                 .body("")
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -201,7 +195,6 @@ public class CVurlPostRequestTest extends AbstractRequestTest {
 
         Response<String> response = cvurl.post(url)
                 .body("")
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -230,7 +223,6 @@ public class CVurlPostRequestTest extends AbstractRequestTest {
 
         Response<String> response = cvurl.post(url)
                 .body("")
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -259,7 +251,6 @@ public class CVurlPostRequestTest extends AbstractRequestTest {
 
         Response<String> response = cvurl.post(url)
                 .body(body)
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -286,7 +277,6 @@ public class CVurlPostRequestTest extends AbstractRequestTest {
 
         Response<String> response = cvurl.post(url)
                 .body(body.getBytes())
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -315,7 +305,6 @@ public class CVurlPostRequestTest extends AbstractRequestTest {
 
         Response<String> response = cvurl.post(url)
                 .body(users)
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -342,7 +331,6 @@ public class CVurlPostRequestTest extends AbstractRequestTest {
 
         Response<String> response = cvurl.post(url)
                 .body(user)
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
