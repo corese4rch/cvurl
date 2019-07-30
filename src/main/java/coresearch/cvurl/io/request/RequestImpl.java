@@ -21,7 +21,7 @@ import java.util.function.Function;
 
 /**
  * Class responsible for sending HTTP requests and parsing responses.
- * Can be created by using {@link RequestBuilder#build()}
+ * Can be created by using {@link RequestBuilder#create()}
  */
 public final class RequestImpl implements Request {
 

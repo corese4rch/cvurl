@@ -120,7 +120,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request {
      *
      * @return new {@link Request}
      */
-    public Request build() {
+    public Request create() {
         return new RequestImpl(setUpHttpRequestBuilder().build(), httpClient, genericMapper, acceptCompressed);
     }
 
@@ -161,51 +161,51 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request {
 
     @Override
     public <U> CompletableFuture<U> asyncAsObject(Class<U> type, int statusCode) {
-        return build().asyncAsObject(type, statusCode);
+        return create().asyncAsObject(type, statusCode);
     }
 
     @Override
     public <U> CompletableFuture<U> asyncAsObject(Class<U> type) {
-        return build().asyncAsObject(type);
+        return create().asyncAsObject(type);
     }
 
     @Override
     public CompletableFuture<Response<String>> asyncAsString() {
-        return build().asyncAsString();
+        return create().asyncAsString();
     }
 
     @Override
     public CompletableFuture<Response<InputStream>> asyncAsStream() {
-        return build().asyncAsStream();
+        return create().asyncAsStream();
     }
 
     @Override
     public <U> CompletableFuture<Response<U>> asyncAs(HttpResponse.BodyHandler<U> bodyHandler) {
-        return build().asyncAs(bodyHandler);
+        return create().asyncAs(bodyHandler);
     }
 
     @Override
     public <U> Optional<U> asObject(Class<U> type, int statusCode) {
-        return build().asObject(type, statusCode);
+        return create().asObject(type, statusCode);
     }
 
     @Override
     public <U> U asObject(Class<U> type) {
-        return build().asObject(type);
+        return create().asObject(type);
     }
 
     @Override
     public Optional<Response<String>> asString() {
-        return build().asString();
+        return create().asString();
     }
 
     @Override
     public Optional<Response<InputStream>> asStream() {
-        return build().asStream();
+        return create().asStream();
     }
 
     @Override
     public <U> Optional<Response<U>> as(HttpResponse.BodyHandler<U> bodyHandler) {
-        return build().as(bodyHandler);
+        return create().as(bodyHandler);
     }
 }
