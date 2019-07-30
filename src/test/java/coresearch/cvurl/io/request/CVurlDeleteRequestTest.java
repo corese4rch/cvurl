@@ -32,7 +32,7 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.delete(url).build().asString().orElseThrow(RuntimeException::new);
+        Response<String> response = cvurl.delete(url).asString().orElseThrow(RuntimeException::new);
         //then
         WireMock.verify(WireMock.exactly(1),
                 WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
@@ -53,7 +53,7 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.delete(url).build().asString().orElseThrow(RuntimeException::new);
+        Response<String> response = cvurl.delete(url).asString().orElseThrow(RuntimeException::new);
 
         //then
         WireMock.verify(WireMock.exactly(1),
@@ -77,7 +77,6 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
 
         Response<String> response = cvurl.delete(url)
                 .queryParam(testParam, testParam)
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -103,7 +102,6 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
 
         Response<String> response = cvurl.delete(url)
                 .header(HttpHeader.AUTHORIZATION, TEST_TOKEN)
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -132,7 +130,6 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
         Response<String> response = cvurl.delete(url)
                 .queryParam(testParam, testParam)
                 .queryParam(testParam2, testParam2)
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -163,7 +160,6 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
 
         Response<String> response = cvurl.delete(url)
                 .headers(headers)
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -187,7 +183,7 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
                         .withHeader(HttpHeader.AUTHORIZATION, TEST_TOKEN)
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.delete(url).build().asString().orElseThrow(RuntimeException::new);
+        Response<String> response = cvurl.delete(url).asString().orElseThrow(RuntimeException::new);
 
         //then
         WireMock.verify(WireMock.exactly(1),
@@ -212,7 +208,7 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
                         .withStatus(HttpStatus.OK)
                         .withBody(body)));
 
-        Response<String> response = cvurl.delete(url).build().asString().orElseThrow(RuntimeException::new);
+        Response<String> response = cvurl.delete(url).asString().orElseThrow(RuntimeException::new);
 
         //then
         WireMock.verify(WireMock.exactly(1),
@@ -238,7 +234,6 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
 
         Response<String> response = cvurl.delete(url)
                 .body(body)
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -265,7 +260,6 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
 
         Response<String> response = cvurl.delete(url)
                 .body(body.getBytes())
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -294,7 +288,6 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
 
         Response<String> response = cvurl.delete(url)
                 .body(users)
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -322,7 +315,6 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
 
         Response<String> response = cvurl.delete(url)
                 .body(user)
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 

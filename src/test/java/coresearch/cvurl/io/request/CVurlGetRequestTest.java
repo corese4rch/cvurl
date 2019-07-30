@@ -1,9 +1,9 @@
 package coresearch.cvurl.io.request;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
-import coresearch.cvurl.io.model.Response;
 import coresearch.cvurl.io.constant.HttpHeader;
 import coresearch.cvurl.io.constant.HttpStatus;
+import coresearch.cvurl.io.model.Response;
 import org.junit.jupiter.api.Test;
 
 import java.net.MalformedURLException;
@@ -27,7 +27,7 @@ public class CVurlGetRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.get(url).build().asString().orElseThrow(RuntimeException::new);
+        Response<String> response = cvurl.get(url).asString().orElseThrow(RuntimeException::new);
 
         //then
         WireMock.verify(WireMock.exactly(1),
@@ -49,7 +49,7 @@ public class CVurlGetRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.get(url).build().asString().orElseThrow(RuntimeException::new);
+        Response<String> response = cvurl.get(url).asString().orElseThrow(RuntimeException::new);
 
         //then
         WireMock.verify(WireMock.exactly(1),
@@ -73,9 +73,7 @@ public class CVurlGetRequestTest extends AbstractRequestTest {
 
         Response<String> response = cvurl.get(url)
                 .queryParam(testParam, testParam)
-                .build()
-                .asString()
-                .orElseThrow(RuntimeException::new);
+                .asString().orElseThrow(RuntimeException::new);
         //then
         WireMock.verify(WireMock.exactly(1),
                 WireMock.getRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT + "?param=param")));
@@ -100,7 +98,6 @@ public class CVurlGetRequestTest extends AbstractRequestTest {
         Response<String> response = cvurl.get(url)
                 .queryParam(testParam, testParam)
                 .queryParam(testParam2, testParam2)
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -126,7 +123,6 @@ public class CVurlGetRequestTest extends AbstractRequestTest {
 
         Response<String> response = cvurl.get(url)
                 .header(HttpHeader.AUTHORIZATION, TEST_TOKEN)
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -157,7 +153,6 @@ public class CVurlGetRequestTest extends AbstractRequestTest {
 
         Response<String> response = cvurl.get(url)
                 .headers(headers)
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -181,7 +176,7 @@ public class CVurlGetRequestTest extends AbstractRequestTest {
                         .withHeader(HttpHeader.AUTHORIZATION, TEST_TOKEN)
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.get(url).build().asString().orElseThrow(RuntimeException::new);
+        Response<String> response = cvurl.get(url).asString().orElseThrow(RuntimeException::new);
 
         //then
         WireMock.verify(WireMock.exactly(1),
@@ -206,7 +201,7 @@ public class CVurlGetRequestTest extends AbstractRequestTest {
                         .withStatus(HttpStatus.OK)
                         .withBody(body)));
 
-        Response<String> response = cvurl.get(url).build().asString().orElseThrow(RuntimeException::new);
+        Response<String> response = cvurl.get(url).asString().orElseThrow(RuntimeException::new);
 
         //then
         WireMock.verify(WireMock.exactly(1),
