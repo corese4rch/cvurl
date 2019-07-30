@@ -17,12 +17,16 @@ import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,6 +42,7 @@ import java.util.zip.GZIPOutputStream;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.times;
 
 
 public class CVurlRequestTest extends AbstractRequestTest {
@@ -697,6 +702,28 @@ public class CVurlRequestTest extends AbstractRequestTest {
                 .get();
 
         assertTrue(isExceptionallyInvoked[0]);
+    }
+
+    @Test
+    public void reusableRequestCreationTest() throws IOException, InterruptedException {
+        //given
+        HttpClient httpClient = Mockito.mock(HttpClient.class);
+        Request request = new CVurl(httpClient).get(url).create();
+
+        ArgumentCaptor<HttpRequest> httpRequestArgumentCaptor = ArgumentCaptor.forClass(HttpRequest.class);
+
+        //when
+        request.asString();
+        request.asString();
+
+        //then both executions are done on the same request
+        Mockito.verify(httpClient, times(2)).send(
+                httpRequestArgumentCaptor.capture(), Mockito.any(HttpResponse.BodyHandler.class));
+
+        HttpRequest httpRequest1 = httpRequestArgumentCaptor.getAllValues().get(0);
+        HttpRequest httpRequest2 = httpRequestArgumentCaptor.getAllValues().get(1);
+
+        assertSame(httpRequest1, httpRequest2);
     }
 
     private byte[] compressWithGZIP(String str) throws IOException {
