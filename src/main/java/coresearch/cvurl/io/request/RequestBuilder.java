@@ -121,7 +121,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request {
      * @return new {@link Request}
      */
     public Request create() {
-        return new RequestImpl(setUpHttpRequestBuilder().build(), httpClient, genericMapper, acceptCompressed);
+        return new CVurlRequest(setUpHttpRequestBuilder().build(), httpClient, genericMapper, acceptCompressed);
     }
 
     private HttpRequest.Builder setUpHttpRequestBuilder() {

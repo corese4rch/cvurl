@@ -23,16 +23,16 @@ import java.util.function.Function;
  * Class responsible for sending HTTP requests and parsing responses.
  * Can be created by using {@link RequestBuilder#create()}
  */
-public final class RequestImpl implements Request {
+public final class CVurlRequest implements Request {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RequestImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CVurlRequest.class);
 
     private HttpClient httpClient;
     private HttpRequest httpRequest;
     private GenericMapper genericMapper;
     private boolean acceptCompressed;
 
-    RequestImpl(HttpRequest httpRequest, HttpClient httpClient, GenericMapper genericMapper, boolean acceptCompressed) {
+    CVurlRequest(HttpRequest httpRequest, HttpClient httpClient, GenericMapper genericMapper, boolean acceptCompressed) {
         this.httpRequest = httpRequest;
         this.httpClient = httpClient;
         this.genericMapper = genericMapper;
