@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.http.Fault;
 import coresearch.cvurl.io.constant.*;
+import coresearch.cvurl.io.exception.RequestExecutionException;
+import coresearch.cvurl.io.exception.ResponseMappingException;
 import coresearch.cvurl.io.helper.ObjectGenerator;
 import coresearch.cvurl.io.helper.model.User;
 import coresearch.cvurl.io.model.Configuration;
@@ -59,7 +61,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void asObjectOnUnparseableBodyShouldReturnEmptyOptional() {
+    public void asObjectWithStatusCodeOnUnparseableBodyShouldReturnEmptyOptional() {
         //given
         wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
                 .willReturn(WireMock.aResponse()
@@ -74,7 +76,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void asObjectTest() throws JsonProcessingException {
+    public void asObjectWithStatusCodeTest() throws JsonProcessingException {
         User user = ObjectGenerator.generateTestObject();
 
         wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
@@ -113,7 +115,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
 
 
     @Test
-    public void asyncAsObjectTest() throws JsonProcessingException, ExecutionException, InterruptedException {
+    public void asyncAsObjectWithStatusCodeTest() throws JsonProcessingException, ExecutionException, InterruptedException {
 
         User user = ObjectGenerator.generateTestObject();
         boolean[] isThenApplyInvoked = {false};
@@ -286,7 +288,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void onSendErrorAsObjectShouldReturnEmptyOptionalTest() {
+    public void onSendErrorAsObjectWithStatusCodeShouldReturnEmptyOptionalTest() {
         //given
         wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
                 .willReturn(WireMock.aResponse().withFault(Fault.RANDOM_DATA_THEN_CLOSE)));
@@ -609,6 +611,102 @@ public class CVurlRequestTest extends AbstractRequestTest {
         var response = cvurl.post(url).acceptCompressed().build().asStream();
 
         assertTrue(response.isEmpty());
+    }
+
+    @Test
+    public void asObjectTest() throws JsonProcessingException {
+        User user = ObjectGenerator.generateTestObject();
+
+        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse()
+                        .withStatus(HttpStatus.OK)
+                        .withBody(mapper.writeValueAsString(user))));
+
+        User resultUser = cvurl.get(url).build()
+                .asObject(User.class);
+
+        assertEquals(user, resultUser);
+    }
+
+    @Test
+    public void onSendErrorAsObjectShouldThrowRequestExecutionExceptionTest() {
+        //given
+        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse().withFault(Fault.RANDOM_DATA_THEN_CLOSE)));
+
+        //then
+        assertThrows(RequestExecutionException.class, () -> cvurl.get(url).build().asObject(User.class));
+    }
+
+    @Test
+    public void asObjectOnUnparseableBodyShouldThrowResponseMappingException() {
+        //given
+        var body = "not a json string";
+        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse()
+                        .withStatus(HttpStatus.OK)
+                        .withBody(body)));
+
+        //when
+        ResponseMappingException responseMappingException = assertThrows(ResponseMappingException.class,
+                () -> cvurl.get(url).build().asObject(User.class));
+
+        //then
+        assertEquals(HttpStatus.OK, responseMappingException.getResponse().status());
+        assertEquals(body, responseMappingException.getResponse().getBody());
+    }
+
+    @Test
+    public void asyncAsObjectTest() throws JsonProcessingException, ExecutionException, InterruptedException {
+        //given
+        User user = ObjectGenerator.generateTestObject();
+        boolean[] isThenApplyInvoked = {false};
+
+        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse()
+                        .withStatus(HttpStatus.OK)
+                        .withBody(mapper.writeValueAsString(user))));
+
+        //when
+        User resultUser = cvurl.get(url).build().asyncAsObject(User.class)
+                .thenApply(res ->
+                {
+                    isThenApplyInvoked[0] = true;
+                    return res;
+                })
+                .get();
+
+        //then
+        assertTrue(isThenApplyInvoked[0]);
+        assertEquals(user, resultUser);
+    }
+
+    @Test
+    public void asyncAsObjectWithUnparseableBodyTest() throws JsonProcessingException, ExecutionException, InterruptedException {
+        //given
+        var body = "response body";
+        boolean[] isExceptionallyInvoked = {false};
+
+        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse()
+                        .withStatus(HttpStatus.OK)
+                        .withBody(body)));
+
+        //then
+        cvurl.get(url).build().asyncAsObject(User.class)
+                .exceptionally(exception ->
+                {
+                    assertTrue(exception.getCause() instanceof ResponseMappingException);
+                    var responseMappingException = ((ResponseMappingException) exception.getCause());
+                    assertEquals(body, responseMappingException.getResponse().getBody());
+                    assertEquals(HttpStatus.OK, responseMappingException.getResponse().status());
+
+                    isExceptionallyInvoked[0] = true;
+                    return null;
+                })
+                .get();
+
+        assertTrue(isExceptionallyInvoked[0]);
     }
 
     private byte[] compressWithGZIP(String str) throws IOException {
