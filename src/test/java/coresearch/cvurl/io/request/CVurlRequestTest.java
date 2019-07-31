@@ -413,7 +413,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
         var value1 = "value1";
         var value2 = "value2";
         var expectedBody = paramName1 + "=" + value1 + "&" + paramName2 + "=" + value2;
-        var paramsMap = new LinkedHashMap<>() {{
+        Map<String, String> paramsMap = new LinkedHashMap<>() {{
             put(paramName1, value1);
             put(paramName2, value2);
         }};
