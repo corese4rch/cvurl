@@ -83,6 +83,16 @@ public final class CVurlRequest implements Request {
     }
 
     /**
+     * Sends current request asynchronously.
+     *
+     * @return {@link CompletableFuture} with returned response.
+     */
+    @Override
+    public CompletableFuture<Response<String>> asyncAsString(HttpResponse.PushPromiseHandler<String> pph) {
+        return this.httpClient.sendAsync(httpRequest, getStringBodyHandler(), pph).thenApply(Response::new);
+    }
+
+    /**
      * Sends current request asynchronously. Returns response with body as {@link InputStream}
      *
      * @return {@link CompletableFuture} with returned response.
@@ -93,6 +103,16 @@ public final class CVurlRequest implements Request {
     }
 
     /**
+     * Sends current request asynchronously. Returns response with body as {@link InputStream}
+     *
+     * @return {@link CompletableFuture} with returned response.
+     */
+    @Override
+    public CompletableFuture<Response<InputStream>> asyncAsStream(HttpResponse.PushPromiseHandler<InputStream> pph) {
+        return this.httpClient.sendAsync(httpRequest, getStreamBodyHandler(), pph).thenApply(Response::new);
+    }
+
+    /**
      * Sends current request asynchronously. Applies provided bodyHandler to the response body.
      *
      * @return {@link CompletableFuture} with returned response.
@@ -100,6 +120,16 @@ public final class CVurlRequest implements Request {
     @Override
     public <T> CompletableFuture<Response<T>> asyncAs(HttpResponse.BodyHandler<T> bodyHandler) {
         return this.httpClient.sendAsync(httpRequest, bodyHandler).thenApply(Response::new);
+    }
+
+    /**
+     * Sends current request asynchronously. Applies provided bodyHandler to the response body.
+     *
+     * @return {@link CompletableFuture} with returned response.
+     */
+    @Override
+    public <T> CompletableFuture<Response<T>> asyncAs(HttpResponse.BodyHandler<T> bodyHandler, HttpResponse.PushPromiseHandler<T> pph) {
+        return this.httpClient.sendAsync(httpRequest, bodyHandler, pph).thenApply(Response::new);
     }
 
     /**
