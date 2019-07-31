@@ -136,7 +136,28 @@ public class MultipartBodyTest {
                         HttpHeader.CONTENT_TYPE, JSON_MIME_TYPE)));
 
         //when
-        MultipartBody multipartBody = MultipartBody.create(BOUNDARY).formPart(partName, filename, Part.of(jsonPath));
+        MultipartBody multipartBody = MultipartBody.create(BOUNDARY)
+                .formPart(partName, Part.of(filename, jsonPath));
+
+        //then
+        assertEquals(expectedResult, convertToString(multipartBody));
+    }
+
+    @Test
+    public void fileFormPartByteArrayTest() throws IOException {
+        //given
+        var partName = "name";
+        Path jsonPath = Resources.get(MULTIPART_BODY_TEST_JSON);
+        var filename = "filename";
+        var expectedResult = generateMultipartBody(BOUNDARY,
+                new TestPart(Files.readString(jsonPath), Map.of(
+                        HttpHeader.CONTENT_DISPOSITION, format(CONTENT_DISPOSITION_WITH_FILENAME_TEMPLATE,
+                                partName, filename),
+                        HttpHeader.CONTENT_TYPE, JSON_MIME_TYPE)));
+
+        //when
+        MultipartBody multipartBody = MultipartBody.create(BOUNDARY)
+                .formPart(partName, Part.of(filename, JSON_MIME_TYPE, Files.readAllBytes(jsonPath)));
 
         //then
         assertEquals(expectedResult, convertToString(multipartBody));
