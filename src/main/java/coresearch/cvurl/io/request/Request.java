@@ -14,9 +14,15 @@ public interface Request {
 
     CompletableFuture<Response<String>> asyncAsString();
 
+    CompletableFuture<Response<String>> asyncAsString(HttpResponse.PushPromiseHandler<String> pph);
+
     CompletableFuture<Response<InputStream>> asyncAsStream();
 
+    CompletableFuture<Response<InputStream>> asyncAsStream(HttpResponse.PushPromiseHandler<InputStream> pph);
+
     <T> CompletableFuture<Response<T>> asyncAs(HttpResponse.BodyHandler<T> bodyHandler);
+
+    <T> CompletableFuture<Response<T>> asyncAs(HttpResponse.BodyHandler<T> bodyHandler, HttpResponse.PushPromiseHandler<T> pph);
 
     <T> Optional<T> asObject(Class<T> type, int statusCode);
 
