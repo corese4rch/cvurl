@@ -6,6 +6,7 @@ import com.github.tomakehurst.wiremock.http.Fault;
 import coresearch.cvurl.io.constant.*;
 import coresearch.cvurl.io.exception.RequestExecutionException;
 import coresearch.cvurl.io.exception.ResponseMappingException;
+import coresearch.cvurl.io.exception.UnexpectedResponseException;
 import coresearch.cvurl.io.helper.ObjectGenerator;
 import coresearch.cvurl.io.helper.model.User;
 import coresearch.cvurl.io.model.Configuration;
@@ -726,6 +727,32 @@ public class CVurlRequestTest extends AbstractRequestTest {
         assertSame(httpRequest1, httpRequest2);
     }
 
+    @Test
+    public void unexpectedResponseTest() throws ExecutionException, InterruptedException {
+        //given
+        boolean[] isExceptionallyInvoked = {false};
+
+        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse()
+                        .withStatus(HttpStatus.NO_CONTENT)));
+
+        //when
+        cvurl.get(url).asyncAsObject(User.class, HttpStatus.OK)
+                .exceptionally(throwable -> {
+                    isExceptionallyInvoked[0] = true;
+                    assertTrue(throwable.getCause() instanceof UnexpectedResponseException);
+
+                    UnexpectedResponseException exception = (UnexpectedResponseException) throwable.getCause();
+                    assertEquals(HttpStatus.NO_CONTENT, exception.getResponse().status());
+
+                    return null;
+                })
+                .get();
+
+        //then
+        assertTrue(isExceptionallyInvoked[0]);
+    }
+
     private byte[] compressWithGZIP(String str) throws IOException {
         var out = new ByteArrayOutputStream();
         try (var gzipOutputStream = new GZIPOutputStream(out)) {
@@ -733,5 +760,4 @@ public class CVurlRequestTest extends AbstractRequestTest {
         }
         return out.toByteArray();
     }
-
 }
