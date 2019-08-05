@@ -32,9 +32,8 @@ public class CVurlPostRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.POST(url)
+        Response<String> response = cvurl.post(url)
                 .body("")
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -58,9 +57,8 @@ public class CVurlPostRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.POST(url)
+        Response<String> response = cvurl.post(url)
                 .body("")
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -84,10 +82,9 @@ public class CVurlPostRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.POST(url)
+        Response<String> response = cvurl.post(url)
                 .queryParam(testParam, testParam)
                 .body("")
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -112,11 +109,10 @@ public class CVurlPostRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.POST(url)
+        Response<String> response = cvurl.post(url)
                 .queryParam(testParam, testParam)
                 .queryParam(testParam2, testParam2)
                 .body("")
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -140,10 +136,9 @@ public class CVurlPostRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.POST(url)
+        Response<String> response = cvurl.post(url)
                 .header(HttpHeader.AUTHORIZATION, TEST_TOKEN)
                 .body("")
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -172,10 +167,9 @@ public class CVurlPostRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.POST(url)
+        Response<String> response = cvurl.post(url)
                 .headers(headers)
                 .body("")
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -199,9 +193,8 @@ public class CVurlPostRequestTest extends AbstractRequestTest {
                         .withHeader(HttpHeader.AUTHORIZATION, TEST_TOKEN)
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.POST(url)
+        Response<String> response = cvurl.post(url)
                 .body("")
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -228,9 +221,8 @@ public class CVurlPostRequestTest extends AbstractRequestTest {
                         .withStatus(HttpStatus.OK)
                         .withBody(body)));
 
-        Response<String> response = cvurl.POST(url)
+        Response<String> response = cvurl.post(url)
                 .body("")
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -257,9 +249,8 @@ public class CVurlPostRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.POST(url)
+        Response<String> response = cvurl.post(url)
                 .body(body)
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -284,9 +275,8 @@ public class CVurlPostRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.POST(url)
+        Response<String> response = cvurl.post(url)
                 .body(body.getBytes())
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -313,9 +303,8 @@ public class CVurlPostRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.POST(url)
+        Response<String> response = cvurl.post(url)
                 .body(users)
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -340,9 +329,8 @@ public class CVurlPostRequestTest extends AbstractRequestTest {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.POST(url)
+        Response<String> response = cvurl.post(url)
                 .body(user)
-                .build()
                 .asString()
                 .orElseThrow(RuntimeException::new);
 

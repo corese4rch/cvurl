@@ -10,7 +10,7 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.time.Duration;
 
-import static coresearch.cvurl.io.util.Validation.notNullParam;
+import static coresearch.cvurl.io.internal.util.Validation.notNullParam;
 
 /**
  * Central part of the lib. Used to initiate {@link Request} creation with proper {@link GenericMapper} and
@@ -129,7 +129,7 @@ public class CVurl {
      * @param url specified url.
      * @return RequestBuilder
      */
-    public RequestBuilder GET(String url) {
+    public RequestBuilder<?> get(String url) {
         return createGetRequest(url);
     }
 
@@ -140,7 +140,7 @@ public class CVurl {
      * @return RequestBuilder
      */
 
-    public RequestBuilder GET(URL url) {
+    public RequestBuilder<?> get(URL url) {
         return createGetRequest(url.toString());
     }
 
@@ -150,7 +150,7 @@ public class CVurl {
      * @param url specified url.
      * @return RequestBuilder
      */
-    public RequestWithBodyBuilder POST(String url) {
+    public RequestWithBodyBuilder post(String url) {
         return createRequestWBody(url, HttpMethod.POST);
     }
 
@@ -160,7 +160,7 @@ public class CVurl {
      * @param url specified url.
      * @return RequestBuilder
      */
-    public RequestWithBodyBuilder POST(URL url) {
+    public RequestWithBodyBuilder post(URL url) {
         return createRequestWBody(url.toString(), HttpMethod.POST);
     }
 
@@ -170,7 +170,7 @@ public class CVurl {
      * @param url specified url.
      * @return RequestBuilder
      */
-    public RequestWithBodyBuilder PUT(String url) {
+    public RequestWithBodyBuilder put(String url) {
         return createRequestWBody(url, HttpMethod.PUT);
     }
 
@@ -180,7 +180,7 @@ public class CVurl {
      * @param url specified url.
      * @return RequestBuilder
      */
-    public RequestWithBodyBuilder PUT(URL url) {
+    public RequestWithBodyBuilder put(URL url) {
         return createRequestWBody(url.toString(), HttpMethod.PUT);
     }
 
@@ -190,7 +190,7 @@ public class CVurl {
      * @param url specified url.
      * @return RequestBuilder
      */
-    public RequestWithBodyBuilder DELETE(String url) {
+    public RequestWithBodyBuilder delete(String url) {
         return createRequestWBody(url, HttpMethod.DELETE);
     }
 
@@ -200,7 +200,7 @@ public class CVurl {
      * @param url specified url.
      * @return RequestBuilder
      */
-    public RequestWithBodyBuilder DELETE(URL url) {
+    public RequestWithBodyBuilder delete(URL url) {
         return createRequestWBody(url.toString(), HttpMethod.DELETE);
     }
 
@@ -210,7 +210,7 @@ public class CVurl {
      * @param url specified url.
      * @return RequestBuilder
      */
-    public RequestWithBodyBuilder PATCH(String url) {
+    public RequestWithBodyBuilder patch(String url) {
         return createRequestWBody(url, HttpMethod.PATCH);
     }
 
@@ -220,7 +220,7 @@ public class CVurl {
      * @param url specified url.
      * @return RequestBuilder
      */
-    public RequestWithBodyBuilder PATCH(URL url) {
+    public RequestWithBodyBuilder patch(URL url) {
         return createRequestWBody(url.toString(), HttpMethod.PATCH);
     }
 
@@ -229,8 +229,8 @@ public class CVurl {
                 configuration.createHttpClient() : HttpClientSingleton.getClient(configuration);
     }
 
-    private RequestBuilder createGetRequest(String url) {
-        return new RequestBuilder(url, HttpMethod.GET, this.genericMapper, this.httpClient).timeout(requestTimeout);
+    private RequestBuilder<?> createGetRequest(String url) {
+        return new RequestBuilder<>(url, HttpMethod.GET, this.genericMapper, this.httpClient).timeout(requestTimeout);
     }
 
     private RequestWithBodyBuilder createRequestWBody(String url, HttpMethod httpMethod) {

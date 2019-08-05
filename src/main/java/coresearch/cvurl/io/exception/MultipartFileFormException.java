@@ -1,10 +1,9 @@
 package coresearch.cvurl.io.exception;
 
 /**
- * Thrown by {@link coresearch.cvurl.io.mapper.GenericMapper} when
- * any problems occur on serialization/deserialization
+ * Thrown when {@link java.io.IOException} happen while reading part content file.
  */
-public class MappingException extends RuntimeException {
+public class MultipartFileFormException extends RuntimeException {
 
     /**
      * Constructs a new exception with the specified detail message and
@@ -19,7 +18,7 @@ public class MappingException extends RuntimeException {
      *                permitted, and indicates that the cause is nonexistent or
      *                unknown.)
      */
-    public MappingException(String message, Throwable cause) {
+    public MultipartFileFormException(String message, Throwable cause) {
         super(message, cause);
     }
 }
