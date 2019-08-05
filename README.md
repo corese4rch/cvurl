@@ -98,7 +98,6 @@ public void cvurl() {
 
         //GET
         Response<String> response = cvurl.get("https://api.imgflip.com/get_memes")
-                        .build()
                         .asString()
                         .orElseThrow(RuntimeException::new);
 
@@ -203,7 +202,6 @@ public void cvurl() {
                         "text0", "text0",
                         "text1", "text1"
                 ))
-                .build()
                 .asObject(Result.class, HttpStatus.OK);
 
         System.out.println("CVurl POST: " + result);
@@ -215,7 +213,6 @@ And another example - due to underlying Mapper (by default it's Jackson) You can
         return cVurl.POST(HOST + USERS)
                 .body(userDto)
                 .header(HttpHeader.CONTENT_TYPE, MIMEType.APPLICATION_JSON)
-                .build()
                 .asObject(UserCreatedResponseDto.class, HttpStatus.CREATED);
     }
 ``` 
