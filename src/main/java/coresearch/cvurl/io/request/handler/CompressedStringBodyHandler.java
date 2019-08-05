@@ -34,6 +34,5 @@ public class CompressedStringBodyHandler implements HttpResponse.BodyHandler<Str
         } catch (IOException e) {
             throw new ResponseBodyHandlingException(e.getMessage(), e);
         }
-
     }
 }

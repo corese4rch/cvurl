@@ -32,6 +32,7 @@ public class Part<T extends Part<T>> {
 
     /**
      * Creates new instance of {@link Part}
+     *
      * @param content content part
      * @return this {@link Part}
      */
@@ -43,6 +44,7 @@ public class Part<T extends Part<T>> {
 
     /**
      * Creates new instance of {@link Part}
+     *
      * @param content content part
      * @return this {@link Part}
      */
@@ -56,17 +58,45 @@ public class Part<T extends Part<T>> {
      * Creates new instance of {@link Part} using file from provided filePath
      * Throws {@link MultipartFileFormException} in case {@link IOException} happens
      * while reading from the file.
+     *
      * @param filePath path to file that will be used as content.
      * @return this {@link Part}
      */
     public static PartWithFileContent of(Path filePath) {
+        return of(filePath.getFileName().toString(), filePath);
+    }
+
+    /**
+     * Creates new instance of {@link Part} using file from provided filePath and filename
+     * Throws {@link MultipartFileFormException} in case {@link IOException} happens
+     * while reading from the file.
+     *
+     * @param filePath path to file that will be used as content.
+     * @return this {@link Part}
+     */
+    public static PartWithFileContent of(String fileName, Path filePath) {
+        notNullParam(fileName, "fileName");
         notNullParam(filePath, "filePath");
 
         try {
-            return new PartWithFileContent(filePath, Files.readAllBytes(filePath));
+            return new PartWithFileContent(fileName, Files.readAllBytes(filePath))
+                    .contentType(Files.probeContentType(filePath));
         } catch (IOException e) {
             throw new MultipartFileFormException(e.getMessage(), e);
         }
+    }
+
+    /**
+     * Creates new instance of {@link Part} using provided fileName, content and content type.
+     *
+     * @return this {@link Part}
+     */
+    public static PartWithFileContent of(String fileName, String contentType, byte[] content) {
+        notNullParam(fileName, "filePath");
+        notNullParam(contentType, "contentType");
+        notNullParam(content, "content");
+
+        return new PartWithFileContent(fileName, content).contentType(contentType);
     }
 
     /**

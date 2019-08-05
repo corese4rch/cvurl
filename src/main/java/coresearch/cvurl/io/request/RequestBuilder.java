@@ -175,13 +175,28 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request {
     }
 
     @Override
+    public CompletableFuture<Response<String>> asyncAsString(HttpResponse.PushPromiseHandler<String> pph) {
+        return create().asyncAsString(pph);
+    }
+
+    @Override
     public CompletableFuture<Response<InputStream>> asyncAsStream() {
         return create().asyncAsStream();
     }
 
     @Override
+    public CompletableFuture<Response<InputStream>> asyncAsStream(HttpResponse.PushPromiseHandler<InputStream> pph) {
+        return create().asyncAsStream(pph);
+    }
+
+    @Override
     public <U> CompletableFuture<Response<U>> asyncAs(HttpResponse.BodyHandler<U> bodyHandler) {
         return create().asyncAs(bodyHandler);
+    }
+
+    @Override
+    public <T> CompletableFuture<Response<T>> asyncAs(HttpResponse.BodyHandler<T> bodyHandler, HttpResponse.PushPromiseHandler<T> pph) {
+        return create().asyncAs(bodyHandler, pph);
     }
 
     @Override

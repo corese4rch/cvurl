@@ -2,10 +2,7 @@ package coresearch.cvurl.io.multipart;
 
 import coresearch.cvurl.io.constant.HttpHeader;
 import coresearch.cvurl.io.constant.MultipartType;
-import coresearch.cvurl.io.exception.MultipartFileFormException;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -127,8 +124,7 @@ public class MultipartBody {
     }
 
     /**
-     * Add a file form data part to the body with provided part name.Use name of provided file as value for filename field
-     * If Content-type is not previously set detect content-type from file.
+     * Add a file form data part to the body with provided part name.
      *
      * @param name part name
      * @param part part to add
@@ -138,34 +134,7 @@ public class MultipartBody {
         notNullParam(name, "name");
         notNullParam(part, "part");
 
-        return formPart(name, part.getFilePath().getFileName().toString(), part);
-    }
-
-    /**
-     * Add a file form data part to the body with provided part name.Use provided filename as value for filename field
-     * If Content-type is not previously set detect content-type from file.
-     *
-     * @param name part name
-     * @param filename value of filename field
-     * @param part part to add
-     * @return this {@link MultipartBody}
-     */
-    public MultipartBody formPart(String name, String filename, PartWithFileContent part) {
-        notNullParam(name, "name");
-        notNullParam(filename, "filename");
-        notNullParam(part, "part");
-
-        var path = part.getFilePath();
-        part.header(HttpHeader.CONTENT_DISPOSITION, getContentDispositionHeader(name, filename));
-
-        if (!part.isContentTypeSet()) {
-            try {
-                part.contentType(Files.probeContentType(path));
-            } catch (IOException e) {
-                throw new MultipartFileFormException(e.getMessage(), e.getCause());
-            }
-        }
-
+        part.header(HttpHeader.CONTENT_DISPOSITION, getContentDispositionHeader(name, part.getFileName()));
         this.parts.add(part);
         return this;
     }
@@ -178,4 +147,3 @@ public class MultipartBody {
         return String.format(CONTENT_DISPOSITION_WITH_FILENAME_TEMPLATE, name, filename);
     }
 }
-
