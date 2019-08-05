@@ -6,7 +6,7 @@
 
     <groupId>com.github.corese4rch</groupId>
     <artifactId>cvurl-io</artifactId>
-    <version>0.9</version>
+    <version>1.0</version>
 
     <name>cVurl</name>
     <description>cVurl is an open-source java wrapper for an HTTP/2 Client. Written in Java11 and can be used with any
@@ -28,7 +28,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- main -->
         <slf4j-api.version>1.8.0-beta4</slf4j-api.version>
-        <jackson.core.version>2.9.9.1</jackson.core.version>
+        <jackson.core.version>2.9.9.2</jackson.core.version>
         <!-- test -->
         <mockito.version>3.0.0</mockito.version>
         <wiremock.version>2.23.2</wiremock.version>
