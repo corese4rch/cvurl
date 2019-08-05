@@ -209,7 +209,7 @@ public void cvurl() {
 ```
 And another example - due to underlying Mapper (by default it's Jackson) You can send use Java objects as a Request body without a hassle
 ```java
- public UserCreatedResponseDto createUser(UserDto userDto) {
+ public Optional<UserCreatedResponseDto> createUser(UserDto userDto) {
         return cVurl.POST(HOST + USERS)
                 .body(userDto)
                 .header(HttpHeader.CONTENT_TYPE, MIMEType.APPLICATION_JSON)
@@ -268,8 +268,7 @@ That's why we do all stuff for you under the hood. What You really use is just t
 ```java
  public User createUserFromFormUrlencoded(Map<String, String> userMap) {
         return cVurl.post("https://...")
-                .formData(userMap)
-                .header(HttpHeader.CONTENT_TYPE, MIMEType.APPLICATION_FORM)
+                .formData(userMap) // will automatically add application/x-www-form-urlencoded header
                 .asObject(User.class, HttpStatus.CREATED) // we assume that API returns JSON that represents User.class
                 .orElseThrow(() -> new RuntimeException("Some comprehensive explanation what went wrong"));
     }
