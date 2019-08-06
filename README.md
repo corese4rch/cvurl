@@ -202,7 +202,7 @@ public void cvurl() {
                         "text0", "text0",
                         "text1", "text1"
                 ))
-                .asObject(Result.class, HttpStatus.OK);
+                .asObject(Result.class);
 
         System.out.println("CVurl POST: " + result);
     }
