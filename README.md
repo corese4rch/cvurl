@@ -1,4 +1,4 @@
-![Logo](https://ibb.co/4MMKy2P)
+![Logo](https://i.ibb.co/L66Ywrn/c-Vurl-sticker-600x300.png)
 
 [![Coverage Status](https://coveralls.io/repos/github/corese4rch/cvurl/badge.svg?branch=master&kill_cache=1)](https://coveralls.io/github/corese4rch/cvurl?branch=master)
 [![Build Status](https://travis-ci.com/corese4rch/cvurl.svg?branch=dev)](https://travis-ci.com/corese4rch/cvurl)
