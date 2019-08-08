@@ -1,20 +1,11 @@
+![Logo](https://i.ibb.co/L66Ywrn/c-Vurl-sticker-600x300.png)
+
 [![Coverage Status](https://coveralls.io/repos/github/corese4rch/cvurl/badge.svg?branch=master&kill_cache=1)](https://coveralls.io/github/corese4rch/cvurl?branch=master)
 [![Build Status](https://travis-ci.com/corese4rch/cvurl.svg?branch=dev)](https://travis-ci.com/corese4rch/cvurl)
 [![GNU License](https://img.shields.io/badge/license-GNU%20GPL%20v3-green.svg)](https://github.com/corese4rch/cvurl/blob/master/LICENSE)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.corese4rch/cvurl-io/badge.svg?kill_cache=1)](https://search.maven.org/search?q=g:com.github.corese4rch%20AND%20a:cvurl-io)
 
 ## cVurl is an open-source wrapper for [Java HTTP/2 Client](https://openjdk.java.net/groups/net/httpclient/intro.html). 
-<pre>
-
-          oooooo     oooo                      oooo  
-           `888.     .8'                       `888  
- .ooooo.    `888.   .8'   oooo  oooo  oooo d8b  888  
-d88' `"Y8    `888. .8'    `888  `888  `888""8P  888  
-888           `888.8'      888   888   888      888  
-888   .o8      `888'       888   888   888      888  
-`Y8bod8P'       `8'        `V88V"V8P' d888b    o888o    
-                                                  
-</pre>
 
 ## Requirements 
  **cVurl** is written in java11 and can be used with any jdk11.0.2 and higher
