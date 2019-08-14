@@ -6,7 +6,7 @@ public final class MIMEType {
 
     public static final String APPLICATION_JSON = "application/json; charset=UTF-8";
 
-    public static final String APPLICATION_OCTET_STRING = "application/octet-stream";
+    public static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
 
     public static final String APPLICATION_JS = "application/javascript";
 
