@@ -850,6 +850,24 @@ public class CVurlRequestTest extends AbstractRequestTest {
         assertEquals(users, resultUsers);
     }
 
+    @Test
+    public void asObjectWithCVTypeOnUnparseableBodyShouldThrowResponseMappingExceptionTest() {
+        //given
+        var body = "not a json string";
+        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse()
+                        .withStatus(HttpStatus.OK)
+                        .withBody(body)));
+
+        //when
+        ResponseMappingException responseMappingException = assertThrows(ResponseMappingException.class,
+                () -> cvurl.get(url).asObject(new CVType<List<User>>() {}));
+
+        //then
+        assertEquals(HttpStatus.OK, responseMappingException.getResponse().status());
+        assertEquals(body, responseMappingException.getResponse().getBody());
+    }
+
     private byte[] compressWithGZIP(String str) throws IOException {
         var out = new ByteArrayOutputStream();
         try (var gzipOutputStream = new GZIPOutputStream(out)) {
