@@ -19,7 +19,7 @@ public abstract class GenericMapper {
         }
     }
 
-    public final <T> T readResponseBody(Response<String> response, CVType<T> type) {
+    public final <T> T readResponseBody(Response<String> response, BodyType<T> type) {
         try {
             return readValue(response.getBody(), type);
         } catch (MappingException e) {
@@ -46,7 +46,7 @@ public abstract class GenericMapper {
      * @param <T>       concrete type
      * @return converted object
      */
-    public abstract <T> T readValue(String value, CVType<T> valueType);
+    public abstract <T> T readValue(String value, BodyType<T> valueType);
 
     /**
      * Serialize object to String.

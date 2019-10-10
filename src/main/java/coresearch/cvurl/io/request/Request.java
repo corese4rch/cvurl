@@ -2,7 +2,7 @@ package coresearch.cvurl.io.request;
 
 import coresearch.cvurl.io.exception.RequestExecutionException;
 import coresearch.cvurl.io.exception.UnexpectedResponseException;
-import coresearch.cvurl.io.mapper.CVType;
+import coresearch.cvurl.io.mapper.BodyType;
 import coresearch.cvurl.io.model.Response;
 
 import java.io.InputStream;
@@ -42,7 +42,7 @@ public interface Request {
      * @return {@link CompletableFuture} with object of provided type or {@link CompletableFuture}
      * that finishes exceptionally with {@link UnexpectedResponseException}
      */
-    <T> CompletableFuture<T> asyncAsObject(CVType<T> type, int statusCode);
+    <T> CompletableFuture<T> asyncAsObject(BodyType<T> type, int statusCode);
 
     /**
      * Sends current request asynchronously.
@@ -64,7 +64,7 @@ public interface Request {
      * that finishes exceptionally with {@link coresearch.cvurl.io.exception.ResponseMappingException} or
      * {@link RequestExecutionException}
      */
-    <T> CompletableFuture<T> asyncAsObject(CVType<T> type);
+    <T> CompletableFuture<T> asyncAsObject(BodyType<T> type);
 
     /**
      * Sends current request asynchronously.
@@ -133,7 +133,7 @@ public interface Request {
      * @param <T>        type of object to convert response body
      * @return object of specified type
      */
-    <T> Optional<T> asObject(CVType<T> type, int statusCode);
+    <T> Optional<T> asObject(BodyType<T> type, int statusCode);
 
     /**
      * Sends current request blocking if necessary to get
@@ -156,7 +156,7 @@ public interface Request {
      * @param <T>  type of object to convert response body
      * @return object of specified type
      */
-    <T> T asObject(CVType<T> type);
+    <T> T asObject(BodyType<T> type);
 
     /**
      * Sends current request blocking if necessary to get

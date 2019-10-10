@@ -9,7 +9,7 @@ import coresearch.cvurl.io.exception.ResponseMappingException;
 import coresearch.cvurl.io.exception.UnexpectedResponseException;
 import coresearch.cvurl.io.helper.ObjectGenerator;
 import coresearch.cvurl.io.helper.model.User;
-import coresearch.cvurl.io.mapper.CVType;
+import coresearch.cvurl.io.mapper.BodyType;
 import coresearch.cvurl.io.model.Configuration;
 import coresearch.cvurl.io.model.Response;
 import coresearch.cvurl.io.multipart.MultipartBody;
@@ -753,7 +753,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void asObjectWithCVTypeTest() throws JsonProcessingException {
+    public void asObjectWithGenericBodyTypeTest() throws JsonProcessingException {
         //given
         List<User> users = ObjectGenerator.generateListOfTestObjects();
 
@@ -763,14 +763,14 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withBody(mapper.writeValueAsString(users))));
 
         //when
-        List<User> resultUsers = cvurl.get(url).asObject(new CVType<>() {});
+        List<User> resultUsers = cvurl.get(url).asObject(new BodyType<>() {});
 
         //then
         assertEquals(users, resultUsers);
     }
 
     @Test
-    public void asObjectWithCVTypeWithNestedGenericsTest() throws JsonProcessingException {
+    public void asObjectWithGenericBodyTypeWithNestedGenericsTest() throws JsonProcessingException {
         //given
         Set<List<User>> users = Set.of(ObjectGenerator.generateListOfTestObjects());
 
@@ -780,14 +780,14 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withBody(mapper.writeValueAsString(users))));
 
         //when
-        Set<List<User>> resultUsers = cvurl.get(url).asObject(new CVType<>() {});
+        Set<List<User>> resultUsers = cvurl.get(url).asObject(new BodyType<>() {});
 
         //then
         assertEquals(users, resultUsers);
     }
 
     @Test
-    public void asObjectWithStatusCodeWithCVTypeTest() throws JsonProcessingException {
+    public void asObjectWithStatusCodeWithGenericBodyTypeTest() throws JsonProcessingException {
         List<User> users = ObjectGenerator.generateListOfTestObjects();
 
         wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
@@ -796,14 +796,14 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withBody(mapper.writeValueAsString(users))));
 
         List<User> resultUsers = cvurl.get(url)
-                .asObject(new CVType<List<User>>() {}, HttpStatus.OK)
+                .asObject(new BodyType<List<User>>() {}, HttpStatus.OK)
                 .orElseThrow(RuntimeException::new);
 
         assertEquals(users, resultUsers);
     }
 
     @Test
-    public void asyncAsObjectWithCVTypeTest() throws JsonProcessingException, ExecutionException, InterruptedException {
+    public void asyncAsObjectWithGenericBodyTypeTest() throws JsonProcessingException, ExecutionException, InterruptedException {
         //given
         List<User> users = ObjectGenerator.generateListOfTestObjects();
         boolean[] isThenApplyInvoked = {false};
@@ -814,7 +814,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withBody(mapper.writeValueAsString(users))));
 
         //when
-        List<User> resultUsers = cvurl.get(url).asyncAsObject(new CVType<List<User>>() {})
+        List<User> resultUsers = cvurl.get(url).asyncAsObject(new BodyType<List<User>>() {})
                 .thenApply(res ->
                 {
                     isThenApplyInvoked[0] = true;
@@ -828,7 +828,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void asyncAsObjectWithStatusCodeWithCVTypeTest() throws JsonProcessingException, ExecutionException, InterruptedException {
+    public void asyncAsObjectWithStatusCodeWithGenericBodyTypeTest() throws JsonProcessingException, ExecutionException, InterruptedException {
         //given
         List<User> users = ObjectGenerator.generateListOfTestObjects();
         boolean[] isThenApplyInvoked = {false};
@@ -838,7 +838,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withStatus(HttpStatus.OK)
                         .withBody(mapper.writeValueAsString(users))));
 
-        List<User> resultUsers = cvurl.get(url).asyncAsObject(new CVType<List<User>>() {}, HttpStatus.OK)
+        List<User> resultUsers = cvurl.get(url).asyncAsObject(new BodyType<List<User>>() {}, HttpStatus.OK)
                 .thenApply(res ->
                 {
                     isThenApplyInvoked[0] = true;
@@ -851,7 +851,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void asObjectWithCVTypeOnUnparseableBodyShouldThrowResponseMappingExceptionTest() {
+    public void asObjectWithGenericBodyTypeOnUnparseableBodyShouldThrowResponseMappingExceptionTest() {
         //given
         var body = "not a json string";
         wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
@@ -861,7 +861,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
 
         //when
         ResponseMappingException responseMappingException = assertThrows(ResponseMappingException.class,
-                () -> cvurl.get(url).asObject(new CVType<List<User>>() {}));
+                () -> cvurl.get(url).asObject(new BodyType<List<User>>() {}));
 
         //then
         assertEquals(HttpStatus.OK, responseMappingException.getResponse().status());

@@ -2,7 +2,7 @@ package coresearch.cvurl.io.request;
 
 import coresearch.cvurl.io.exception.RequestExecutionException;
 import coresearch.cvurl.io.exception.UnexpectedResponseException;
-import coresearch.cvurl.io.mapper.CVType;
+import coresearch.cvurl.io.mapper.BodyType;
 import coresearch.cvurl.io.mapper.GenericMapper;
 import coresearch.cvurl.io.model.Response;
 import coresearch.cvurl.io.request.handler.CompressedInputStreamBodyHandler;
@@ -47,7 +47,7 @@ public final class CVurlRequest implements Request {
     }
 
     @Override
-    public <T> CompletableFuture<T> asyncAsObject(CVType<T> type, int statusCode) {
+    public <T> CompletableFuture<T> asyncAsObject(BodyType<T> type, int statusCode) {
         return this.httpClient.sendAsync(httpRequest, getStringBodyHandler())
                 .thenApply((response -> parseResponse(response, type, statusCode)));
     }
@@ -59,7 +59,7 @@ public final class CVurlRequest implements Request {
     }
 
     @Override
-    public <T> CompletableFuture<T> asyncAsObject(CVType<T> type) {
+    public <T> CompletableFuture<T> asyncAsObject(BodyType<T> type) {
         return this.httpClient.sendAsync(httpRequest, getStringBodyHandler())
                 .thenApply((response -> genericMapper.readResponseBody(new Response<>(response), type)));
     }
@@ -101,7 +101,7 @@ public final class CVurlRequest implements Request {
     }
 
     @Override
-    public <T> Optional<T> asObject(CVType<T> type, int statusCode) {
+    public <T> Optional<T> asObject(BodyType<T> type, int statusCode) {
         return sendRequestAndWrapInOptional(getStringBodyHandler(),
                 (response) -> parseResponse(response, type, statusCode));
     }
@@ -117,7 +117,7 @@ public final class CVurlRequest implements Request {
     }
 
     @Override
-    public <T> T asObject(CVType<T> type) {
+    public <T> T asObject(BodyType<T> type) {
         try {
             return sendRequest(getStringBodyHandler(),
                     response -> genericMapper.readResponseBody(new Response<>(response), type));
@@ -164,7 +164,7 @@ public final class CVurlRequest implements Request {
         return genericMapper.readValue(response.body(), type);
     }
 
-    private <T> T parseResponse(HttpResponse<String> response, CVType<T> type, int statusCode) {
+    private <T> T parseResponse(HttpResponse<String> response, BodyType<T> type, int statusCode) {
         checkIfStatusCodesAreEqual(response, statusCode);
         return genericMapper.readValue(response.body(), type);
     }

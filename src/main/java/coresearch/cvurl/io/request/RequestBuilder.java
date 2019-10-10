@@ -2,7 +2,7 @@ package coresearch.cvurl.io.request;
 
 import coresearch.cvurl.io.constant.HttpContentEncoding;
 import coresearch.cvurl.io.constant.HttpHeader;
-import coresearch.cvurl.io.mapper.CVType;
+import coresearch.cvurl.io.mapper.BodyType;
 import coresearch.cvurl.io.mapper.GenericMapper;
 import coresearch.cvurl.io.constant.HttpMethod;
 import coresearch.cvurl.io.model.Response;
@@ -166,7 +166,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request {
     }
 
     @Override
-    public <U> CompletableFuture<U> asyncAsObject(CVType<U> type, int statusCode) {
+    public <U> CompletableFuture<U> asyncAsObject(BodyType<U> type, int statusCode) {
         return create().asyncAsObject(type, statusCode);
     }
 
@@ -176,7 +176,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request {
     }
 
     @Override
-    public <U> CompletableFuture<U> asyncAsObject(CVType<U> type) {
+    public <U> CompletableFuture<U> asyncAsObject(BodyType<U> type) {
         return create().asyncAsObject(type);
     }
 
@@ -216,7 +216,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request {
     }
 
     @Override
-    public <U> Optional<U> asObject(CVType<U> type, int statusCode) {
+    public <U> Optional<U> asObject(BodyType<U> type, int statusCode) {
         return create().asObject(type, statusCode);
     }
 
@@ -226,7 +226,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request {
     }
 
     @Override
-    public <T> T asObject(CVType<T> type) {
+    public <T> T asObject(BodyType<T> type) {
         return create().asObject(type);
     }
 
