@@ -40,18 +40,6 @@ public final class CVurlRequest implements Request {
         this.acceptCompressed = acceptCompressed;
     }
 
-    /**
-     * Sends current request asynchronously. If response status code
-     * matches provided status code then returns {@link CompletableFuture}
-     * with object of provided type. Otherwise returns {@link CompletableFuture}
-     * that finishes exceptionally with {@link UnexpectedResponseException}.
-     *
-     * @param type       type of object to convert response body.
-     * @param statusCode status code on which converting should be done
-     * @param <T>        type of object to convert response body
-     * @return {@link CompletableFuture} with object of provided type or {@link CompletableFuture}
-     * that finishes exceptionally with {@link UnexpectedResponseException}
-     */
     @Override
     public <T> CompletableFuture<T> asyncAsObject(Class<T> type, int statusCode) {
         return this.httpClient.sendAsync(httpRequest, getStringBodyHandler())
@@ -64,15 +52,6 @@ public final class CVurlRequest implements Request {
                 .thenApply((response -> parseResponse(response, type, statusCode)));
     }
 
-    /**
-     * Sends current request asynchronously.
-     *
-     * @param type type of object to convert response body.
-     * @param <T>  type of object to convert response body
-     * @return {@link CompletableFuture} with object of provided type or {@link CompletableFuture}
-     * that finishes exceptionally with {@link coresearch.cvurl.io.exception.ResponseMappingException} or
-     * {@link RequestExecutionException}
-     */
     @Override
     public <T> CompletableFuture<T> asyncAsObject(Class<T> type) {
         return this.httpClient.sendAsync(httpRequest, getStringBodyHandler())
@@ -85,77 +64,36 @@ public final class CVurlRequest implements Request {
                 .thenApply((response -> genericMapper.readResponseBody(new Response<>(response), type)));
     }
 
-    /**
-     * Sends current request asynchronously.
-     *
-     * @return {@link CompletableFuture} with returned response.
-     */
     @Override
     public CompletableFuture<Response<String>> asyncAsString() {
         return this.httpClient.sendAsync(httpRequest, getStringBodyHandler()).thenApply(Response::new);
     }
 
-    /**
-     * Sends current request asynchronously.
-     *
-     * @return {@link CompletableFuture} with returned response.
-     */
     @Override
     public CompletableFuture<Response<String>> asyncAsString(HttpResponse.PushPromiseHandler<String> pph) {
         return this.httpClient.sendAsync(httpRequest, getStringBodyHandler(), pph).thenApply(Response::new);
     }
 
-    /**
-     * Sends current request asynchronously. Returns response with body as {@link InputStream}
-     *
-     * @return {@link CompletableFuture} with returned response.
-     */
     @Override
     public CompletableFuture<Response<InputStream>> asyncAsStream() {
         return this.httpClient.sendAsync(httpRequest, getStreamBodyHandler()).thenApply(Response::new);
     }
 
-    /**
-     * Sends current request asynchronously. Returns response with body as {@link InputStream}
-     *
-     * @return {@link CompletableFuture} with returned response.
-     */
     @Override
     public CompletableFuture<Response<InputStream>> asyncAsStream(HttpResponse.PushPromiseHandler<InputStream> pph) {
         return this.httpClient.sendAsync(httpRequest, getStreamBodyHandler(), pph).thenApply(Response::new);
     }
 
-    /**
-     * Sends current request asynchronously. Applies provided bodyHandler to the response body.
-     *
-     * @return {@link CompletableFuture} with returned response.
-     */
     @Override
     public <T> CompletableFuture<Response<T>> asyncAs(HttpResponse.BodyHandler<T> bodyHandler) {
         return this.httpClient.sendAsync(httpRequest, bodyHandler).thenApply(Response::new);
     }
 
-    /**
-     * Sends current request asynchronously. Applies provided bodyHandler to the response body.
-     *
-     * @return {@link CompletableFuture} with returned response.
-     */
     @Override
     public <T> CompletableFuture<Response<T>> asyncAs(HttpResponse.BodyHandler<T> bodyHandler, HttpResponse.PushPromiseHandler<T> pph) {
         return this.httpClient.sendAsync(httpRequest, bodyHandler, pph).thenApply(Response::new);
     }
 
-    /**
-     * Sends current request blocking if necessary to get
-     * the response. Converts response body to specified type if
-     * provided statusCode matches response status code and returns empty optional otherwise.
-     * Is some error happens during request sending or response body conversion returns empty optional.
-     *
-     * @param type       type of object to convert response body.
-     * @param statusCode status code on which converting should be done
-     * @param <T>        type of object to convert response body
-     * @return object of specified type
-     */
     @Override
     public <T> Optional<T> asObject(Class<T> type, int statusCode) {
         return sendRequestAndWrapInOptional(getStringBodyHandler(),
@@ -168,15 +106,6 @@ public final class CVurlRequest implements Request {
                 (response) -> parseResponse(response, type, statusCode));
     }
 
-    /**
-     * Sends current request blocking if necessary to get
-     * the response. Converts response body to specified type, if error happens during conversion
-     * throws {@link coresearch.cvurl.io.exception.ResponseMappingException}.
-     *
-     * @param type type of object to convert response body.
-     * @param <T>  type of object to convert response body
-     * @return object of specified type
-     */
     @Override
     public <T> T asObject(Class<T> type) {
         try {
@@ -197,38 +126,16 @@ public final class CVurlRequest implements Request {
         }
     }
 
-    /**
-     * Sends current request blocking if necessary to get
-     * the response.
-     *
-     * @return {@link Optional} with response if request no error happened during
-     * request sending or empty {@link Optional} otherwise.
-     */
     @Override
     public Optional<Response<String>> asString() {
         return sendRequestAndWrapInOptional(getStringBodyHandler(), Response::new);
     }
 
-    /**
-     * Sends current request blocking if necessary to get
-     * the response as {@link InputStream}
-     *
-     * @return {@link Optional} with response if request no error happened during
-     * request sending or empty {@link Optional} otherwise.
-     */
     @Override
     public Optional<Response<InputStream>> asStream() {
         return sendRequestAndWrapInOptional(getStreamBodyHandler(), Response::new);
     }
 
-    /**
-     * Sends current request blocking if necessary to get
-     * the response with body parsed by provided bodyHandler.
-     *
-     * @param bodyHandler used to parse response body
-     * @return {@link Optional} with response if request no error happened during
-     * request sending or empty {@link Optional} otherwise.
-     */
     @Override
     public <T> Optional<Response<T>> as(HttpResponse.BodyHandler<T> bodyHandler) {
         return sendRequestAndWrapInOptional(bodyHandler, Response::new);
