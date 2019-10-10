@@ -2,6 +2,7 @@ package coresearch.cvurl.io.request;
 
 import coresearch.cvurl.io.exception.RequestExecutionException;
 import coresearch.cvurl.io.exception.UnexpectedResponseException;
+import coresearch.cvurl.io.mapper.CVType;
 import coresearch.cvurl.io.mapper.GenericMapper;
 import coresearch.cvurl.io.model.Response;
 import coresearch.cvurl.io.request.handler.CompressedInputStreamBodyHandler;
@@ -57,6 +58,12 @@ public final class CVurlRequest implements Request {
                 .thenApply((response -> parseResponse(response, type, statusCode)));
     }
 
+    @Override
+    public <T> CompletableFuture<T> asyncAsObject(CVType<T> type, int statusCode) {
+        return this.httpClient.sendAsync(httpRequest, getStringBodyHandler())
+                .thenApply((response -> parseResponse(response, type, statusCode)));
+    }
+
     /**
      * Sends current request asynchronously.
      *
@@ -68,6 +75,12 @@ public final class CVurlRequest implements Request {
      */
     @Override
     public <T> CompletableFuture<T> asyncAsObject(Class<T> type) {
+        return this.httpClient.sendAsync(httpRequest, getStringBodyHandler())
+                .thenApply((response -> genericMapper.readResponseBody(new Response<>(response), type)));
+    }
+
+    @Override
+    public <T> CompletableFuture<T> asyncAsObject(CVType<T> type) {
         return this.httpClient.sendAsync(httpRequest, getStringBodyHandler())
                 .thenApply((response -> genericMapper.readResponseBody(new Response<>(response), type)));
     }
@@ -149,6 +162,12 @@ public final class CVurlRequest implements Request {
                 (response) -> parseResponse(response, type, statusCode));
     }
 
+    @Override
+    public <T> Optional<T> asObject(CVType<T> type, int statusCode) {
+        return sendRequestAndWrapInOptional(getStringBodyHandler(),
+                (response) -> parseResponse(response, type, statusCode));
+    }
+
     /**
      * Sends current request blocking if necessary to get
      * the response. Converts response body to specified type, if error happens during conversion
@@ -160,6 +179,16 @@ public final class CVurlRequest implements Request {
      */
     @Override
     public <T> T asObject(Class<T> type) {
+        try {
+            return sendRequest(getStringBodyHandler(),
+                    response -> genericMapper.readResponseBody(new Response<>(response), type));
+        } catch (IOException | InterruptedException e) {
+            throw new RequestExecutionException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public <T> T asObject(CVType<T> type) {
         try {
             return sendRequest(getStringBodyHandler(),
                     response -> genericMapper.readResponseBody(new Response<>(response), type));
@@ -224,13 +253,21 @@ public final class CVurlRequest implements Request {
     }
 
     private <T> T parseResponse(HttpResponse<String> response, Class<T> type, int statusCode) {
+        checkIfStatusCodesAreEqual(response, statusCode);
+        return genericMapper.readValue(response.body(), type);
+    }
+
+    private <T> T parseResponse(HttpResponse<String> response, CVType<T> type, int statusCode) {
+        checkIfStatusCodesAreEqual(response, statusCode);
+        return genericMapper.readValue(response.body(), type);
+    }
+
+    private void checkIfStatusCodesAreEqual(HttpResponse<String> response, int statusCode) {
         if (response.statusCode() != statusCode) {
             throw new UnexpectedResponseException("Received response with status code: " + response.statusCode() +
                     ",expected: " + statusCode + ";Response: " + response.body(),
                     new Response<>(response));
         }
-
-        return genericMapper.readValue(response.body(), type);
     }
 
     private <T, U> T sendRequest(HttpResponse.BodyHandler<U> bodyHandler,

@@ -1,5 +1,6 @@
 package coresearch.cvurl.io.request;
 
+import coresearch.cvurl.io.mapper.CVType;
 import coresearch.cvurl.io.model.Response;
 
 import java.io.InputStream;
@@ -10,7 +11,11 @@ import java.util.concurrent.CompletableFuture;
 public interface Request {
     <T> CompletableFuture<T> asyncAsObject(Class<T> type, int statusCode);
 
+    <T> CompletableFuture<T> asyncAsObject(CVType<T> type, int statusCode);
+
     <T> CompletableFuture<T> asyncAsObject(Class<T> type);
+
+    <T> CompletableFuture<T> asyncAsObject(CVType<T> type);
 
     CompletableFuture<Response<String>> asyncAsString();
 
@@ -26,7 +31,11 @@ public interface Request {
 
     <T> Optional<T> asObject(Class<T> type, int statusCode);
 
+    <T> Optional<T> asObject(CVType<T> type, int statusCode);
+
     <T> T asObject(Class<T> type);
+
+    <T> T asObject(CVType<T> type);
 
     Optional<Response<String>> asString();
 
