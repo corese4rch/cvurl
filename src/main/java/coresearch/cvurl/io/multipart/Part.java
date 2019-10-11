@@ -6,10 +6,7 @@ import coresearch.cvurl.io.exception.MultipartFileFormException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static coresearch.cvurl.io.internal.util.Validation.notNullParam;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -57,7 +54,8 @@ public class Part<T extends Part<T>> {
     /**
      * Creates new instance of {@link Part} using file from provided filePath
      * Throws {@link MultipartFileFormException} in case {@link IOException} happens
-     * while reading from the file.
+     * while reading from the file. If file content type can be autodetected then it will
+     * be set as part header, otherwise part won't have content type header.
      *
      * @param filePath path to file that will be used as content.
      * @return this {@link Part}
@@ -69,7 +67,8 @@ public class Part<T extends Part<T>> {
     /**
      * Creates new instance of {@link Part} using file from provided filePath and filename
      * Throws {@link MultipartFileFormException} in case {@link IOException} happens
-     * while reading from the file.
+     * while reading from the file. If file content type can be autodetected then it will
+     * be set as part header, otherwise part won't have content type header.
      *
      * @param filePath path to file that will be used as content.
      * @return this {@link Part}
@@ -79,8 +78,10 @@ public class Part<T extends Part<T>> {
         notNullParam(filePath, "filePath");
 
         try {
-            return new PartWithFileContent(fileName, Files.readAllBytes(filePath))
-                    .contentType(Files.probeContentType(filePath));
+            PartWithFileContent part = new PartWithFileContent(fileName, Files.readAllBytes(filePath));
+            Optional.ofNullable(Files.probeContentType(filePath))
+                    .ifPresent(part::contentType);
+            return part;
         } catch (IOException e) {
             throw new MultipartFileFormException(e.getMessage(), e);
         }
@@ -102,7 +103,7 @@ public class Part<T extends Part<T>> {
     /**
      * Add a header to the part.
      *
-     * @param name header name
+     * @param name  header name
      * @param value header value
      * @return this {@link Part}
      */

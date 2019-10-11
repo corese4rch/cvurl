@@ -29,6 +29,7 @@ public class MultipartBodyTest {
     private static final String CONTENT_DISPOSITION_WITH_FILENAME_TEMPLATE = CONTENT_DISPOSITION_TEMPLATE + "; filename=\"%s\"";
 
     private static final String MULTIPART_BODY_TEST_JSON = "multipart-body-test.json";
+    private static final String MULTIPART_BODY_TEST_UNKNOWN_EXTENSION = "multipart-body-test.ololo";
     private static final String JSON_MIME_TYPE = "application/json";
     private static final String CRLF = "\r\n";
 
@@ -188,6 +189,23 @@ public class MultipartBodyTest {
         //then
         assertThrows(MultipartFileFormException.class,
                 () -> MultipartBody.create().formPart("name", Part.of(path)));
+    }
+
+    @Test
+    public void filePartWithUnknownContentTypeTest() throws IOException {
+        //given
+        var partName = "name";
+        Path path = Resources.get(MULTIPART_BODY_TEST_UNKNOWN_EXTENSION);
+        var expectedResult = generateMultipartBody(BOUNDARY,
+                new TestPart(Files.readString(path), Map.of(
+                        HttpHeader.CONTENT_DISPOSITION, format(CONTENT_DISPOSITION_WITH_FILENAME_TEMPLATE,
+                                partName, MULTIPART_BODY_TEST_UNKNOWN_EXTENSION))));
+
+        //when
+        MultipartBody multipartBody = MultipartBody.create(BOUNDARY).formPart(partName, Part.of(path));
+
+        //then no content type should be set
+        assertEquals(expectedResult, convertToString(multipartBody));
     }
 
     private String convertToString(MultipartBody multipartBody) {
