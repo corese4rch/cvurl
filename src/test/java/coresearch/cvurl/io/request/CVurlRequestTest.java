@@ -9,6 +9,7 @@ import coresearch.cvurl.io.exception.ResponseMappingException;
 import coresearch.cvurl.io.exception.UnexpectedResponseException;
 import coresearch.cvurl.io.helper.ObjectGenerator;
 import coresearch.cvurl.io.helper.model.User;
+import coresearch.cvurl.io.mapper.BodyType;
 import coresearch.cvurl.io.model.Configuration;
 import coresearch.cvurl.io.model.Response;
 import coresearch.cvurl.io.multipart.MultipartBody;
@@ -32,9 +33,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -751,6 +750,122 @@ public class CVurlRequestTest extends AbstractRequestTest {
 
         //then
         assertTrue(isExceptionallyInvoked[0]);
+    }
+
+    @Test
+    public void asObjectWithGenericBodyTypeTest() throws JsonProcessingException {
+        //given
+        List<User> users = ObjectGenerator.generateListOfTestObjects();
+
+        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse()
+                        .withStatus(HttpStatus.OK)
+                        .withBody(mapper.writeValueAsString(users))));
+
+        //when
+        List<User> resultUsers = cvurl.get(url).asObject(new BodyType<>() {});
+
+        //then
+        assertEquals(users, resultUsers);
+    }
+
+    @Test
+    public void asObjectWithGenericBodyTypeWithNestedGenericsTest() throws JsonProcessingException {
+        //given
+        Set<List<User>> users = Set.of(ObjectGenerator.generateListOfTestObjects());
+
+        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse()
+                        .withStatus(HttpStatus.OK)
+                        .withBody(mapper.writeValueAsString(users))));
+
+        //when
+        Set<List<User>> resultUsers = cvurl.get(url).asObject(new BodyType<>() {});
+
+        //then
+        assertEquals(users, resultUsers);
+    }
+
+    @Test
+    public void asObjectWithStatusCodeWithGenericBodyTypeTest() throws JsonProcessingException {
+        List<User> users = ObjectGenerator.generateListOfTestObjects();
+
+        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse()
+                        .withStatus(HttpStatus.OK)
+                        .withBody(mapper.writeValueAsString(users))));
+
+        List<User> resultUsers = cvurl.get(url)
+                .asObject(new BodyType<List<User>>() {}, HttpStatus.OK)
+                .orElseThrow(RuntimeException::new);
+
+        assertEquals(users, resultUsers);
+    }
+
+    @Test
+    public void asyncAsObjectWithGenericBodyTypeTest() throws JsonProcessingException, ExecutionException, InterruptedException {
+        //given
+        List<User> users = ObjectGenerator.generateListOfTestObjects();
+        boolean[] isThenApplyInvoked = {false};
+
+        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse()
+                        .withStatus(HttpStatus.OK)
+                        .withBody(mapper.writeValueAsString(users))));
+
+        //when
+        List<User> resultUsers = cvurl.get(url).asyncAsObject(new BodyType<List<User>>() {})
+                .thenApply(res ->
+                {
+                    isThenApplyInvoked[0] = true;
+                    return res;
+                })
+                .get();
+
+        //then
+        assertTrue(isThenApplyInvoked[0]);
+        assertEquals(users, resultUsers);
+    }
+
+    @Test
+    public void asyncAsObjectWithStatusCodeWithGenericBodyTypeTest() throws JsonProcessingException, ExecutionException, InterruptedException {
+        //given
+        List<User> users = ObjectGenerator.generateListOfTestObjects();
+        boolean[] isThenApplyInvoked = {false};
+
+        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse()
+                        .withStatus(HttpStatus.OK)
+                        .withBody(mapper.writeValueAsString(users))));
+
+        List<User> resultUsers = cvurl.get(url).asyncAsObject(new BodyType<List<User>>() {}, HttpStatus.OK)
+                .thenApply(res ->
+                {
+                    isThenApplyInvoked[0] = true;
+                    return res;
+                })
+                .get();
+
+        assertTrue(isThenApplyInvoked[0]);
+        assertEquals(users, resultUsers);
+    }
+
+    @Test
+    public void asObjectWithGenericBodyTypeOnUnparseableBodyShouldThrowResponseMappingExceptionTest() {
+        //given
+        var body = "not a json string";
+        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
+                .willReturn(WireMock.aResponse()
+                        .withStatus(HttpStatus.OK)
+                        .withBody(body)));
+
+        //when
+        ResponseMappingException responseMappingException = assertThrows(ResponseMappingException.class,
+                () -> cvurl.get(url).asObject(new BodyType<List<User>>() {}));
+
+        //then
+        assertEquals(HttpStatus.OK, responseMappingException.getResponse().status());
+        assertEquals(body, responseMappingException.getResponse().getBody());
     }
 
     private byte[] compressWithGZIP(String str) throws IOException {

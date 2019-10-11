@@ -2,6 +2,7 @@ package coresearch.cvurl.io.request;
 
 import coresearch.cvurl.io.constant.HttpContentEncoding;
 import coresearch.cvurl.io.constant.HttpHeader;
+import coresearch.cvurl.io.mapper.BodyType;
 import coresearch.cvurl.io.mapper.GenericMapper;
 import coresearch.cvurl.io.constant.HttpMethod;
 import coresearch.cvurl.io.model.Response;
@@ -165,7 +166,17 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request {
     }
 
     @Override
+    public <U> CompletableFuture<U> asyncAsObject(BodyType<U> type, int statusCode) {
+        return create().asyncAsObject(type, statusCode);
+    }
+
+    @Override
     public <U> CompletableFuture<U> asyncAsObject(Class<U> type) {
+        return create().asyncAsObject(type);
+    }
+
+    @Override
+    public <U> CompletableFuture<U> asyncAsObject(BodyType<U> type) {
         return create().asyncAsObject(type);
     }
 
@@ -205,7 +216,17 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request {
     }
 
     @Override
+    public <U> Optional<U> asObject(BodyType<U> type, int statusCode) {
+        return create().asObject(type, statusCode);
+    }
+
+    @Override
     public <U> U asObject(Class<U> type) {
+        return create().asObject(type);
+    }
+
+    @Override
+    public <T> T asObject(BodyType<T> type) {
         return create().asObject(type);
     }
 
