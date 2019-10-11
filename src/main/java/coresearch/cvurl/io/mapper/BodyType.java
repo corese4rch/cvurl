@@ -11,16 +11,17 @@ import java.lang.reflect.Type;
  * this code snippet would parse response body to {@code List<User>}
  */
 public abstract class BodyType<T> {
+
+    private static final String ERROR_MESSAGE = "Type should be direct child type of BodyType";
+
     private Type type;
 
     protected BodyType() {
-        Type superclass = this.getClass().getGenericSuperclass();
-        if (((ParameterizedType) superclass).getRawType() != BodyType.class) {
-            throw new IllegalStateException("Type should be direct child type of BodyType");
+        ParameterizedType superclass = (ParameterizedType) this.getClass().getGenericSuperclass();
+        if (superclass.getRawType() != BodyType.class) {
+            throw new IllegalStateException(ERROR_MESSAGE);
         }
-
-        ParameterizedType type = ((ParameterizedType) superclass);
-        this.type = type.getActualTypeArguments()[0];
+        this.type = superclass.getActualTypeArguments()[0];
     }
 
     /**
