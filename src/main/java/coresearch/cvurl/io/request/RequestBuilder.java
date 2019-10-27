@@ -2,24 +2,24 @@ package coresearch.cvurl.io.request;
 
 import coresearch.cvurl.io.constant.HttpContentEncoding;
 import coresearch.cvurl.io.constant.HttpHeader;
-import coresearch.cvurl.io.mapper.BodyType;
-import coresearch.cvurl.io.mapper.GenericMapper;
 import coresearch.cvurl.io.constant.HttpMethod;
+import coresearch.cvurl.io.mapper.BodyType;
+import coresearch.cvurl.io.model.Configuration;
+import coresearch.cvurl.io.model.RequestConfiguration;
 import coresearch.cvurl.io.model.Response;
 
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URLEncoder;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collector;
-import java.util.Optional;
 
 import static java.util.stream.Collectors.joining;
 
@@ -30,22 +30,21 @@ import static java.util.stream.Collectors.joining;
  */
 public class RequestBuilder<T extends RequestBuilder<T>> implements Request {
 
-    protected GenericMapper genericMapper;
+    protected final Configuration configuration;
+    protected final RequestConfiguration.Builder requestConfigurationBuilder;
+
     protected HttpMethod method;
     protected HttpRequest.BodyPublisher bodyPublisher = HttpRequest.BodyPublishers.noBody();
 
-    private boolean acceptCompressed;
     private String uri;
-    private HttpClient httpClient;
     private Map<String, String> queryParams = new HashMap<>();
     private Map<String, String> headers = new HashMap<>();
-    private Optional<Duration> timeout = Optional.empty();
 
-    RequestBuilder(String uri, HttpMethod method, GenericMapper genericMapper, HttpClient httpClient) {
+    RequestBuilder(String uri, HttpMethod method, Configuration configuration) {
         this.method = method;
         this.uri = uri;
-        this.genericMapper = genericMapper;
-        this.httpClient = httpClient;
+        this.configuration = configuration;
+        this.requestConfigurationBuilder = configuration.getGlobalRequestConfiguration().preconfiguredBuilder();
     }
 
     /**
@@ -106,13 +105,13 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request {
      */
     @SuppressWarnings("unchecked")
     public T timeout(Duration timeout) {
-        this.timeout = Optional.ofNullable(timeout);
+        this.requestConfigurationBuilder.requestTimeout(timeout);
         return (T) this;
     }
 
     @SuppressWarnings("unchecked")
     public T acceptCompressed() {
-        this.acceptCompressed = true;
+        this.requestConfigurationBuilder.acceptCompressed(true);
         return (T) this;
     }
 
@@ -122,22 +121,22 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request {
      * @return new {@link Request}
      */
     public Request create() {
-        return new CVurlRequest(setUpHttpRequestBuilder().build(), httpClient, genericMapper, acceptCompressed);
+        RequestConfiguration requestConfiguration = requestConfigurationBuilder.build();
+        return new CVurlRequest(setUpHttpRequestBuilder(requestConfiguration).build(), configuration, requestConfiguration);
     }
 
-    private HttpRequest.Builder setUpHttpRequestBuilder() {
+    private HttpRequest.Builder setUpHttpRequestBuilder(RequestConfiguration requestConfiguration) {
         var builder = HttpRequest.newBuilder()
                 .uri(prepareURI())
                 .method(method.name(), bodyPublisher);
 
-        if (acceptCompressed) {
+        if (requestConfiguration.isAcceptCompressed()) {
             this.header(HttpHeader.ACCEPT_ENCODING, HttpContentEncoding.GZIP);
         }
 
-        timeout.ifPresent(builder::timeout);
+        requestConfiguration.getRequestTimeout().ifPresent(builder::timeout);
 
         headers.forEach(builder::header);
-
 
         return builder;
     }

@@ -14,11 +14,12 @@ public class CVurlTest {
     @Test
     public void createCurlWithPrototypeHttpClientTest() {
         //given
-        var configuration = Configuration.builder().httpClientMode(HttpClientMode.PROTOTYPE).build();
+        var configuration1 = Configuration.builder().httpClientMode(HttpClientMode.PROTOTYPE).build();
+        var configuration2 = Configuration.builder().httpClientMode(HttpClientMode.PROTOTYPE).build();
 
         //when
-        var cvurl1 = new CVurl(configuration);
-        var cvurl2 = new CVurl(configuration);
+        var cvurl1 = new CVurl(configuration1);
+        var cvurl2 = new CVurl(configuration2);
 
         //then
         assertNotSame(getHttpClient(cvurl1), getHttpClient(cvurl2));
@@ -27,11 +28,12 @@ public class CVurlTest {
     @Test
     public void createCurlWithSingletoneHttpClientTest() {
         //given
-        var configuration = Configuration.builder().httpClientMode(HttpClientMode.SINGLETONE).build();
+        var configuration1 = Configuration.builder().httpClientMode(HttpClientMode.SINGLETONE).build();
+        var configuration2 = Configuration.builder().httpClientMode(HttpClientMode.SINGLETONE).build();
 
         //when
-        var cvurl1 = new CVurl(configuration);
-        var cvurl2 = new CVurl(configuration);
+        var cvurl1 = new CVurl(configuration1);
+        var cvurl2 = new CVurl(configuration2);
 
         //then
         assertSame(getHttpClient(cvurl1), getHttpClient(cvurl2));
@@ -47,14 +49,19 @@ public class CVurlTest {
         assertThrows(NullPointerException.class, () -> new CVurl(MapperFactory.createDefault(), configuration));
     }
 
-    private HttpClient getHttpClient(CVurl cvurl) {
+    private Configuration getConfiguration(CVurl cvurl) {
         try {
-            var httpClient = CVurl.class.getDeclaredField("httpClient");
-            httpClient.setAccessible(true);
+            var configurationField = CVurl.class.getDeclaredField("configuration");
+            configurationField.setAccessible(true);
 
-            return (HttpClient) httpClient.get(cvurl);
+            return (Configuration) configurationField.get(cvurl);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+
+    }
+
+    private HttpClient getHttpClient(CVurl cvurl) {
+        return getConfiguration(cvurl).getHttpClient();
     }
 }

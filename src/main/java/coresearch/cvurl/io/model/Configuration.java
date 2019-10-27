@@ -1,6 +1,9 @@
 package coresearch.cvurl.io.model;
 
 import coresearch.cvurl.io.constant.HttpClientMode;
+import coresearch.cvurl.io.mapper.GenericMapper;
+import coresearch.cvurl.io.mapper.MapperFactory;
+import coresearch.cvurl.io.request.HttpClientSingleton;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
@@ -13,150 +16,209 @@ import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.Optional;
 import java.util.concurrent.Executor;
+
+import static coresearch.cvurl.io.internal.util.Validation.notNullParam;
+import static coresearch.cvurl.io.internal.util.Validation.notNullParams;
 
 /**
  * Data class that holds configuration of {@link coresearch.cvurl.io.request.CVurl}
  */
 public class Configuration {
 
-    private static final int NO_PRIORITY = -1;
+    private final HttpClient httpClient;
 
-    private final Authenticator authenticator;
-    private final Duration connectTimeout;
-    private final CookieHandler cookieHandler;
-    private final Executor executor;
-    private final HttpClient.Redirect followRedirects;
-    private final int priority;
-    private final ProxySelector proxySelector;
-    private final SSLContext sslContext;
-    private final HttpClient.Version version;
-    private final SSLParameters sslParameters;
+    private final GenericMapper genericMapper;
 
     private final HttpClientMode httpClientMode;
 
-    private final Duration requestTimeout;
+    private final RequestConfiguration globalRequestConfiguration;
 
-    private Configuration(Authenticator authenticator, Duration connectTimeout, CookieHandler cookieHandler,
-                          Executor executor, HttpClient.Redirect followRedirects, int priority, ProxySelector proxySelector,
-                          SSLContext sslContext, HttpClient.Version version, SSLParameters sslParameters, Duration requestTimeout, HttpClientMode httpClientMode) {
-        this.authenticator = authenticator;
-        this.connectTimeout = connectTimeout;
-        this.cookieHandler = cookieHandler;
-        this.executor = executor;
-        this.followRedirects = followRedirects;
-        this.priority = priority;
-        this.proxySelector = proxySelector;
-        this.sslContext = sslContext;
-        this.version = version;
-        this.sslParameters = sslParameters;
-        this.requestTimeout = requestTimeout;
+    private Configuration(HttpClient httpClient, GenericMapper genericMapper, HttpClientMode httpClientMode,
+                          RequestConfiguration globalRequestConfiguration) {
+        notNullParams(httpClient, genericMapper, globalRequestConfiguration);
+
+        this.httpClient = httpClient;
+        this.genericMapper = genericMapper;
+        this.globalRequestConfiguration = globalRequestConfiguration;
         this.httpClientMode = httpClientMode;
     }
 
+    public Configuration() {
+        this.httpClient = HttpClient.newHttpClient();
+        this.genericMapper = MapperFactory.createDefault();
+        this.globalRequestConfiguration = RequestConfiguration.defaultConfiguration();
+        this.httpClientMode = HttpClientMode.PROTOTYPE;
+    }
+
     /**
-     * Creates {@link HttpClient} based on current configuration.
+     * Creates {@link ConfigurationWithClientPropertiesBuilder} used to build {@link Configuration} object.
      *
-     * @return new {@link HttpClient} build from this configuration
+     * @return new ConfigurationWithClientPropertiesBuilder
      */
-    public HttpClient createHttpClient() {
-        var builder = HttpClient.newBuilder();
-
-        if (getConnectTimeout() != null) {
-            builder.connectTimeout(getConnectTimeout());
-        }
-        if (getAuthenticator() != null) {
-            builder.authenticator(getAuthenticator());
-        }
-        if (getCookieHandler() != null) {
-            builder.cookieHandler(getCookieHandler());
-        }
-        if (getExecutor() != null) {
-            builder.executor(getExecutor());
-        }
-        if (getPriority() != NO_PRIORITY) {
-            builder.priority(getPriority());
-        }
-        if (getFollowRedirects() != null) {
-            builder.followRedirects(getFollowRedirects());
-        }
-        if (getProxySelector() != null) {
-            builder.proxy(getProxySelector());
-        }
-        if (getSslContext() != null) {
-            builder.sslContext(getSslContext());
-        }
-        if (getSslParameters() != null) {
-            builder.sslParameters(getSslParameters());
-        }
-        if (getVersion() != null) {
-            builder.version(getVersion());
-        }
-
-        return builder.build();
+    public static ConfigurationWithClientPropertiesBuilder builder() {
+        return new ConfigurationWithClientPropertiesBuilder();
     }
 
     /**
      * Creates {@link ConfigurationBuilder} used to build {@link Configuration} object.
      *
-     * @return new ConfigurationBuilder
+     * @return new ConfigurationWithClientPropertiesBuilder
      */
-    public static ConfigurationBuilder builder() {
-        return new ConfigurationBuilder();
+    public static ConfigurationBuilder builder(HttpClient httpClient) {
+        return new ConfigurationBuilder(httpClient);
     }
 
-    public ProxySelector getProxySelector() {
-        return proxySelector;
+    public static Configuration defaultConfiguration() {
+        return new Configuration();
+    }
+
+    /**
+     * Creates {@link ConfigurationWithClientPropertiesBuilder} used to build {@link Configuration} object.
+     *
+     * @return new ConfigurationWithClientPropertiesBuilder
+     */
+    public ConfigurationBuilder preconfiguredBuilder() {
+        return new ConfigurationBuilder(getHttpClient())
+                .genericMapper(getGenericMapper())
+                .requestTimeout(getGlobalRequestConfiguration().getRequestTimeout().orElse(null));
+    }
+
+    public HttpClient getHttpClient() {
+        return httpClient;
+    }
+
+    /**
+     * Creates {@link HttpClient} based on current configuration.
+     * Deprecated, use {@link #getHttpClient()} instead.
+     *
+     * @return new {@link HttpClient} build from this configuration
+     */
+    @Deprecated
+    public HttpClient createHttpClient() {
+        return getHttpClient();
+    }
+
+    public Optional<ProxySelector> getProxySelector() {
+        return httpClient.proxy();
     }
 
     public SSLContext getSslContext() {
-        return sslContext;
+        return httpClient.sslContext();
     }
 
     public HttpClient.Version getVersion() {
-        return version;
+        return httpClient.version();
     }
 
     public SSLParameters getSslParameters() {
-        return sslParameters;
+        return httpClient.sslParameters();
     }
 
-    public Authenticator getAuthenticator() {
-        return authenticator;
+    public Optional<Authenticator> getAuthenticator() {
+        return httpClient.authenticator();
     }
 
-    public Duration getConnectTimeout() {
-        return connectTimeout;
+    public Optional<Duration> getConnectTimeout() {
+        return httpClient.connectTimeout();
     }
 
-    public CookieHandler getCookieHandler() {
-        return cookieHandler;
+    public Optional<CookieHandler> getCookieHandler() {
+        return httpClient.cookieHandler();
     }
 
-    public Executor getExecutor() {
-        return executor;
+    public Optional<Executor> getExecutor() {
+        return httpClient.executor();
     }
 
     public HttpClient.Redirect getFollowRedirects() {
-        return followRedirects;
+        return httpClient.followRedirects();
     }
 
-    public int getPriority() {
-        return priority;
+    public GenericMapper getGenericMapper() {
+        return genericMapper;
     }
 
-    public Duration getRequestTimeout() {
-        return requestTimeout;
+    public RequestConfiguration getGlobalRequestConfiguration() {
+        return globalRequestConfiguration;
     }
 
     public HttpClientMode getHttpClientMode() {
         return httpClientMode;
     }
 
+    public static class ConfigurationBuilder<T extends ConfigurationBuilder<T>> implements RequestConfigurer<ConfigurationBuilder> {
+        private GenericMapper genericMapper;
+        private HttpClient httpClient;
+        private HttpClientMode httpClientMode = HttpClientMode.PROTOTYPE;
+
+        private final RequestConfiguration.Builder requestConfigurationBuilder = RequestConfiguration.builder();
+
+        private ConfigurationBuilder() {
+        }
+
+        private ConfigurationBuilder(HttpClient httpClient) {
+            this.httpClient = httpClient;
+        }
+
+        @SuppressWarnings("unchecked")
+        public T genericMapper(GenericMapper genericMapper) {
+            this.genericMapper = notNullParam(genericMapper);
+            return (T) this;
+        }
+
+        @SuppressWarnings("unchecked")
+        public T httpClientMode(HttpClientMode httpClientMode) {
+            this.httpClientMode = notNullParam(httpClientMode);
+            return (T) this;
+        }
+
+        /**
+         * Sets a global timeout for requests created by {@link coresearch.cvurl.io.request.CVurl}
+         * from this configuration.The effect
+         * of not setting a timeout is the same as setting an infinite Duration, ie.
+         * block forever.
+         *
+         * @param requestTimeout the timeout duration
+         * @return this builder
+         */
+        @Override
+        public ConfigurationBuilder requestTimeout(Duration requestTimeout) {
+            this.requestConfigurationBuilder.requestTimeout(notNullParam(requestTimeout));
+            return this;
+        }
+
+        @Override
+        public ConfigurationBuilder acceptCompressed(boolean acceptCompressed) {
+            this.requestConfigurationBuilder.acceptCompressed(acceptCompressed);
+            return this;
+        }
+
+        protected HttpClient getHttpClient() {
+            return this.httpClient;
+        }
+
+        public Configuration build() {
+            if (genericMapper == null) {
+                genericMapper = MapperFactory.createDefault();
+            }
+
+            var httpClient = httpClientMode == HttpClientMode.PROTOTYPE ?
+                    this.getHttpClient() : HttpClientSingleton.getClient(this.getHttpClient());
+
+            return new Configuration(httpClient, genericMapper, httpClientMode, requestConfigurationBuilder.build());
+        }
+    }
+
     /**
      * Builder for {@link Configuration}.
      */
-    public static class ConfigurationBuilder {
+    public static class ConfigurationWithClientPropertiesBuilder
+            extends ConfigurationBuilder<ConfigurationWithClientPropertiesBuilder> {
+
+        private static final int NO_PRIORITY = -1;
+
         private Authenticator authenticator;
         private Duration connectTimeout;
         private CookieHandler cookieHandler;
@@ -167,10 +229,8 @@ public class Configuration {
         private SSLContext sslContext;
         private HttpClient.Version version;
         private SSLParameters sslParameters;
-        private Duration requestTimeout;
-        private HttpClientMode httpClientMode = HttpClientMode.PROTOTYPE;
 
-        public ConfigurationBuilder authenticator(Authenticator authenticator) {
+        public ConfigurationWithClientPropertiesBuilder authenticator(Authenticator authenticator) {
             this.authenticator = authenticator;
             return this;
         }
@@ -192,7 +252,7 @@ public class Configuration {
          *                       established
          * @return this builder
          */
-        public ConfigurationBuilder connectTimeout(Duration connectTimeout) {
+        public ConfigurationWithClientPropertiesBuilder connectTimeout(Duration connectTimeout) {
             this.connectTimeout = connectTimeout;
             return this;
         }
@@ -203,7 +263,7 @@ public class Configuration {
          * @param cookieHandler the cookie handler
          * @return this builder
          */
-        public ConfigurationBuilder cookieHandler(CookieHandler cookieHandler) {
+        public ConfigurationWithClientPropertiesBuilder cookieHandler(CookieHandler cookieHandler) {
             this.cookieHandler = cookieHandler;
             return this;
         }
@@ -218,7 +278,7 @@ public class Configuration {
          * @param executor the Executor
          * @return this builder
          */
-        public ConfigurationBuilder executor(Executor executor) {
+        public ConfigurationWithClientPropertiesBuilder executor(Executor executor) {
             this.executor = executor;
             return this;
         }
@@ -234,7 +294,7 @@ public class Configuration {
          * @param followRedirects the redirection policy
          * @return this builder
          */
-        public ConfigurationBuilder followRedirects(HttpClient.Redirect followRedirects) {
+        public ConfigurationWithClientPropertiesBuilder followRedirects(HttpClient.Redirect followRedirects) {
             this.followRedirects = followRedirects;
             return this;
         }
@@ -247,13 +307,13 @@ public class Configuration {
          * @param priority the priority weighting
          * @return this builder
          */
-        public ConfigurationBuilder priority(int priority) {
+        public ConfigurationWithClientPropertiesBuilder priority(int priority) {
             this.priority = priority;
             return this;
         }
 
         /**
-         * Sets a {@link java.net.ProxySelector}.
+         * Sets a {@link ProxySelector}.
          *
          * @param proxySelector the ProxySelector
          * @return this builder
@@ -272,7 +332,7 @@ public class Configuration {
          * one returned by {@link ProxySelector#of(InetSocketAddress)
          * ProxySelector::of}, before {@linkplain #build() building}.
          */
-        public ConfigurationBuilder proxySelector(ProxySelector proxySelector) {
+        public ConfigurationWithClientPropertiesBuilder proxySelector(ProxySelector proxySelector) {
             this.proxySelector = proxySelector;
             return this;
         }
@@ -289,7 +349,7 @@ public class Configuration {
          * @param sslContext the SSLContext
          * @return this builder
          */
-        public ConfigurationBuilder sslContext(SSLContext sslContext) {
+        public ConfigurationWithClientPropertiesBuilder sslContext(SSLContext sslContext) {
             this.sslContext = sslContext;
             return this;
         }
@@ -315,7 +375,7 @@ public class Configuration {
          * For example, if HTTP/2 is requested through a proxy, and if the implementation
          * does not support this mode, then HTTP/1.1 may be used
          */
-        public ConfigurationBuilder version(HttpClient.Version version) {
+        public ConfigurationWithClientPropertiesBuilder version(HttpClient.Version version) {
             this.version = version;
             return this;
         }
@@ -335,48 +395,47 @@ public class Configuration {
          * @param sslParameters the SSLParameters
          * @return this builder
          */
-        public ConfigurationBuilder sslParameters(SSLParameters sslParameters) {
+        public ConfigurationWithClientPropertiesBuilder sslParameters(SSLParameters sslParameters) {
             this.sslParameters = sslParameters;
             return this;
         }
 
-        /**
-         * Sets a global timeout for requests created by {@link coresearch.cvurl.io.request.CVurl}
-         * from this configuration.The effect
-         * of not setting a timeout is the same as setting an infinite Duration, ie.
-         * block forever.
-         *
-         * @param requestTimeout the timeout duration
-         * @return this builder
-         */
-        public ConfigurationBuilder requestTimeout(Duration requestTimeout) {
-            this.requestTimeout = requestTimeout;
-            return this;
-        }
+        @Override
+        protected HttpClient getHttpClient() {
+            var builder = HttpClient.newBuilder();
 
-        /**
-         * Sets {@link HttpClientMode}. If mode is set to PROTOTYPE - new {@link HttpClient}
-         * will be create for each created {@link coresearch.cvurl.io.request.CVurl}. If mode
-         * is set to SINGLETONE - then all instances of {@link coresearch.cvurl.io.request.CVurl}
-         * that created from config with this mode will use the same {@link HttpClient}
-         * configured on the first {@link coresearch.cvurl.io.request.CVurl} creation.
-         *
-         * @param httpClientMode mode that defines scope of HttpClient.
-         * @return this builder
-         */
-        public ConfigurationBuilder httpClientMode(HttpClientMode httpClientMode) {
-            this.httpClientMode = httpClientMode;
-            return this;
-        }
+            if (connectTimeout != null) {
+                builder.connectTimeout(connectTimeout);
+            }
+            if (authenticator != null) {
+                builder.authenticator(authenticator);
+            }
+            if (cookieHandler != null) {
+                builder.cookieHandler(cookieHandler);
+            }
+            if (executor != null) {
+                builder.executor(executor);
+            }
+            if (priority != NO_PRIORITY) {
+                builder.priority(priority);
+            }
+            if (followRedirects != null) {
+                builder.followRedirects(followRedirects);
+            }
+            if (proxySelector != null) {
+                builder.proxy(proxySelector);
+            }
+            if (sslContext != null) {
+                builder.sslContext(sslContext);
+            }
+            if (sslParameters != null) {
+                builder.sslParameters(sslParameters);
+            }
+            if (version != null) {
+                builder.version(version);
+            }
 
-        /**
-         * Builds new configuration.
-         *
-         * @return new configuration
-         */
-        public Configuration build() {
-            return new Configuration(authenticator, connectTimeout, cookieHandler, executor,
-                    followRedirects, priority, proxySelector, sslContext, version, sslParameters, requestTimeout, httpClientMode);
+            return builder.build();
         }
     }
 }

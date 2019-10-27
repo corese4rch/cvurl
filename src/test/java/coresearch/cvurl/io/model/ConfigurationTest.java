@@ -1,5 +1,6 @@
 package coresearch.cvurl.io.model;
 
+import coresearch.cvurl.io.mapper.GenericMapper;
 import org.junit.jupiter.api.Test;
 
 import javax.net.ssl.SSLContext;
@@ -26,7 +27,7 @@ public class ConfigurationTest {
         var followRedirects = mock(HttpClient.Redirect.class);
         var proxySelector = mock(ProxySelector.class);
         var sslContext = mock(SSLContext.class);
-        var sslParameters = mock(SSLParameters.class);
+        var sslParameters = new SSLParameters(new String[]{"test"});
         var priority = 1;
         var version = HttpClient.Version.HTTP_1_1;
 
@@ -45,16 +46,15 @@ public class ConfigurationTest {
                 .build();
 
         //then
-        assertSame(authenticator, conf.getAuthenticator());
-        assertSame(connectTimeout, conf.getConnectTimeout());
-        assertSame(cookieHandler, conf.getCookieHandler());
-        assertSame(executor, conf.getExecutor());
+        assertSame(authenticator, conf.getAuthenticator().orElseThrow(RuntimeException::new));
+        assertSame(connectTimeout, conf.getConnectTimeout().orElseThrow(RuntimeException::new));
+        assertSame(cookieHandler, conf.getCookieHandler().orElseThrow(RuntimeException::new));
+        assertSame(executor, conf.getExecutor().orElseThrow(RuntimeException::new));
         assertSame(followRedirects, conf.getFollowRedirects());
-        assertSame(proxySelector, conf.getProxySelector());
+        assertSame(proxySelector, conf.getProxySelector().orElseThrow(RuntimeException::new));
         assertSame(sslContext, conf.getSslContext());
-        assertSame(sslParameters, conf.getSslParameters());
+        assertArrayEquals(sslParameters.getCipherSuites(), conf.getSslParameters().getCipherSuites());
         assertSame(version, conf.getVersion());
-        assertEquals(priority, conf.getPriority());
     }
 
     @Test
@@ -96,6 +96,29 @@ public class ConfigurationTest {
         assertSame(sslContext, httpClient.sslContext());
         assertArrayEquals(sslParameters.getCipherSuites(), httpClient.sslParameters().getCipherSuites());
         assertSame(version, httpClient.version());
+    }
+
+    @Test
+    public void httpClientBasedBuilderTest() {
+        //given
+        var httpClient = mock(HttpClient.class);
+        var genericMapper = mock(GenericMapper.class);
+        var requestTimeout = mock(Duration.class);
+        var acceptCompressed = true;
+
+        //when
+        var configuration = Configuration.builder(httpClient)
+                .genericMapper(genericMapper)
+                .requestTimeout(requestTimeout)
+                .acceptCompressed(acceptCompressed)
+                .build();
+
+        //then
+        assertSame(configuration.getHttpClient(), httpClient);
+        assertSame(configuration.getGenericMapper(), genericMapper);
+        assertSame(configuration.getGlobalRequestConfiguration().getRequestTimeout().orElseThrow(RuntimeException::new),
+                requestTimeout);
+        assertEquals(configuration.getGlobalRequestConfiguration().isAcceptCompressed(), acceptCompressed);
     }
 
 }
