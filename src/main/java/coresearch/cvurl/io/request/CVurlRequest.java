@@ -156,8 +156,7 @@ public final class CVurlRequest implements Request {
         try {
             return Optional.of(sendRequest(bodyHandler, responseMapper));
         } catch (Exception e) {
-            isLogEnabled().let(() ->
-                    LOGGER.error("Error while sending request: {} exception happened with message {}", e.toString(), e.getMessage()));
+            LOGGER.error("Error while sending request: {} exception happened with message {}", e.toString(), e.getMessage());
             return Optional.empty();
         }
     }
