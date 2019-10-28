@@ -7,4 +7,6 @@ public interface RequestConfigurer<T> {
     T requestTimeout(Duration duration);
 
     T acceptCompressed(boolean acceptCompressed);
+
+    T isLogEnabled(boolean isLogEnabled);
 }

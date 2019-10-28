@@ -8,6 +8,7 @@ import coresearch.cvurl.io.model.RequestConfiguration;
 import coresearch.cvurl.io.model.Response;
 import coresearch.cvurl.io.request.handler.CompressedInputStreamBodyHandler;
 import coresearch.cvurl.io.request.handler.CompressedStringBodyHandler;
+import coresearch.cvurl.io.util.FeatureFlag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -155,7 +156,8 @@ public final class CVurlRequest implements Request {
         try {
             return Optional.of(sendRequest(bodyHandler, responseMapper));
         } catch (Exception e) {
-            LOGGER.error("Error while sending request: {} exception happened with message {}", e.toString(), e.getMessage());
+            isLogEnabled().let(() ->
+                    LOGGER.error("Error while sending request: {} exception happened with message {}", e.toString(), e.getMessage()));
             return Optional.empty();
         }
     }
@@ -180,12 +182,16 @@ public final class CVurlRequest implements Request {
 
     private <T, U> T sendRequest(HttpResponse.BodyHandler<U> bodyHandler,
                                  Function<HttpResponse<U>, T> responseMapper) throws IOException, InterruptedException {
-        LOGGER.info("Sending request {}", this.httpRequest);
+        isLogEnabled().let(() -> LOGGER.info("Sending request {}", this.httpRequest));
         HttpResponse<U> response = getHttpClient().send(this.httpRequest, bodyHandler);
         return responseMapper.apply(response);
     }
 
     private HttpClient getHttpClient() {
         return configuration.getHttpClient();
+    }
+
+    private FeatureFlag isLogEnabled() {
+        return requestConfiguration.getIsLogEnabled();
     }
 }

@@ -148,6 +148,10 @@ public class Configuration {
         return httpClientMode;
     }
 
+    public void setIsLogEnable(boolean enabled) {
+        this.getGlobalRequestConfiguration().setIsLogEnabled(enabled);
+    }
+
     public static class ConfigurationBuilder<T extends ConfigurationBuilder<T>> implements RequestConfigurer<ConfigurationBuilder> {
         private GenericMapper genericMapper;
         private HttpClient httpClient;
@@ -192,6 +196,12 @@ public class Configuration {
         @Override
         public ConfigurationBuilder acceptCompressed(boolean acceptCompressed) {
             this.requestConfigurationBuilder.acceptCompressed(acceptCompressed);
+            return this;
+        }
+
+        @Override
+        public ConfigurationBuilder isLogEnabled(boolean isLogEnabled) {
+            this.requestConfigurationBuilder.isLogEnabled(isLogEnabled);
             return this;
         }
 

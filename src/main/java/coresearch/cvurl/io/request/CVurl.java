@@ -127,6 +127,10 @@ public class CVurl {
                 .build();
     }
 
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
     /**
      * Creates RequestBuilder with specified url and HttpMethod.GET.
      *
