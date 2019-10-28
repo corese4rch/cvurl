@@ -32,6 +32,7 @@ public final class CVurlRequest implements Request {
 
     private final Configuration configuration;
     private final RequestConfiguration requestConfiguration;
+    private final HttpClient httpClient;
 
     private HttpRequest httpRequest;
 
@@ -40,60 +41,61 @@ public final class CVurlRequest implements Request {
         this.httpRequest = httpRequest;
         this.configuration = configuration;
         this.requestConfiguration = requestConfiguration;
+        this.httpClient = configuration.getHttpClient();
     }
 
     @Override
     public <T> CompletableFuture<T> asyncAsObject(Class<T> type, int statusCode) {
-        return getHttpClient().sendAsync(httpRequest, getStringBodyHandler())
+        return httpClient.sendAsync(httpRequest, getStringBodyHandler())
                 .thenApply((response -> parseResponse(response, type, statusCode)));
     }
 
     @Override
     public <T> CompletableFuture<T> asyncAsObject(BodyType<T> type, int statusCode) {
-        return getHttpClient().sendAsync(httpRequest, getStringBodyHandler())
+        return httpClient.sendAsync(httpRequest, getStringBodyHandler())
                 .thenApply((response -> parseResponse(response, type, statusCode)));
     }
 
     @Override
     public <T> CompletableFuture<T> asyncAsObject(Class<T> type) {
-        return getHttpClient().sendAsync(httpRequest, getStringBodyHandler())
+        return httpClient.sendAsync(httpRequest, getStringBodyHandler())
                 .thenApply((response -> configuration.getGenericMapper().readResponseBody(new Response<>(response), type)));
     }
 
     @Override
     public <T> CompletableFuture<T> asyncAsObject(BodyType<T> type) {
-        return getHttpClient().sendAsync(httpRequest, getStringBodyHandler())
+        return httpClient.sendAsync(httpRequest, getStringBodyHandler())
                 .thenApply((response -> configuration.getGenericMapper().readResponseBody(new Response<>(response), type)));
     }
 
     @Override
     public CompletableFuture<Response<String>> asyncAsString() {
-        return getHttpClient().sendAsync(httpRequest, getStringBodyHandler()).thenApply(Response::new);
+        return httpClient.sendAsync(httpRequest, getStringBodyHandler()).thenApply(Response::new);
     }
 
     @Override
     public CompletableFuture<Response<String>> asyncAsString(HttpResponse.PushPromiseHandler<String> pph) {
-        return getHttpClient().sendAsync(httpRequest, getStringBodyHandler(), pph).thenApply(Response::new);
+        return httpClient.sendAsync(httpRequest, getStringBodyHandler(), pph).thenApply(Response::new);
     }
 
     @Override
     public CompletableFuture<Response<InputStream>> asyncAsStream() {
-        return getHttpClient().sendAsync(httpRequest, getStreamBodyHandler()).thenApply(Response::new);
+        return httpClient.sendAsync(httpRequest, getStreamBodyHandler()).thenApply(Response::new);
     }
 
     @Override
     public CompletableFuture<Response<InputStream>> asyncAsStream(HttpResponse.PushPromiseHandler<InputStream> pph) {
-        return getHttpClient().sendAsync(httpRequest, getStreamBodyHandler(), pph).thenApply(Response::new);
+        return httpClient.sendAsync(httpRequest, getStreamBodyHandler(), pph).thenApply(Response::new);
     }
 
     @Override
     public <T> CompletableFuture<Response<T>> asyncAs(HttpResponse.BodyHandler<T> bodyHandler) {
-        return getHttpClient().sendAsync(httpRequest, bodyHandler).thenApply(Response::new);
+        return httpClient.sendAsync(httpRequest, bodyHandler).thenApply(Response::new);
     }
 
     @Override
     public <T> CompletableFuture<Response<T>> asyncAs(HttpResponse.BodyHandler<T> bodyHandler, HttpResponse.PushPromiseHandler<T> pph) {
-        return getHttpClient().sendAsync(httpRequest, bodyHandler, pph).thenApply(Response::new);
+        return httpClient.sendAsync(httpRequest, bodyHandler, pph).thenApply(Response::new);
     }
 
     @Override
@@ -182,12 +184,8 @@ public final class CVurlRequest implements Request {
     private <T, U> T sendRequest(HttpResponse.BodyHandler<U> bodyHandler,
                                  Function<HttpResponse<U>, T> responseMapper) throws IOException, InterruptedException {
         isLogEnabled().let(() -> LOGGER.info("Sending request {}", this.httpRequest));
-        HttpResponse<U> response = getHttpClient().send(this.httpRequest, bodyHandler);
+        HttpResponse<U> response = httpClient.send(this.httpRequest, bodyHandler);
         return responseMapper.apply(response);
-    }
-
-    private HttpClient getHttpClient() {
-        return configuration.getHttpClient();
     }
 
     private FeatureFlag isLogEnabled() {
