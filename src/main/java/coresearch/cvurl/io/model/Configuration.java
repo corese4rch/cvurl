@@ -91,11 +91,11 @@ public class Configuration {
 
     /**
      * Creates {@link HttpClient} based on current configuration.
-     * Deprecated, use {@link #getHttpClient()} instead.
      *
      * @return new {@link HttpClient} build from this configuration
+     * @deprecated Use {@link #getHttpClient()} instead.
      */
-    @Deprecated
+    @Deprecated(since = "1.2", forRemoval = true)
     public HttpClient createHttpClient() {
         return getHttpClient();
     }
