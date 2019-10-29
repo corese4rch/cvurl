@@ -8,7 +8,6 @@ import coresearch.cvurl.io.model.RequestConfiguration;
 import coresearch.cvurl.io.model.Response;
 import coresearch.cvurl.io.request.handler.CompressedInputStreamBodyHandler;
 import coresearch.cvurl.io.request.handler.CompressedStringBodyHandler;
-import coresearch.cvurl.io.util.FeatureFlag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -183,12 +182,10 @@ public final class CVurlRequest implements Request {
 
     private <T, U> T sendRequest(HttpResponse.BodyHandler<U> bodyHandler,
                                  Function<HttpResponse<U>, T> responseMapper) throws IOException, InterruptedException {
-        isLogEnabled().let(() -> LOGGER.info("Sending request {}", this.httpRequest));
+        if (requestConfiguration.getIsLogEnabled()) {
+            LOGGER.info("Sending request {}", this.httpRequest);
+        }
         HttpResponse<U> response = httpClient.send(this.httpRequest, bodyHandler);
         return responseMapper.apply(response);
-    }
-
-    private FeatureFlag isLogEnabled() {
-        return requestConfiguration.getIsLogEnabled();
     }
 }
