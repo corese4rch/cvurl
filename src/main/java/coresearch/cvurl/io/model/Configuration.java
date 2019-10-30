@@ -64,7 +64,7 @@ public class Configuration {
     }
 
     /**
-     * Creates {@link ConfigurationBuilder} used to build {@link Configuration} object.
+     * Creates {@link ConfigurationBuilder} with predefined {@link HttpClient} used to build {@link Configuration} object.
      *
      * @return new ConfigurationWithClientPropertiesBuilder
      */
@@ -72,6 +72,11 @@ public class Configuration {
         return new ConfigurationBuilder(httpClient);
     }
 
+    /**
+     * Creates configuration with default properties.
+     *
+     * @return new configuration
+     */
     public static Configuration defaultConfiguration() {
         return new Configuration();
     }
@@ -195,12 +200,25 @@ public class Configuration {
             return this;
         }
 
+        /**
+         * Sets property that defines whether decompression should be applied to the
+         * response body and corresponding header should be added to request.
+         *
+         * @param acceptCompressed property
+         * @return this {@link ConfigurationBuilder}
+         */
         @Override
         public ConfigurationBuilder acceptCompressed(boolean acceptCompressed) {
             this.requestConfigurationBuilder.acceptCompressed(acceptCompressed);
             return this;
         }
 
+        /**
+         * Sets a feature flag that defines if we logging every request url and body with level INFO or not.
+         *
+         * @param logEnable flag
+         * @return this {@link Configuration}
+         */
         @Override
         public ConfigurationBuilder logEnabled(boolean logEnable) {
             this.requestConfigurationBuilder.logEnabled(logEnable);
