@@ -4,7 +4,7 @@ import coresearch.cvurl.io.exception.RequestExecutionException;
 import coresearch.cvurl.io.exception.UnexpectedResponseException;
 import coresearch.cvurl.io.mapper.BodyType;
 import coresearch.cvurl.io.model.Configuration;
-import coresearch.cvurl.io.model.RequestConfiguration;
+import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
 import coresearch.cvurl.io.model.Response;
 import coresearch.cvurl.io.request.handler.CompressedInputStreamBodyHandler;
 import coresearch.cvurl.io.request.handler.CompressedStringBodyHandler;

@@ -5,7 +5,7 @@ import coresearch.cvurl.io.constant.HttpHeader;
 import coresearch.cvurl.io.constant.HttpMethod;
 import coresearch.cvurl.io.mapper.BodyType;
 import coresearch.cvurl.io.model.Configuration;
-import coresearch.cvurl.io.model.RequestConfiguration;
+import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
 import coresearch.cvurl.io.model.Response;
 
 import java.io.InputStream;

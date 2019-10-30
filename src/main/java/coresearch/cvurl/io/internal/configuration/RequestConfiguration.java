@@ -1,4 +1,4 @@
-package coresearch.cvurl.io.model;
+package coresearch.cvurl.io.internal.configuration;
 
 import java.time.Duration;
 import java.util.Optional;

@@ -1,5 +1,6 @@
 package coresearch.cvurl.io.model;
 
+import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

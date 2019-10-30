@@ -1,6 +1,8 @@
 package coresearch.cvurl.io.model;
 
 import coresearch.cvurl.io.constant.HttpClientMode;
+import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
+import coresearch.cvurl.io.internal.configuration.RequestConfigurer;
 import coresearch.cvurl.io.mapper.GenericMapper;
 import coresearch.cvurl.io.mapper.MapperFactory;
 import coresearch.cvurl.io.request.HttpClientSingleton;
