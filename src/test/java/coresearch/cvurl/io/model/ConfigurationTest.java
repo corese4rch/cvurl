@@ -1,6 +1,8 @@
 package coresearch.cvurl.io.model;
 
+import coresearch.cvurl.io.constant.HttpClientMode;
 import coresearch.cvurl.io.mapper.GenericMapper;
+import coresearch.cvurl.io.mapper.impl.JacksonMapper;
 import org.junit.jupiter.api.Test;
 
 import javax.net.ssl.SSLContext;
@@ -10,6 +12,8 @@ import java.net.CookieHandler;
 import java.net.ProxySelector;
 import java.net.http.HttpClient;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.concurrent.Executor;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -121,4 +125,99 @@ public class ConfigurationTest {
         assertEquals(configuration.getGlobalRequestConfiguration().isAcceptCompressed(), acceptCompressed);
     }
 
+    @Test
+    public void defaultConfigurationTest() {
+        //when
+        var configuration = Configuration.defaultConfiguration();
+
+        //then
+        assertTrue(httpClientsEquals(configuration.getHttpClient(), HttpClient.newHttpClient()));
+        assertSame(configuration.getGenericMapper().getClass(), JacksonMapper.class);
+        assertSame(configuration.getHttpClientMode(), HttpClientMode.PROTOTYPE);
+        assertTrue(requestConfigurationsEquals(
+                configuration.getGlobalRequestConfiguration(), RequestConfiguration.defaultConfiguration()));
+    }
+
+    @Test
+    public void preconfiguredBuilderTest() {
+        //given
+        var configuration = Configuration.defaultConfiguration();
+
+        //when
+        var configurationBuilder = configuration.preconfiguredBuilder();
+
+        //then
+        var resultConfiguration = configurationBuilder.build();
+
+        assertTrue(httpClientsEquals(configuration.getHttpClient(), resultConfiguration.getHttpClient()));
+        assertSame(configuration.getGenericMapper().getClass(), resultConfiguration.getGenericMapper().getClass());
+        assertSame(configuration.getHttpClientMode(), resultConfiguration.getHttpClientMode());
+        assertTrue(requestConfigurationsEquals(
+                configuration.getGlobalRequestConfiguration(), resultConfiguration.getGlobalRequestConfiguration()));
+    }
+
+    @Test
+    public void setLogEnabledIsMutableTest() {
+        //given
+        var configuration = Configuration.defaultConfiguration();
+
+        //when
+        configuration.setIsLogEnable(true);
+
+        //then
+        assertTrue(configuration.getGlobalRequestConfiguration().isLogEnabled());
+    }
+
+    @Test
+    public void configurationBuilderTest() {
+        //given
+        var httpClient = mock(HttpClient.class);
+        var genericMapper = mock(GenericMapper.class);
+        var clientMode = HttpClientMode.PROTOTYPE;
+        var timeout = Duration.ofSeconds(1);
+        var acceptCompressed = true;
+        var logEnabled = true;
+
+        //when
+        var configuration = Configuration.builder(httpClient)
+                .genericMapper(genericMapper)
+                .httpClientMode(clientMode)
+                .requestTimeout(timeout)
+                .acceptCompressed(acceptCompressed)
+                .logEnabled(logEnabled)
+                .build();
+
+        //then
+        assertSame(configuration.getHttpClient(), httpClient);
+        assertSame(configuration.getGenericMapper(), genericMapper);
+        assertEquals(configuration.getGlobalRequestConfiguration().getRequestTimeout()
+                .orElseThrow(RuntimeException::new), timeout);
+        assertEquals(configuration.getGlobalRequestConfiguration().isAcceptCompressed(), acceptCompressed);
+        assertEquals(configuration.getGlobalRequestConfiguration().isLogEnabled(), logEnabled);
+    }
+
+    private boolean httpClientsEquals(HttpClient client1, HttpClient client2) {
+        return optionalsEqual(client1.authenticator(), client2.authenticator()) &&
+                optionalsEqual(client1.connectTimeout(), client2.connectTimeout()) &&
+                optionalsEqual(client1.cookieHandler(), client2.cookieHandler()) &&
+                optionalsEqual(client1.executor(), client2.executor()) &&
+                optionalsEqual(client1.proxy(), client2.proxy()) &&
+                optionalsEqual(client1.proxy(), client2.proxy()) &&
+                client1.followRedirects().equals(client2.followRedirects()) &&
+                client1.sslContext().equals(client2.sslContext()) &&
+                Arrays.equals(client1.sslParameters().getCipherSuites(), client2.sslParameters().getCipherSuites()) &&
+                client1.version().equals(client2.version());
+
+    }
+
+    private boolean requestConfigurationsEquals(RequestConfiguration conf1, RequestConfiguration conf2) {
+        return optionalsEqual(conf1.getRequestTimeout(), conf2.getRequestTimeout()) &&
+                conf1.isAcceptCompressed() == conf2.isAcceptCompressed() &&
+                conf1.isLogEnabled() == conf2.isLogEnabled();
+    }
+
+    private <T> boolean optionalsEqual(Optional<T> opt1, Optional<T> opt2) {
+        return opt1.map(t -> t.equals(opt2.get()))
+                .orElseGet(() -> !opt2.isPresent());
+    }
 }

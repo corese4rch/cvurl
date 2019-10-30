@@ -8,5 +8,5 @@ public interface RequestConfigurer<T> {
 
     T acceptCompressed(boolean acceptCompressed);
 
-    T isLogEnabled(boolean isLogEnabled);
+    T logEnabled(boolean logEnable);
 }

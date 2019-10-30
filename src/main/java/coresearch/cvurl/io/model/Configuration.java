@@ -149,7 +149,7 @@ public class Configuration {
     }
 
     public void setIsLogEnable(boolean enabled) {
-        this.getGlobalRequestConfiguration().setIsLogEnabled(enabled);
+        this.getGlobalRequestConfiguration().setLogEnabled(enabled);
     }
 
     public static class ConfigurationBuilder<T extends ConfigurationBuilder<T>> implements RequestConfigurer<ConfigurationBuilder> {
@@ -189,7 +189,7 @@ public class Configuration {
          */
         @Override
         public ConfigurationBuilder requestTimeout(Duration requestTimeout) {
-            this.requestConfigurationBuilder.requestTimeout(notNullParam(requestTimeout));
+            this.requestConfigurationBuilder.requestTimeout(requestTimeout);
             return this;
         }
 
@@ -200,8 +200,8 @@ public class Configuration {
         }
 
         @Override
-        public ConfigurationBuilder isLogEnabled(boolean isLogEnabled) {
-            this.requestConfigurationBuilder.isLogEnabled(isLogEnabled);
+        public ConfigurationBuilder logEnabled(boolean logEnable) {
+            this.requestConfigurationBuilder.logEnabled(logEnable);
             return this;
         }
 

@@ -182,7 +182,7 @@ public final class CVurlRequest implements Request {
 
     private <T, U> T sendRequest(HttpResponse.BodyHandler<U> bodyHandler,
                                  Function<HttpResponse<U>, T> responseMapper) throws IOException, InterruptedException {
-        if (requestConfiguration.getIsLogEnabled()) {
+        if (requestConfiguration.isLogEnabled()) {
             LOGGER.info("Sending request {}", this.httpRequest);
         }
         HttpResponse<U> response = httpClient.send(this.httpRequest, bodyHandler);

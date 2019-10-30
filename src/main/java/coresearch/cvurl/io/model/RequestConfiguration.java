@@ -6,25 +6,25 @@ import java.util.Optional;
 public class RequestConfiguration {
     private final Duration requestTimeout;
     private final boolean acceptCompressed;
-    private boolean isLogEnabled;
+    private boolean logEnabled;
 
     public RequestConfiguration() {
         this.requestTimeout = null;
         this.acceptCompressed = false;
-        this.isLogEnabled = false;
+        this.logEnabled = false;
     }
 
-    private RequestConfiguration(Duration requestTimeout, boolean acceptCompressed, boolean isLogEnabled) {
+    private RequestConfiguration(Duration requestTimeout, boolean acceptCompressed, boolean logEnabled) {
         this.requestTimeout = requestTimeout;
         this.acceptCompressed = acceptCompressed;
-        this.isLogEnabled = isLogEnabled;
+        this.logEnabled = logEnabled;
     }
 
     public Builder preconfiguredBuilder() {
         return builder()
                 .requestTimeout(requestTimeout)
                 .acceptCompressed(acceptCompressed)
-                .isLogEnabled(isLogEnabled);
+                .logEnabled(logEnabled);
     }
 
     public Optional<Duration> getRequestTimeout() {
@@ -35,12 +35,12 @@ public class RequestConfiguration {
         return acceptCompressed;
     }
 
-    public boolean getIsLogEnabled() {
-        return isLogEnabled;
+    public boolean isLogEnabled() {
+        return logEnabled;
     }
 
-    public void setIsLogEnabled(boolean enabled) {
-        this.isLogEnabled = enabled;
+    public void setLogEnabled(boolean enabled) {
+        this.logEnabled = enabled;
     }
 
     public static Builder builder() {
@@ -54,7 +54,7 @@ public class RequestConfiguration {
     public static class Builder implements RequestConfigurer<Builder> {
         private Duration timeout;
         private boolean acceptCompressed;
-        private boolean isLogEnabled;
+        private boolean logEnabled;
 
         @Override
         public Builder requestTimeout(Duration timeout) {
@@ -69,13 +69,13 @@ public class RequestConfiguration {
         }
 
         @Override
-        public Builder isLogEnabled(boolean isLogEnabled) {
-            this.isLogEnabled = isLogEnabled;
+        public Builder logEnabled(boolean logEnable) {
+            this.logEnabled = logEnable;
             return this;
         }
 
         public RequestConfiguration build() {
-            return new RequestConfiguration(timeout, acceptCompressed, isLogEnabled);
+            return new RequestConfiguration(timeout, acceptCompressed, logEnabled);
         }
     }
 }
