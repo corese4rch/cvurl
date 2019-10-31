@@ -463,7 +463,7 @@ compile group: 'com.github.corese4rch', name: 'cvurl-io', version: '1.1'
 
     * **It's so damn easy !**  
     Nice, but what about KISS, dude, users just wanna chill they don't wan't to be perplexed 
-    by atrocious hardship of caring about all this stuff, man - this what you probably could say. And you would reply 
+    by atrocious hardship of caring about all this stuff, man - this what you probably could say. And I would reply 
     to you with great confidence: it's easy as pie, relax and just see for yourself: 
     
     ```java
