@@ -478,7 +478,7 @@ compile group: 'com.github.corese4rch', name: 'cvurl-io', version: '1.1'
              //that's all ! here you go, run explore world wide web, boy
      
              //nice, I see you have your own instances of HttpClient and GenericMapper
-             //great, let's build our brand new CVUrl with it.
+             //great, let's build our brand new CVurl with it.
              var cVurl = new CVurl(Configuration.builder(httpClient)
                      .genericMapper(genericMapper)
                      .build());
