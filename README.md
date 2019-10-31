@@ -425,7 +425,7 @@ compile group: 'com.github.corese4rch', name: 'cvurl-io', version: '1.1'
  * [micronaut example](https://github.com/corese4rch/cvurl-examples/tree/master/cvurl-usage-micronaut)
  * [quarkus example](https://github.com/corese4rch/cvurl-examples/tree/master/cvurl-usage-quarkus) 
  
-## Majore feature updates
+### Majore feature updates
  **1.2** Changes: 
  1) **Ability to parse response body to nested generic type**  
       
@@ -441,11 +441,12 @@ compile group: 'com.github.corese4rch', name: 'cvurl-io', version: '1.1'
     } 
     ```      
 
-2) **More convenient and stylish configuration management**   
+ 2) **More convenient and stylish configuration management**   
      First I would like to give a little bit of introduction to what can look like not a 
      large switch but in reality will be a great asset to the ease of using and developing CVurl.
      -----
-     So what we tried to achieve introducing those changes: 
+     So what we tried to achieve introducing those changes:
+      
     * **Better scoping**    
     We provided clean separation of configuration scopes providing general per CVurl instance CVUrlConfiguration and more specific per request RequestConfiguration. CVurlConfiguration contains central gears to maintain our wrapper such as 
     HttpClient, GenericMapper and so on. RequestConfiguration on the other hand is newly created on each request and serves as context for different properties of requests such as requestTimeout, acceptCompressed and so on.I like to think about this way:
@@ -464,6 +465,7 @@ compile group: 'com.github.corese4rch', name: 'cvurl-io', version: '1.1'
     Nice, but what about KISS, dude, users just wanna chill they don't wan't to be perplexed 
     by atrocious hardship of caring about all this stuff, man - this what you probably could say. And you would reply 
     to you with great confidence: it's easy as pie, relax and just see for yourself: 
+    
     ```java
        private HttpClient httpClient = HttpClient.newHttpClient();
        private GenericMapper genericMapper = MapperFactory.createDefault();
