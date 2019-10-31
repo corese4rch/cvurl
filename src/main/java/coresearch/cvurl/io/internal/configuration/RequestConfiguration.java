@@ -69,8 +69,8 @@ public class RequestConfiguration {
         }
 
         @Override
-        public Builder logEnabled(boolean logEnable) {
-            this.logEnabled = logEnable;
+        public Builder logEnabled(boolean logEnabled) {
+            this.logEnabled = logEnabled;
             return this;
         }
 
