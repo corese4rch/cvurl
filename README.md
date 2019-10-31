@@ -444,7 +444,7 @@ compile group: 'com.github.corese4rch', name: 'cvurl-io', version: '1.1'
  2) **More convenient and stylish configuration management**   
      First I would like to give a little bit of introduction to what can look like not a 
      large switch but in reality will be a great asset to the ease of using and developing CVurl.
-     -----
+     
      So what we tried to achieve introducing those changes:
       
     * **Better scoping**    
