@@ -892,7 +892,8 @@ public class CVurlRequestTest extends AbstractRequestTest {
 
         //then
         var requestConfiguration = getRequestConfiguration((CVurlRequest) request);
-        assertEquals(requestConfiguration.getRequestTimeout().orElseThrow(RuntimeException::new), timeout);
+        assertEquals(requestConfiguration.getRequestTimeout()
+                .orElseThrow(() -> new IllegalStateException("No request timeout, it should be set")), timeout);
         assertEquals(requestConfiguration.isAcceptCompressed(), acceptCompressed);
         assertEquals(requestConfiguration.isLogEnabled(), logEnabled);
     }
