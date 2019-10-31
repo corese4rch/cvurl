@@ -9,6 +9,7 @@ import coresearch.cvurl.io.exception.ResponseMappingException;
 import coresearch.cvurl.io.exception.UnexpectedResponseException;
 import coresearch.cvurl.io.helper.ObjectGenerator;
 import coresearch.cvurl.io.helper.model.User;
+import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
 import coresearch.cvurl.io.mapper.BodyType;
 import coresearch.cvurl.io.model.Configuration;
 import coresearch.cvurl.io.model.Response;
@@ -25,6 +26,7 @@ import org.mockito.Mockito;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -868,11 +870,48 @@ public class CVurlRequestTest extends AbstractRequestTest {
         assertEquals(body, responseMappingException.getResponse().getBody());
     }
 
+    @Test
+    public void overwritingGlobalRequestConfigurationTest() {
+        //given
+        var cVurl = new CVurl(Configuration.builderWithDefaultHttpClient()
+                .requestTimeout(Duration.ofSeconds(1))
+                .acceptCompressed(false)
+                .logEnabled(false)
+                .build());
+
+        var timeout = Duration.ofSeconds(15);
+        var acceptCompressed = true;
+        var logEnabled = true;
+
+        //when
+        Request request = cvurl.get(url)
+                .requestTimeout(timeout)
+                .acceptCompressed(acceptCompressed)
+                .logEnabled(logEnabled)
+                .create();
+
+        //then
+        var requestConfiguration = getRequestConfiguration((CVurlRequest) request);
+        assertEquals(requestConfiguration.getRequestTimeout().orElseThrow(RuntimeException::new), timeout);
+        assertEquals(requestConfiguration.isAcceptCompressed(), acceptCompressed);
+        assertEquals(requestConfiguration.isLogEnabled(), logEnabled);
+    }
+
     private byte[] compressWithGZIP(String str) throws IOException {
         var out = new ByteArrayOutputStream();
         try (var gzipOutputStream = new GZIPOutputStream(out)) {
             gzipOutputStream.write(str.getBytes());
         }
         return out.toByteArray();
+    }
+
+    private RequestConfiguration getRequestConfiguration(CVurlRequest request) {
+        try {
+            Field requestConfigurationField = request.getClass().getDeclaredField("requestConfiguration");
+            requestConfigurationField.setAccessible(true);
+            return (RequestConfiguration) requestConfigurationField.get(request);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

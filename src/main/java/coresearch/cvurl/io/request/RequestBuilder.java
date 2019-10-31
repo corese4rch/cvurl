@@ -3,6 +3,7 @@ package coresearch.cvurl.io.request;
 import coresearch.cvurl.io.constant.HttpContentEncoding;
 import coresearch.cvurl.io.constant.HttpHeader;
 import coresearch.cvurl.io.constant.HttpMethod;
+import coresearch.cvurl.io.internal.configuration.RequestConfigurer;
 import coresearch.cvurl.io.mapper.BodyType;
 import coresearch.cvurl.io.model.Configuration;
 import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
@@ -28,7 +29,7 @@ import static java.util.stream.Collectors.joining;
  *
  * @param <T>
  */
-public class RequestBuilder<T extends RequestBuilder<T>> implements Request {
+public class RequestBuilder<T extends RequestBuilder<T>> implements Request, RequestConfigurer<RequestBuilder> {
 
     protected final Configuration configuration;
     protected final RequestConfiguration.Builder requestConfigurationBuilder;
@@ -102,16 +103,44 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request {
      *
      * @param timeout request timeout
      * @return this builder
+     * @deprecated Use {@link #requestTimeout(Duration)} instead
      */
     @SuppressWarnings("unchecked")
+    @Deprecated(since = "1.2", forRemoval = true)
     public T timeout(Duration timeout) {
         this.requestConfigurationBuilder.requestTimeout(timeout);
         return (T) this;
     }
 
+    /**
+     * Sets whether this client should accept compressed response body.
+     *
+     * @return this builder
+     */
     @SuppressWarnings("unchecked")
     public T acceptCompressed() {
         this.requestConfigurationBuilder.acceptCompressed(true);
+        return (T) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public T requestTimeout(Duration timeout) {
+        this.requestConfigurationBuilder.requestTimeout(timeout);
+        return (T) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public T acceptCompressed(boolean acceptCompressed) {
+        this.requestConfigurationBuilder.acceptCompressed(acceptCompressed);
+        return (T) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public T logEnabled(boolean logEnabled) {
+        this.requestConfigurationBuilder.logEnabled(logEnabled);
         return (T) this;
     }
 

@@ -73,6 +73,15 @@ public class Configuration {
     }
 
     /**
+     * Creates {@link ConfigurationBuilder} with default {@link HttpClient} used to build {@link Configuration} object.
+     *
+     * @return new ConfigurationWithClientPropertiesBuilder
+     */
+    public static ConfigurationBuilder builderWithDefaultHttpClient() {
+        return new ConfigurationBuilder(HttpClient.newHttpClient());
+    }
+
+    /**
      * Creates configuration with default properties.
      *
      * @return new configuration
@@ -216,12 +225,12 @@ public class Configuration {
         /**
          * Sets a feature flag that defines if we logging every request url and body with level INFO or not.
          *
-         * @param logEnable flag
+         * @param logEnabled flag
          * @return this {@link Configuration}
          */
         @Override
-        public ConfigurationBuilder logEnabled(boolean logEnable) {
-            this.requestConfigurationBuilder.logEnabled(logEnable);
+        public ConfigurationBuilder logEnabled(boolean logEnabled) {
+            this.requestConfigurationBuilder.logEnabled(logEnabled);
             return this;
         }
 
