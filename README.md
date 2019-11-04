@@ -450,8 +450,8 @@ compile group: 'com.github.corese4rch', name: 'cvurl-io', version: '1.1'
     * **Better scoping**    
     We provided clean separation of configuration scopes providing general per CVurl instance CVUrlConfiguration and more specific per request RequestConfiguration. CVurlConfiguration contains central gears to maintain our wrapper such as 
     HttpClient, GenericMapper and so on. RequestConfiguration on the other hand is newly created on each request and serves as context for different properties of requests such as requestTimeout, acceptCompressed and so on.I like to think about this way:
-        * Single CVurlConfiguration is per single instance of CVurl.  
-        * CVurlConfiguration as well as central components of the system contains instance of RequestConfiguration which values will be used as default properties of RequestConfiguration created from this CVurl. On each sending of actual request (asObject(), asString(), ...) new instance of RequestConfiguration will be created with default properties provided by central global RequestConfiguration from CVurlConfiguration.So...
+        * One CVurlConfiguration is per single instance of CVurl.  
+        * CVurlConfiguration, as well as central components of the system, contains instance of RequestConfiguration which values will be used as default properties of RequestConfiguration created from this CVurl. On each sending of actual request (asObject(), asString(), ...) new instance of RequestConfiguration will be created with default properties provided by central global RequestConfiguration from CVurlConfiguration.So...
         * You can control global default properties for all requests, as well as separate property for each separate request, dude! Wow, so much control. Nice ....
     
     * **Ability to microcontrol but not necessity to microcontrol**.  
