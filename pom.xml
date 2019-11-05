@@ -40,7 +40,7 @@
         <maven-failsafe-plugin.version>3.0.0-M3</maven-failsafe-plugin.version>
         <jacoco-plugin.version>0.8.4</jacoco-plugin.version>
         <sonar-plugin.version>3.6.0.1398</sonar-plugin.version>
-        <source-plugin.version>3.1.0</source-plugin.version>
+        <source-plugin.version>3.2.0</source-plugin.version>
         <release-plugin.version>2.5.3</release-plugin.version>
         <maven-enforcer-plugin.version>3.0.0-M2</maven-enforcer-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
