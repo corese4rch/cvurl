@@ -2,36 +2,37 @@ package coresearch.cvurl.io.model;
 
 import coresearch.cvurl.io.constant.HttpClientMode;
 import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
-import coresearch.cvurl.io.mapper.GenericMapper;
+import coresearch.cvurl.io.mapper.MapperFactory;
 import coresearch.cvurl.io.mapper.impl.JacksonMapper;
+import coresearch.cvurl.io.utils.MockHttpClient;
+import coresearch.cvurl.io.utils.MockProxySelector;
 import org.junit.jupiter.api.Test;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
 import java.net.Authenticator;
-import java.net.CookieHandler;
-import java.net.ProxySelector;
+import java.net.CookieManager;
 import java.net.http.HttpClient;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 
 public class ConfigurationTest {
 
     @Test
-    public void builderTest() {
+    public void builderTest() throws NoSuchAlgorithmException {
         //given
-        var authenticator = mock(Authenticator.class);
+        var authenticator = new Authenticator() {};
         var connectTimeout = Duration.ofSeconds(1);
-        var cookieHandler = mock(CookieHandler.class);
-        var executor = mock(Executor.class);
-        var followRedirects = mock(HttpClient.Redirect.class);
-        var proxySelector = mock(ProxySelector.class);
-        var sslContext = mock(SSLContext.class);
+        var cookieHandler = new CookieManager();
+        var executor = Executors.newFixedThreadPool(1);
+        var followRedirects = HttpClient.Redirect.NEVER;
+        var proxySelector = MockProxySelector.create();
+        var sslContext = SSLContext.getDefault();
         var sslParameters = new SSLParameters(new String[]{"test"});
         var priority = 1;
         var version = HttpClient.Version.HTTP_1_1;
@@ -63,15 +64,15 @@ public class ConfigurationTest {
     }
 
     @Test
-    public void createHttpClientTest() {
+    public void createHttpClientTest() throws NoSuchAlgorithmException {
         //given
-        var authenticator = mock(Authenticator.class);
+        var authenticator = new Authenticator() {};
         var connectTimeout = Duration.ofSeconds(1);
-        var cookieHandler = mock(CookieHandler.class);
-        var executor = mock(Executor.class);
-        var followRedirects = mock(HttpClient.Redirect.class);
-        var proxySelector = mock(ProxySelector.class);
-        var sslContext = mock(SSLContext.class);
+        var cookieHandler = new CookieManager();
+        var executor = Executors.newFixedThreadPool(1);
+        var followRedirects = HttpClient.Redirect.NEVER;
+        var proxySelector = MockProxySelector.create();
+        var sslContext = SSLContext.getDefault();
         var sslParameters = new SSLParameters(new String[]{"test"});
         var priority = 1;
         var version = HttpClient.Version.HTTP_1_1;
@@ -106,9 +107,9 @@ public class ConfigurationTest {
     @Test
     public void httpClientBasedBuilderTest() {
         //given
-        var httpClient = mock(HttpClient.class);
-        var genericMapper = mock(GenericMapper.class);
-        var requestTimeout = mock(Duration.class);
+        var httpClient = MockHttpClient.create();
+        var genericMapper = MapperFactory.createDefault();
+        var requestTimeout = Duration.ofSeconds(42);
         var acceptCompressed = true;
 
         //when
@@ -172,8 +173,8 @@ public class ConfigurationTest {
     @Test
     public void configurationBuilderTest() {
         //given
-        var httpClient = mock(HttpClient.class);
-        var genericMapper = mock(GenericMapper.class);
+        var httpClient = MockHttpClient.create();
+        var genericMapper = MapperFactory.createDefault();
         var clientMode = HttpClientMode.PROTOTYPE;
         var timeout = Duration.ofSeconds(1);
         var acceptCompressed = true;
