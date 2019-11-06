@@ -11,24 +11,24 @@ import coresearch.cvurl.io.helper.ObjectGenerator;
 import coresearch.cvurl.io.helper.model.User;
 import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
 import coresearch.cvurl.io.mapper.BodyType;
+import coresearch.cvurl.io.mapper.GenericMapper;
+import coresearch.cvurl.io.mapper.MapperFactory;
 import coresearch.cvurl.io.model.Configuration;
 import coresearch.cvurl.io.model.Response;
 import coresearch.cvurl.io.multipart.MultipartBody;
 import coresearch.cvurl.io.multipart.Part;
+import coresearch.cvurl.io.utils.MockHttpClient;
 import coresearch.cvurl.io.utils.Resources;
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.net.MalformedURLException;
-import java.net.URI;
+import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -44,7 +44,6 @@ import java.util.zip.GZIPOutputStream;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.times;
 
 
 public class CVurlRequestTest extends AbstractRequestTest {
@@ -709,21 +708,17 @@ public class CVurlRequestTest extends AbstractRequestTest {
     @Test
     public void reusableRequestCreationTest() throws IOException, InterruptedException {
         //given
-        HttpClient httpClient = Mockito.mock(HttpClient.class);
+        MockHttpClient httpClient = MockHttpClient.create();
         Request request = new CVurl(httpClient).get(url).create();
 
-        ArgumentCaptor<HttpRequest> httpRequestArgumentCaptor = ArgumentCaptor.forClass(HttpRequest.class);
 
         //when
         request.asString();
         request.asString();
 
         //then both executions are done on the same request
-        Mockito.verify(httpClient, times(2)).send(
-                httpRequestArgumentCaptor.capture(), Mockito.any(HttpResponse.BodyHandler.class));
-
-        HttpRequest httpRequest1 = httpRequestArgumentCaptor.getAllValues().get(0);
-        HttpRequest httpRequest2 = httpRequestArgumentCaptor.getAllValues().get(1);
+        HttpRequest httpRequest1 = httpClient.requests.get(0);
+        HttpRequest httpRequest2 = httpClient.requests.get(1);
 
         assertSame(httpRequest1, httpRequest2);
     }
@@ -897,6 +892,9 @@ public class CVurlRequestTest extends AbstractRequestTest {
         assertEquals(requestConfiguration.isAcceptCompressed(), acceptCompressed);
         assertEquals(requestConfiguration.isLogEnabled(), logEnabled);
     }
+
+    private HttpClient httpClient = HttpClient.newHttpClient();
+    private GenericMapper genericMapper = MapperFactory.createDefault();
 
     private byte[] compressWithGZIP(String str) throws IOException {
         var out = new ByteArrayOutputStream();
