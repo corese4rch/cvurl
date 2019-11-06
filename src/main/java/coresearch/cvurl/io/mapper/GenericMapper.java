@@ -19,6 +19,14 @@ public abstract class GenericMapper {
         }
     }
 
+    public final <T> T readResponseBody(Response<String> response, BodyType<T> type) {
+        try {
+            return readValue(response.getBody(), type);
+        } catch (MappingException e) {
+            throw new ResponseMappingException(e.getMessage(), e, response);
+        }
+    }
+
     /**
      * Deserialize String value to object of specified type.
      *
@@ -28,6 +36,17 @@ public abstract class GenericMapper {
      * @return converted object
      */
     public abstract <T> T readValue(String value, Class<T> valueType);
+
+    /**
+     * Deserialize String value to object of specified type.Should be used when you need to deserialize
+     * to type with generics.
+     *
+     * @param value     value to be converted.
+     * @param valueType type to object of which value should be converted.
+     * @param <T>       concrete type
+     * @return converted object
+     */
+    public abstract <T> T readValue(String value, BodyType<T> valueType);
 
     /**
      * Serialize object to String.

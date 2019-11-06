@@ -425,6 +425,82 @@ compile group: 'com.github.corese4rch', name: 'cvurl-io', version: '1.1'
  * [micronaut example](https://github.com/corese4rch/cvurl-examples/tree/master/cvurl-usage-micronaut)
  * [quarkus example](https://github.com/corese4rch/cvurl-examples/tree/master/cvurl-usage-quarkus) 
  
+### Majore feature updates
+ **1.2** Changes: 
+ 1) **Ability to parse response body to nested generic type**  
+      
+    ```java
+    public static void main(String[] args){
+      var cvurl = new CVurl();
+      
+      //imagine you need to parse response as List of instances of some data class User
+      //now you can do it with no fuss
+      List<User> resultUsers = cvurl.get(url)
+              .asObject(new BodyType<List<User>>() {}, HttpStatus.OK)
+              .orElseThrow(RuntimeException::new);
+    } 
+    ```      
+
+ 2) **More convenient and stylish configuration management**   
+     First I would like to give a little bit of introduction to what can look like not a 
+     large switch but in reality will be a great asset to the ease of use for developers and ease of further development for us.
+     
+     So what we tried to achieve introducing those changes:
+      
+    * **Better scoping**    
+    We provided clean separation of configuration scopes providing general per CVurl instance CVUrlConfiguration and more specific per request RequestConfiguration. CVurlConfiguration contains central gears to maintain our wrapper such as 
+    HttpClient, GenericMapper and so on. RequestConfiguration on the other hand is newly created on each request and serves as context for different properties of requests such as requestTimeout, acceptCompressed and so on.I like to think about this way:
+        * One CVurlConfiguration per single instance of CVurl.  
+        * CVurlConfiguration, as well as central components of the system, contains instance of RequestConfiguration which values will be used as default properties of RequestConfiguration created from this CVurl. On each sending of actual request (asObject(), asString(), ...) new instance of RequestConfiguration will be created with default properties provided by central global RequestConfiguration from CVurlConfiguration.So...
+        * You can control global default properties for all requests, as well as separate property for each separate request, dude! Wow, so much control. Nice ....
+    
+    * **Ability to microcontrol but not necessity to microcontrol**.  
+    We don't force our user to microcontrol everything in order to achieve great performance,
+     we give you ability to toggle setups with no fuss on high level and to give specific 
+     configurations for specific requests only when is needed
+    
+    * **Ability for us to grow quickly and provide more excellent improvements to CVurl.**
+
+    * **It's so damn easy !**  
+    Nice, but what about KISS, dude, users just wanna chill they don't wan't to be perplexed 
+    by atrocious hardship of caring about all this stuff, man - this what you probably could say. And I would reply 
+    to you with great confidence: it's easy as pie, relax and just see for yourself: 
+    
+    ```java
+       private HttpClient httpClient = HttpClient.newHttpClient();
+       private GenericMapper genericMapper = MapperFactory.createDefault();
+     
+         @Test
+         public void sexyTest() {
+             //so you are simple man and for you simple http needs you need a simple instrument
+             //like this one
+             var cVurl = new CVurl();
+             //that's all ! here you go, run explore world wide web, boy
+     
+             //nice, I see you have your own instances of HttpClient and GenericMapper
+             //great, let's build our brand new CVurl with it.
+             var cVurl = new CVurl(Configuration.builder(httpClient)
+                     .genericMapper(genericMapper)
+                     .build());
+     
+             //now let's make it a lil bit cooler, let's add some requestTimeout
+             //so you don't have to wait for her reply all the day because of bad connection.
+             //this time let's also create our own httpClient, how about that sounds ?
+             var cVurl = new CVurl(Configuration.builder()
+                     .executor(Executors.newFixedThreadPool(3))
+                     .requestTimeout(Duration.ofSeconds(5))
+                     .build());
+             //you see how nice it is, you configured your CVurl and by the way you configured and created your brand new HttpClient.
+     
+             //but hey your mate's server always reply in 10 seconds, how would you communicate ?
+             //dont worry, buddy, we got you covered, you can configure specific requests
+             // with great ease and comfort. Let's say we use just created CVurl
+             cVurl.get("http://slow.mate.server.com")
+                     .header("password", "chinchila")
+                     .requestTimeout(Duration.ofSeconds(15)) //now you can wait for slow server as much as you need  (you better not though)
+                     .asString();
+         }
+    ```         
    
 ## License
  >  Copyright 2019 Core Value, Inc. Licensed under GNU GPLv3 

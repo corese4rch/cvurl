@@ -1,36 +1,32 @@
 package coresearch.cvurl.io.model;
 
-import name.falgout.jeffrey.testing.junit.mockito.MockitoExtension;
+import coresearch.cvurl.io.utils.MockHttpRequest;
+import coresearch.cvurl.io.utils.MockHttpResponse;
+import coresearch.cvurl.io.utils.MockSSLSession;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 
 import javax.net.ssl.SSLSession;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 public class ResponseTest {
 
-    @Mock
-    public HttpResponse<String> httpResponse;
+    public MockHttpResponse httpResponse = MockHttpResponse.create();
 
     @Test
     public void requestTest() {
         //given
-        HttpRequest request = mock(HttpRequest.class);
-        when(httpResponse.request()).thenReturn(request);
+        HttpRequest request = MockHttpRequest.create();
+        httpResponse.setHttpRequest(request);
 
         //when
         HttpRequest result = new Response<>(httpResponse).request();
@@ -42,8 +38,8 @@ public class ResponseTest {
     @Test
     public void previousResponseTest() {
         //given
-        HttpResponse<String> previousResponse = mock(HttpResponse.class);
-        when(httpResponse.previousResponse()).thenReturn(Optional.of(previousResponse));
+        HttpResponse<String> previousResponse = MockHttpResponse.create();
+        httpResponse.setPreviousResponse(previousResponse);
 
         //when
         HttpResponse<String> result = new Response<>(httpResponse).previousResponse().orElseThrow(RuntimeException::new);
@@ -55,8 +51,8 @@ public class ResponseTest {
     @Test
     public void sslSessionTest() {
         //given
-        SSLSession sslSession = mock(SSLSession.class);
-        when(httpResponse.sslSession()).thenReturn(Optional.of(sslSession));
+        SSLSession sslSession = MockSSLSession.create();
+        httpResponse.setSslSession(sslSession);
 
         //when
         SSLSession result = new Response<>(httpResponse).sslSession().orElseThrow(RuntimeException::new);
@@ -66,10 +62,10 @@ public class ResponseTest {
     }
 
     @Test
-    public void uriTest() {
+    public void uriTest() throws URISyntaxException {
         //given
-        URI uri = mock(URI.class);
-        when(httpResponse.uri()).thenReturn(uri);
+        URI uri = new URI("//https://www.google.com/");
+        httpResponse.setUri(uri);
 
         //when
         URI result = new Response<>(httpResponse).uri();
@@ -81,9 +77,8 @@ public class ResponseTest {
     @Test
     public void versionTest() {
         //given
-        HttpClient.Version version = mock(HttpClient.Version.class);
-        when(httpResponse.version()).thenReturn(version);
-
+        HttpClient.Version version = HttpClient.Version.HTTP_1_1;
+        httpResponse.setVersion(version);
         //when
         HttpClient.Version result = new Response<>(httpResponse).version();
 
@@ -97,7 +92,7 @@ public class ResponseTest {
         String key = "key";
         List<String> values = List.of("val1", "val2");
         HttpHeaders headers = HttpHeaders.of(Map.of(key, values), (k, v) -> true);
-        when(httpResponse.headers()).thenReturn(headers);
+        httpResponse.setHeaders(headers);
 
         //when
         List<String> result = new Response<>(httpResponse).getHeaderValuesAsList(key);

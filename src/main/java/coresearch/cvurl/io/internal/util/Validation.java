@@ -8,6 +8,13 @@ public class Validation {
 
     private static final String ERROR_MESSAGE = "%s parameter cannot be null";
 
+    public static <T> void notNullParams(T... objs) {
+        for (T obj : objs) {
+            notNullParam(obj, obj.getClass().getSimpleName());
+        }
+    }
+
+
     public static <T> T notNullParam(T obj) {
         return notNullParam(obj, obj.getClass().getSimpleName());
     }
