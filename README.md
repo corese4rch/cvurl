@@ -14,7 +14,7 @@
 ## Dependencies
  **cVurl** is made purely with Java 11 and one of our goals was to bring as fewer dependencies to your project as possible. The only dependencies that will be added to your project are:
  
- ```java
+ ```xml
         //(1)
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -426,7 +426,7 @@ compile group: 'com.github.corese4rch', name: 'cvurl-io', version: '1.2'
  * [quarkus example](https://github.com/corese4rch/cvurl-examples/tree/master/cvurl-usage-quarkus) 
  
 ## Changelog
-Please see the [Changelog](https://github.com/corese4rch/cvurl/wiki/Changelog) page to see what's recently changed.
+Please see the [change log](https://github.com/corese4rch/cvurl/wiki/Change-Log) page to see what's recently changed.
    
 ## License
  >  Copyright 2019 Core Value, Inc. Licensed under GNU GPLv3 
