@@ -417,13 +417,7 @@ compile group: 'com.github.corese4rch', name: 'cvurl-io', version: '1.2'
 ```
    
 ## Examples
- More examples can be found at [example repository](https://github.com/corese4rch/cvurl-examples)
- 
- Usage examples:
- * [spring-boot example](https://github.com/corese4rch/cvurl-examples/tree/master/cvurl-usage-spring-boot)
- * [plain java 11 example](https://github.com/corese4rch/cvurl-examples/tree/master/cvurl-usage-plain-java)
- * [micronaut example](https://github.com/corese4rch/cvurl-examples/tree/master/cvurl-usage-micronaut)
- * [quarkus example](https://github.com/corese4rch/cvurl-examples/tree/master/cvurl-usage-quarkus) 
+Examples can be found on our [Wiki page](https://github.com/corese4rch/cvurl/wiki).
  
 ## Changelog
 Please see the [change log](https://github.com/corese4rch/cvurl/wiki/Change-Log) page to see what's recently changed.
