@@ -338,6 +338,15 @@
                 <role>Developer</role>
             </roles>
         </developer>
+        <developer>
+            <id>4</id>
+            <name>Dmytro Tarianyk</name>
+            <email>dmytro.tarianyk@avenga.com</email>
+            <organization>CoreValue powered by Avenga</organization>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
     </developers>
 
     <issueManagement>
