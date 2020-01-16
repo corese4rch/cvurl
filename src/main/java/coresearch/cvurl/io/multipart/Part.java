@@ -20,7 +20,7 @@ public class Part<T extends Part<T>> {
 
     private static final String CRLF = "\r\n";
     private static final String BOUNDARY_DELIMITER = "--";
-    private static final String CONTENT_PART = "content";
+    private static final String CONTENT_ARGUMENT = "content";
     private Map<String, String> headers;
     private byte[] content;
 
@@ -36,7 +36,7 @@ public class Part<T extends Part<T>> {
      * @return this {@link Part}
      */
     public static Part of(byte[] content) {
-        notNullParam(content, CONTENT_PART);
+        notNullParam(content, CONTENT_ARGUMENT);
 
         return new Part(content);
     }
@@ -48,7 +48,7 @@ public class Part<T extends Part<T>> {
      * @return this {@link Part}
      */
     public static Part of(String content) {
-        notNullParam(content, CONTENT_PART);
+        notNullParam(content, CONTENT_ARGUMENT);
 
         return new Part(content.getBytes());
     }
@@ -97,7 +97,7 @@ public class Part<T extends Part<T>> {
     public static PartWithFileContent of(String fileName, String contentType, byte[] content) {
         notNullParam(fileName, "filePath");
         notNullParam(contentType, "contentType");
-        notNullParam(content, CONTENT_PART);
+        notNullParam(content, CONTENT_ARGUMENT);
 
         return new PartWithFileContent(fileName, content).contentType(contentType);
     }
