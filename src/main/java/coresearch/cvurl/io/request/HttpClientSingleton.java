@@ -2,11 +2,16 @@ package coresearch.cvurl.io.request;
 
 import java.net.http.HttpClient;
 
-public class HttpClientSingleton {
+import static java.lang.String.format;
 
-    private static volatile HttpClient httpClient;
+public final class HttpClientSingleton {
 
-    @SuppressWarnings({"UnusedAssignment", "ConstantConditions"})
+    private static HttpClient httpClient;
+
+    private HttpClientSingleton() {
+        throw new IllegalStateException(format("Creating of class %s is forbidden", HttpClientSingleton.class.getName()));
+    }
+
     public static HttpClient getClient(HttpClient fromClient) {
         HttpClient client = httpClient;
         if (null == client) {

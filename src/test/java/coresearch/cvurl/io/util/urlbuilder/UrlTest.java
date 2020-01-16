@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class UrlTest {
 
     private static final String VALIDATION_ERROR_MESSAGE = "%s parameter cannot be null";
+    private static final String URL = "http://www.google.com";
 
     @ParameterizedTest
     @ValueSource(strings = {
@@ -51,7 +52,7 @@ public class UrlTest {
     @ValueSource(strings = {"path/", " /path/", " //path// "})
     public void pathTest(String path) {
         //given
-        var url = "http://www.google.com";
+        var url = URL;
         var expectedResult = url + "/path/";
 
         //when
@@ -64,7 +65,7 @@ public class UrlTest {
     @Test
     public void nestedPathTest() {
         //given
-        var url = "http://www.google.com";
+        var url = URL;
         var path = "path1/path2";
         var expectedUrl = url + "/" + path;
 
@@ -87,7 +88,7 @@ public class UrlTest {
     @Test
     public void pathReturnsNewObjectTest() {
         //given
-        var urlStr = "http://www.google.com";
+        var urlStr = URL;
         var path = "path";
         var url = Url.of(urlStr);
 

@@ -18,7 +18,7 @@ import java.util.concurrent.Executor;
 
 public class MockHttpClient extends HttpClient {
 
-    public List<HttpRequest> requests = new ArrayList<>();
+    private List<HttpRequest> requests = new ArrayList<>();
 
     private MockHttpClient() { }
 
@@ -73,7 +73,7 @@ public class MockHttpClient extends HttpClient {
 
     @Override
     public <T> HttpResponse<T> send(HttpRequest request, HttpResponse.BodyHandler<T> responseBodyHandler) throws IOException, InterruptedException {
-        requests.add(request);
+        getRequests().add(request);
         return null;
     }
 
@@ -85,5 +85,9 @@ public class MockHttpClient extends HttpClient {
     @Override
     public <T> CompletableFuture<HttpResponse<T>> sendAsync(HttpRequest request, HttpResponse.BodyHandler<T> responseBodyHandler, HttpResponse.PushPromiseHandler<T> pushPromiseHandler) {
         return null;
+    }
+
+    public List<HttpRequest> getRequests() {
+        return requests;
     }
 }

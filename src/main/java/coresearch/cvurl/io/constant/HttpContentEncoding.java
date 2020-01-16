@@ -2,7 +2,8 @@ package coresearch.cvurl.io.constant;
 
 import static java.lang.String.format;
 
-public class HttpContentEncoding {
+public final class HttpContentEncoding {
+
     public static final String GZIP = "gzip";
 
     private HttpContentEncoding() {

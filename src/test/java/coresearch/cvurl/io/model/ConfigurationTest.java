@@ -204,7 +204,6 @@ public class ConfigurationTest {
                 optionalsEqual(client1.cookieHandler(), client2.cookieHandler()) &&
                 optionalsEqual(client1.executor(), client2.executor()) &&
                 optionalsEqual(client1.proxy(), client2.proxy()) &&
-                optionalsEqual(client1.proxy(), client2.proxy()) &&
                 client1.followRedirects().equals(client2.followRedirects()) &&
                 client1.sslContext().equals(client2.sslContext()) &&
                 Arrays.equals(client1.sslParameters().getCipherSuites(), client2.sslParameters().getCipherSuites()) &&

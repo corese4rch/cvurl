@@ -2,7 +2,8 @@ package coresearch.cvurl.io.constant;
 
 import static java.lang.String.format;
 
-public class MultipartType {
+public final class MultipartType {
+
     public static final String MIXED = "mixed";
     public static final String FORM = "form-data";
     public static final String ALTERNATIVE = "alternative";

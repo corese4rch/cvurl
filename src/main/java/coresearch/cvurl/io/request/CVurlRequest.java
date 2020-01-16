@@ -100,33 +100,23 @@ public final class CVurlRequest implements Request {
     @Override
     public <T> Optional<T> asObject(Class<T> type, int statusCode) {
         return sendRequestAndWrapInOptional(getStringBodyHandler(),
-                (response) -> parseResponse(response, type, statusCode));
+                response -> parseResponse(response, type, statusCode));
     }
 
     @Override
     public <T> Optional<T> asObject(BodyType<T> type, int statusCode) {
         return sendRequestAndWrapInOptional(getStringBodyHandler(),
-                (response) -> parseResponse(response, type, statusCode));
+                response -> parseResponse(response, type, statusCode));
     }
 
     @Override
     public <T> T asObject(Class<T> type) {
-        try {
-            return sendRequest(getStringBodyHandler(),
-                    response -> configuration.getGenericMapper().readResponseBody(new Response<>(response), type));
-        } catch (IOException | InterruptedException e) {
-            throw new RequestExecutionException(e.getMessage(), e);
-        }
+        return asObject(response -> configuration.getGenericMapper().readResponseBody(new Response<>(response), type));
     }
 
     @Override
     public <T> T asObject(BodyType<T> type) {
-        try {
-            return sendRequest(getStringBodyHandler(),
-                    response -> configuration.getGenericMapper().readResponseBody(new Response<>(response), type));
-        } catch (IOException | InterruptedException e) {
-            throw new RequestExecutionException(e.getMessage(), e);
-        }
+        return asObject(response -> configuration.getGenericMapper().readResponseBody(new Response<>(response), type));
     }
 
     @Override
@@ -152,12 +142,27 @@ public final class CVurlRequest implements Request {
         return requestConfiguration.isAcceptCompressed() ? new CompressedInputStreamBodyHandler() : BodyHandlers.ofInputStream();
     }
 
+    private <T> T asObject(Function<HttpResponse<String>, T> responseMapper) {
+        try {
+            return sendRequest(getStringBodyHandler(), responseMapper);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            throw new RequestExecutionException(ie.getMessage(), ie);
+        } catch (IOException io) {
+            throw new RequestExecutionException(io.getMessage(), io);
+        }
+    }
+
     private <T, U> Optional<T> sendRequestAndWrapInOptional(HttpResponse.BodyHandler<U> bodyHandler,
                                                             Function<HttpResponse<U>, T> responseMapper) {
         try {
             return Optional.of(sendRequest(bodyHandler, responseMapper));
+        } catch (InterruptedException ie) {
+            LOGGER.error("Error while sending request. Thread execution was interrupted.");
+            Thread.currentThread().interrupt();
+            return Optional.empty();
         } catch (Exception e) {
-            LOGGER.error("Error while sending request: {} exception happened with message {}", e.toString(), e.getMessage());
+            LOGGER.error("Error while sending request: {} exception happened with message {}", e, e.getMessage());
             return Optional.empty();
         }
     }

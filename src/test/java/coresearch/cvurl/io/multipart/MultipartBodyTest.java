@@ -32,12 +32,12 @@ public class MultipartBodyTest {
     private static final String MULTIPART_BODY_TEST_UNKNOWN_EXTENSION = "multipart-body-test.ololo";
     private static final String JSON_MIME_TYPE = "application/json";
     private static final String CRLF = "\r\n";
+    private static final String CONTENT = "content";
 
     @Test
-    public void singlePartWithoutContentTypeTest() throws IOException {
+    public void singlePartWithoutContentTypeTest() {
         //given
-        var partContent = "content";
-        var partContentType = MIMEType.TEXT_PLAIN;
+        var partContent = CONTENT;
         var expectedResult = generateMultipartBody(BOUNDARY,
                 new TestPart(partContent));
 
@@ -50,9 +50,9 @@ public class MultipartBodyTest {
 
 
     @Test
-    public void singlePartWithContentTypeTest() throws IOException {
+    public void singlePartWithContentTypeTest() {
         //given
-        var partContent = "content";
+        var partContent = CONTENT;
         var partContentType = MIMEType.TEXT_PLAIN;
         var expectedResult = generateMultipartBody(BOUNDARY,
                 new TestPart(partContent, Map.of(
@@ -69,7 +69,7 @@ public class MultipartBodyTest {
     public void singleFormPartTest() {
         //given
         var partName = "name";
-        var partContent = "content";
+        var partContent = CONTENT;
         var partContentType = MIMEType.TEXT_PLAIN;
         var expectedResult = generateMultipartBody(BOUNDARY,
                 new TestPart(partContent, Map.of(
@@ -165,10 +165,10 @@ public class MultipartBodyTest {
     }
 
     @Test
-    public void byteArrayPartTest() throws IOException {
+    public void byteArrayPartTest() {
         //given
         var partName = "name";
-        var strContent = "content";
+        var strContent = CONTENT;
         var content = strContent.getBytes();
         var expectedResult = generateMultipartBody(BOUNDARY,
                 new TestPart(strContent, Map.of(

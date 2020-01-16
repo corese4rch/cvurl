@@ -5,6 +5,7 @@ import java.net.Proxy;
 import java.net.ProxySelector;
 import java.net.SocketAddress;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MockProxySelector extends ProxySelector {
@@ -18,11 +19,11 @@ public class MockProxySelector extends ProxySelector {
 
     @Override
     public List<Proxy> select(URI uri) {
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
     public void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
-
+        // Implementation is not needed
     }
 }
