@@ -243,10 +243,10 @@ public class Configuration {
                 genericMapper = MapperFactory.createDefault();
             }
 
-            var httpClient = httpClientMode == HttpClientMode.PROTOTYPE ?
+            var client = httpClientMode == HttpClientMode.PROTOTYPE ?
                     this.getHttpClient() : HttpClientSingleton.getClient(this.getHttpClient());
 
-            return new Configuration(httpClient, genericMapper, httpClientMode, requestConfigurationBuilder.build());
+            return new Configuration(client, genericMapper, httpClientMode, requestConfigurationBuilder.build());
         }
     }
 

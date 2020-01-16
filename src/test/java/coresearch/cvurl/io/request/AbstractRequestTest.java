@@ -9,10 +9,10 @@ import org.junit.jupiter.api.BeforeEach;
 
 public abstract class AbstractRequestTest {
 
-    protected static String URL_PATTERN = "http://localhost:%d%s";
-    protected static String TEST_ENDPOINT = "/test/endpoint";
-    protected static String TEST_TOKEN = "test-token";
-    protected static int PORT = 8080;
+    protected static final String URL_PATTERN = "http://localhost:%d%s";
+    protected static final String TEST_ENDPOINT = "/test/endpoint";
+    protected static final String TEST_TOKEN = "test-token";
+    protected static final int PORT = 8080;
 
     protected WireMockServer wiremock;
     protected ObjectMapper mapper;

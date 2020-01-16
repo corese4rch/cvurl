@@ -305,8 +305,8 @@
         <developer>
             <id>0</id>
             <name>Andrew Petryk</name>
-            <email>andrew.petryk@gmail.com</email>
-            <organization>CoreValue Services</organization>
+            <email>andrew.petryk@avenga.com</email>
+            <organization>CoreValue powered by Avenga</organization>
             <roles>
                 <role>Product Owner/Team Lead</role>
             </roles>
@@ -314,8 +314,8 @@
         <developer>
             <id>1</id>
             <name>Mykhailo Voloshchuk</name>
-            <email>mvoloshchuk@corevalue.net</email>
-            <organization>CoreValue Services</organization>
+            <email>mykhailo.voloshchuk@avenga.com</email>
+            <organization>CoreValue powered by Avenga</organization>
             <roles>
                 <role>Developer</role>
             </roles>
@@ -323,8 +323,8 @@
         <developer>
             <id>2</id>
             <name>Ivan Mahlatii</name>
-            <email>imahlatii@corevalue.net</email>
-            <organization>CoreValue Services</organization>
+            <email>ivan.mahlatii@avenga.com</email>
+            <organization>CoreValue powered by Avenga</organization>
             <roles>
                 <role>Developer</role>
             </roles>
@@ -332,8 +332,17 @@
         <developer>
             <id>3</id>
             <name>Yurii Kaplun</name>
-            <email>yukaplun@corevalue.net</email>
-            <organization>CoreValue Services</organization>
+            <email>yurii.kaplun@avenga.com</email>
+            <organization>CoreValue powered by Avenga</organization>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>4</id>
+            <name>Dmytro Tarianyk</name>
+            <email>dmytro.tarianyk@avenga.com</email>
+            <organization>CoreValue powered by Avenga</organization>
             <roles>
                 <role>Developer</role>
             </roles>

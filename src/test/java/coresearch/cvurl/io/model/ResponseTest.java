@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class ResponseTest {
 
-    public MockHttpResponse httpResponse = MockHttpResponse.create();
+    private MockHttpResponse httpResponse = MockHttpResponse.create();
 
     @Test
     public void requestTest() {

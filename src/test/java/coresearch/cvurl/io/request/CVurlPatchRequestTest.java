@@ -20,6 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CVurlPatchRequestTest extends AbstractRequestTest {
 
+    private static final String TEST_BODY_FOR_TEST = "Test body for test";
+
     @Test
     public void sendPATCHTest() {
 
@@ -203,14 +205,14 @@ public class CVurlPatchRequestTest extends AbstractRequestTest {
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
         assertTrue(response.headersNames().contains(HttpHeader.AUTHORIZATION));
-        assertEquals(TEST_TOKEN, response.getHeaderValue(HttpHeader.AUTHORIZATION).get());
+        assertEquals(TEST_TOKEN, response.getHeaderValue(HttpHeader.AUTHORIZATION).orElseThrow());
     }
 
     @Test
     public void sendPATCH_StringResponseTest() {
 
         //given
-        String body = "Test body for test";
+        String body = TEST_BODY_FOR_TEST;
         String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
         //when
@@ -238,7 +240,7 @@ public class CVurlPatchRequestTest extends AbstractRequestTest {
     public void sendPATCH_StringRequestBodyTest() {
 
         //given
-        String body = "Test body for test";
+        String body = TEST_BODY_FOR_TEST;
         String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
         //when
@@ -263,7 +265,7 @@ public class CVurlPatchRequestTest extends AbstractRequestTest {
     public void sendPATCH_BytesRequestBodyTest() {
 
         //given
-        String body = "Test body for test";
+        String body = TEST_BODY_FOR_TEST;
         String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
         //when

@@ -20,10 +20,10 @@ public class Url {
     private static final Pattern DOUBLE_SLASHES_PATTERN = Pattern.compile("(?<!(http:|https:))/{2,}");
     private static final Pattern WHITESPACES_PATTERN = Pattern.compile("\\s+");
 
-    private final String url;
+    private final String baseUrl;
 
-    private Url(String url) {
-        this.url = url;
+    private Url(String baseUrl) {
+        this.baseUrl = baseUrl;
     }
 
     /**
@@ -58,7 +58,7 @@ public class Url {
      */
     public Url path(String path) {
         notNullParam(path, "path");
-        return new Url(this.url + "/" + path);
+        return new Url(this.baseUrl + "/" + path);
     }
 
     /**
@@ -69,7 +69,7 @@ public class Url {
      */
     public URL create() {
         try {
-            return new URL(removeRedundantSlashesAndWhitespaces(url));
+            return new URL(removeRedundantSlashesAndWhitespaces(baseUrl));
         } catch (MalformedURLException e) {
             throw new BadUrlException(e.getMessage(), e);
         }

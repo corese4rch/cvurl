@@ -28,8 +28,8 @@ public class CVurlTest {
     @Test
     public void createCVurlWithSingletoneHttpClientTest() {
         //given
-        var configuration1 = Configuration.builder().httpClientMode(HttpClientMode.SINGLETONE).build();
-        var configuration2 = Configuration.builder().httpClientMode(HttpClientMode.SINGLETONE).build();
+        var configuration1 = Configuration.builder().httpClientMode(HttpClientMode.SINGLETON).build();
+        var configuration2 = Configuration.builder().httpClientMode(HttpClientMode.SINGLETON).build();
 
         //when
         var cvurl1 = new CVurl(configuration1);

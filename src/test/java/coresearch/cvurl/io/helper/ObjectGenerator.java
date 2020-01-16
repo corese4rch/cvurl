@@ -7,9 +7,15 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import static java.lang.String.format;
+
 public class ObjectGenerator {
 
     private static Random random = new Random();
+
+    private ObjectGenerator() {
+        throw new IllegalStateException(format("Creating of class %s is forbidden", ObjectGenerator.class.getName()));
+    }
 
     public static User generateTestObject() {
         return new User(UUID.randomUUID().toString(), random.nextInt(100));
