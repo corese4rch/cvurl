@@ -1,9 +1,8 @@
 language: java
 jdk:
   - oraclejdk11
-  - oraclejdk13
   - openjdk11
-  - openjdk13
+  - openjdk14
 
 after_success:
   - |
