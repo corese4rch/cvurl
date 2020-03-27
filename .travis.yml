@@ -4,6 +4,7 @@ jdk:
   - oraclejdk13
   - openjdk11
   - openjdk13
+  - openjdk14
 
 after_success:
   - |
