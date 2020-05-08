@@ -11,7 +11,7 @@ import coresearch.cvurl.io.helper.ObjectGenerator;
 import coresearch.cvurl.io.helper.model.User;
 import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
 import coresearch.cvurl.io.mapper.BodyType;
-import coresearch.cvurl.io.model.Configuration;
+import coresearch.cvurl.io.model.CvurlConfig;
 import coresearch.cvurl.io.model.Response;
 import coresearch.cvurl.io.multipart.MultipartBody;
 import coresearch.cvurl.io.multipart.Part;
@@ -148,7 +148,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
     @Test
     public void curlRequestTimeoutTest() {
         //given
-        CVurl cvurl = new CVurl(Configuration.builder()
+        CVurl cvurl = new CVurl(CvurlConfig.builder()
                 .requestTimeout(Duration.ofMillis(100))
                 .build());
 
@@ -182,7 +182,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
     @Test
     public void requestTimeoutOverridesCurlTimeoutTest() {
         //given
-        CVurl cvurl = new CVurl(Configuration.builder()
+        CVurl cvurl = new CVurl(CvurlConfig.builder()
                 .requestTimeout(Duration.ofMillis(200))
                 .build());
 

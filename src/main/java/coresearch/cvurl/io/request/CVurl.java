@@ -3,7 +3,7 @@ package coresearch.cvurl.io.request;
 import coresearch.cvurl.io.constant.HttpMethod;
 import coresearch.cvurl.io.mapper.GenericMapper;
 import coresearch.cvurl.io.mapper.MapperFactory;
-import coresearch.cvurl.io.model.Configuration;
+import coresearch.cvurl.io.model.CvurlConfig;
 
 import java.net.URL;
 import java.net.http.HttpClient;
@@ -17,25 +17,25 @@ import static coresearch.cvurl.io.internal.util.Validation.notNullParam;
  */
 public class CVurl {
 
-    private Configuration configuration;
+    private CvurlConfig cvurlConfig;
 
     /**
      * Creates CVurl with default mapper created by {@link MapperFactory#createDefault()}, default {@link HttpClient} created
      * by {@link HttpClient#newHttpClient()} and request timeout set to null.
      */
     public CVurl() {
-        this.configuration = Configuration.defaultConfiguration();
+        this.cvurlConfig = CvurlConfig.defaultConfiguration();
     }
 
     /**
-     * Creates CVurl with specified {@link Configuration} and
+     * Creates CVurl with specified {@link CvurlConfig} and
      * default mapper created by {@link MapperFactory#createDefault()}.
      *
-     * @param configuration configuration with which CVurl will be created.
+     * @param cvurlConfig configuration with which CVurl will be created.
      */
-    public CVurl(Configuration configuration) {
-        notNullParam(configuration);
-        this.configuration = configuration;
+    public CVurl(CvurlConfig cvurlConfig) {
+        notNullParam(cvurlConfig);
+        this.cvurlConfig = cvurlConfig;
     }
 
     /**
@@ -46,7 +46,7 @@ public class CVurl {
      * @param httpClient httpClient with which CVurl will be created.
      */
     public CVurl(HttpClient httpClient) {
-        this.configuration = Configuration.builder(httpClient).build();
+        this.cvurlConfig = CvurlConfig.builder(httpClient).build();
     }
 
     /**
@@ -55,27 +55,27 @@ public class CVurl {
      *
      * @param genericMapper mapper with which CVurl will be created.
      * @deprecated You should use {@link #CVurl()} if you want to create CVurl with default configuration,
-     * or {@link #CVurl(Configuration)} to build customized CVurl, or {@link #CVurl(HttpClient)} if
+     * or {@link #CVurl(CvurlConfig)} to build customized CVurl, or {@link #CVurl(HttpClient)} if
      * you want to create {@link CVurl} with given HttpClient.
      */
     @Deprecated(since = "1.2", forRemoval = true)
     public CVurl(GenericMapper genericMapper) {
-        this.configuration = Configuration.builder().genericMapper(genericMapper).build();
+        this.cvurlConfig = CvurlConfig.builder().genericMapper(genericMapper).build();
     }
 
     /**
-     * Creates CVurl with specified {@link GenericMapper} and {@link Configuration}
+     * Creates CVurl with specified {@link GenericMapper} and {@link CvurlConfig}
      *
      * @param genericMapper mapper with which CVurl will be created.
-     * @param configuration configuration with which CVurl will be created.
+     * @param cvurlConfig configuration with which CVurl will be created.
      * @deprecated You should use {@link #CVurl()} if you want to create CVurl with default configuration,
-     * or {@link #CVurl(Configuration)} to build customized CVurl, or {@link #CVurl(HttpClient)} if
+     * or {@link #CVurl(CvurlConfig)} to build customized CVurl, or {@link #CVurl(HttpClient)} if
      * you want to create {@link CVurl} with given HttpClient.
      */
     @Deprecated(since = "1.2", forRemoval = true)
-    public CVurl(GenericMapper genericMapper, Configuration configuration) {
-        notNullParam(configuration);
-        this.configuration = configuration.preconfiguredBuilder().genericMapper(genericMapper).build();
+    public CVurl(GenericMapper genericMapper, CvurlConfig cvurlConfig) {
+        notNullParam(cvurlConfig);
+        this.cvurlConfig = cvurlConfig.preconfiguredBuilder().genericMapper(genericMapper).build();
     }
 
     /**
@@ -85,12 +85,12 @@ public class CVurl {
      * @param httpClient     httpClient with which CVurl will be created.
      * @param requestTimeout requestTimeout with which CVurl will be created.
      * @deprecated You should use {@link #CVurl()} if you want to create CVurl with default configuration,
-     * or {@link #CVurl(Configuration)} to build customized CVurl, or {@link #CVurl(HttpClient)} if
+     * or {@link #CVurl(CvurlConfig)} to build customized CVurl, or {@link #CVurl(HttpClient)} if
      * you want to create {@link CVurl} with given HttpClient.
      */
     @Deprecated(since = "1.2", forRemoval = true)
     public CVurl(HttpClient httpClient, Duration requestTimeout) {
-        this.configuration = Configuration.builder(httpClient).requestTimeout(requestTimeout).build();
+        this.cvurlConfig = CvurlConfig.builder(httpClient).requestTimeout(requestTimeout).build();
     }
 
     /**
@@ -100,12 +100,12 @@ public class CVurl {
      * @param genericMapper mapper with which CVurl will be created.
      * @param httpClient    httpClient with which CVurl will be created.
      * @deprecated You should use {@link #CVurl()} if you want to create CVurl with default configuration,
-     * or {@link #CVurl(Configuration)} to build customized CVurl, or {@link #CVurl(HttpClient)} if
+     * or {@link #CVurl(CvurlConfig)} to build customized CVurl, or {@link #CVurl(HttpClient)} if
      * you want to create {@link CVurl} with given HttpClient.
      */
     @Deprecated(since = "1.2", forRemoval = true)
     public CVurl(GenericMapper genericMapper, HttpClient httpClient) {
-        this.configuration = Configuration.builder(httpClient).genericMapper(genericMapper).build();
+        this.cvurlConfig = CvurlConfig.builder(httpClient).genericMapper(genericMapper).build();
     }
 
     /**
@@ -116,19 +116,19 @@ public class CVurl {
      * @param httpClient     httpClient with which CVurl will be created.
      * @param requestTimeout requestTimeout with which CVurl will be created.
      * @deprecated You should use {@link #CVurl()} if you want to create CVurl with default configuration,
-     * or {@link #CVurl(Configuration)} to build customized CVurl, or {@link #CVurl(HttpClient)} if
+     * or {@link #CVurl(CvurlConfig)} to build customized CVurl, or {@link #CVurl(HttpClient)} if
      * you want to create {@link CVurl} with given HttpClient.
      */
     @Deprecated(since = "1.2", forRemoval = true)
     public CVurl(GenericMapper genericMapper, HttpClient httpClient, Duration requestTimeout) {
-        this.configuration = Configuration.builder(httpClient)
+        this.cvurlConfig = CvurlConfig.builder(httpClient)
                 .genericMapper(genericMapper)
                 .requestTimeout(requestTimeout)
                 .build();
     }
 
-    public Configuration getConfiguration() {
-        return configuration;
+    public CvurlConfig getCvurlConfig() {
+        return cvurlConfig;
     }
 
     /**
@@ -233,10 +233,10 @@ public class CVurl {
     }
 
     private RequestBuilder<?> createGetRequest(String url) {
-        return new RequestBuilder<>(url, HttpMethod.GET, configuration);
+        return new RequestBuilder<>(url, HttpMethod.GET, cvurlConfig);
     }
 
     private RequestWithBodyBuilder createRequestWBody(String url, HttpMethod httpMethod) {
-        return new RequestWithBodyBuilder(url, httpMethod, configuration);
+        return new RequestWithBodyBuilder(url, httpMethod, cvurlConfig);
     }
 }
