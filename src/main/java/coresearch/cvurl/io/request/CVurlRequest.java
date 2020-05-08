@@ -3,7 +3,7 @@ package coresearch.cvurl.io.request;
 import coresearch.cvurl.io.exception.RequestExecutionException;
 import coresearch.cvurl.io.exception.UnexpectedResponseException;
 import coresearch.cvurl.io.mapper.BodyType;
-import coresearch.cvurl.io.model.CvurlConfig;
+import coresearch.cvurl.io.model.CVurlConfig;
 import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
 import coresearch.cvurl.io.model.Response;
 import coresearch.cvurl.io.request.handler.CompressedInputStreamBodyHandler;
@@ -29,13 +29,13 @@ public final class CVurlRequest implements Request {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CVurlRequest.class);
 
-    private final CvurlConfig cvurlConfig;
+    private final CVurlConfig cvurlConfig;
     private final RequestConfiguration requestConfiguration;
     private final HttpClient httpClient;
 
     private HttpRequest httpRequest;
 
-    CVurlRequest(HttpRequest httpRequest, CvurlConfig cvurlConfig,
+    CVurlRequest(HttpRequest httpRequest, CVurlConfig cvurlConfig,
                  RequestConfiguration requestConfiguration) {
         this.httpRequest = httpRequest;
         this.cvurlConfig = cvurlConfig;

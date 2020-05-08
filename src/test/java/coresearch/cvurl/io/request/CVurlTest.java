@@ -2,7 +2,7 @@ package coresearch.cvurl.io.request;
 
 import coresearch.cvurl.io.constant.HttpClientMode;
 import coresearch.cvurl.io.mapper.MapperFactory;
-import coresearch.cvurl.io.model.CvurlConfig;
+import coresearch.cvurl.io.model.CVurlConfig;
 import org.junit.jupiter.api.Test;
 
 import java.net.http.HttpClient;
@@ -14,8 +14,8 @@ public class CVurlTest {
     @Test
     public void createCVurlWithPrototypeHttpClientTest() {
         //given
-        var configuration1 = CvurlConfig.builder().httpClientMode(HttpClientMode.PROTOTYPE).build();
-        var configuration2 = CvurlConfig.builder().httpClientMode(HttpClientMode.PROTOTYPE).build();
+        var configuration1 = CVurlConfig.builder().httpClientMode(HttpClientMode.PROTOTYPE).build();
+        var configuration2 = CVurlConfig.builder().httpClientMode(HttpClientMode.PROTOTYPE).build();
 
         //when
         var cvurl1 = new CVurl(configuration1);
@@ -28,8 +28,8 @@ public class CVurlTest {
     @Test
     public void createCVurlWithSingletoneHttpClientTest() {
         //given
-        var configuration1 = CvurlConfig.builder().httpClientMode(HttpClientMode.SINGLETON).build();
-        var configuration2 = CvurlConfig.builder().httpClientMode(HttpClientMode.SINGLETON).build();
+        var configuration1 = CVurlConfig.builder().httpClientMode(HttpClientMode.SINGLETON).build();
+        var configuration2 = CVurlConfig.builder().httpClientMode(HttpClientMode.SINGLETON).build();
 
         //when
         var cvurl1 = new CVurl(configuration1);
@@ -42,7 +42,7 @@ public class CVurlTest {
     @Test
     public void createCVurlWithNullConfigShouldThrowNPE() {
         //given
-        CvurlConfig cvurlConfig = null;
+        CVurlConfig cvurlConfig = null;
 
         //then
         assertThrows(NullPointerException.class, () -> new CVurl(cvurlConfig));

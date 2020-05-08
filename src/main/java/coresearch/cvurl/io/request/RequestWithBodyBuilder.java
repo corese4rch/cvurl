@@ -3,7 +3,7 @@ package coresearch.cvurl.io.request;
 import coresearch.cvurl.io.constant.HttpHeader;
 import coresearch.cvurl.io.constant.HttpMethod;
 import coresearch.cvurl.io.constant.MIMEType;
-import coresearch.cvurl.io.model.CvurlConfig;
+import coresearch.cvurl.io.model.CVurlConfig;
 import coresearch.cvurl.io.multipart.MultipartBody;
 
 import java.net.URLEncoder;
@@ -21,7 +21,7 @@ public class RequestWithBodyBuilder extends RequestBuilder<RequestWithBodyBuilde
 
     private static final String MULTIPART_HEADER_TEMPLATE = "multipart/%s;boundary=%s";
 
-    RequestWithBodyBuilder(String uri, HttpMethod method, CvurlConfig cvurlConfig) {
+    RequestWithBodyBuilder(String uri, HttpMethod method, CVurlConfig cvurlConfig) {
         super(uri, method, cvurlConfig);
     }
 
