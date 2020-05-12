@@ -16,8 +16,6 @@ public class MockSSLSession implements SSLSession {
         return new MockSSLSession();
     }
 
-    ;
-
     @Override
     public byte[] getId() {
         return new byte[0];
@@ -40,7 +38,7 @@ public class MockSSLSession implements SSLSession {
 
     @Override
     public void invalidate() {
-
+        // Implementation is not needed
     }
 
     @Override
@@ -50,7 +48,7 @@ public class MockSSLSession implements SSLSession {
 
     @Override
     public void putValue(String s, Object o) {
-
+        // Implementation is not needed
     }
 
     @Override
@@ -60,7 +58,7 @@ public class MockSSLSession implements SSLSession {
 
     @Override
     public void removeValue(String s) {
-
+        // Implementation is not needed
     }
 
     @Override

@@ -185,7 +185,7 @@ public class CVurlGetRequestTest extends AbstractRequestTest {
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
         assertTrue(response.headersNames().contains(HttpHeader.AUTHORIZATION));
-        assertEquals(TEST_TOKEN, response.getHeaderValue(HttpHeader.AUTHORIZATION).get());
+        assertEquals(TEST_TOKEN, response.getHeaderValue(HttpHeader.AUTHORIZATION).orElseThrow());
     }
 
     @Test

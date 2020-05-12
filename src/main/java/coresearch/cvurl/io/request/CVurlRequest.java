@@ -3,7 +3,7 @@ package coresearch.cvurl.io.request;
 import coresearch.cvurl.io.exception.RequestExecutionException;
 import coresearch.cvurl.io.exception.UnexpectedResponseException;
 import coresearch.cvurl.io.mapper.BodyType;
-import coresearch.cvurl.io.model.Configuration;
+import coresearch.cvurl.io.model.CVurlConfig;
 import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
 import coresearch.cvurl.io.model.Response;
 import coresearch.cvurl.io.request.handler.CompressedInputStreamBodyHandler;
@@ -29,18 +29,18 @@ public final class CVurlRequest implements Request {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CVurlRequest.class);
 
-    private final Configuration configuration;
+    private final CVurlConfig cvurlConfig;
     private final RequestConfiguration requestConfiguration;
     private final HttpClient httpClient;
 
     private HttpRequest httpRequest;
 
-    CVurlRequest(HttpRequest httpRequest, Configuration configuration,
+    CVurlRequest(HttpRequest httpRequest, CVurlConfig cvurlConfig,
                  RequestConfiguration requestConfiguration) {
         this.httpRequest = httpRequest;
-        this.configuration = configuration;
+        this.cvurlConfig = cvurlConfig;
         this.requestConfiguration = requestConfiguration;
-        this.httpClient = configuration.getHttpClient();
+        this.httpClient = cvurlConfig.getHttpClient();
     }
 
     @Override
@@ -58,13 +58,13 @@ public final class CVurlRequest implements Request {
     @Override
     public <T> CompletableFuture<T> asyncAsObject(Class<T> type) {
         return httpClient.sendAsync(httpRequest, getStringBodyHandler())
-                .thenApply((response -> configuration.getGenericMapper().readResponseBody(new Response<>(response), type)));
+                .thenApply((response -> cvurlConfig.getGenericMapper().readResponseBody(new Response<>(response), type)));
     }
 
     @Override
     public <T> CompletableFuture<T> asyncAsObject(BodyType<T> type) {
         return httpClient.sendAsync(httpRequest, getStringBodyHandler())
-                .thenApply((response -> configuration.getGenericMapper().readResponseBody(new Response<>(response), type)));
+                .thenApply((response -> cvurlConfig.getGenericMapper().readResponseBody(new Response<>(response), type)));
     }
 
     @Override
@@ -100,33 +100,23 @@ public final class CVurlRequest implements Request {
     @Override
     public <T> Optional<T> asObject(Class<T> type, int statusCode) {
         return sendRequestAndWrapInOptional(getStringBodyHandler(),
-                (response) -> parseResponse(response, type, statusCode));
+                response -> parseResponse(response, type, statusCode));
     }
 
     @Override
     public <T> Optional<T> asObject(BodyType<T> type, int statusCode) {
         return sendRequestAndWrapInOptional(getStringBodyHandler(),
-                (response) -> parseResponse(response, type, statusCode));
+                response -> parseResponse(response, type, statusCode));
     }
 
     @Override
     public <T> T asObject(Class<T> type) {
-        try {
-            return sendRequest(getStringBodyHandler(),
-                    response -> configuration.getGenericMapper().readResponseBody(new Response<>(response), type));
-        } catch (IOException | InterruptedException e) {
-            throw new RequestExecutionException(e.getMessage(), e);
-        }
+        return asObject(response -> cvurlConfig.getGenericMapper().readResponseBody(new Response<>(response), type));
     }
 
     @Override
     public <T> T asObject(BodyType<T> type) {
-        try {
-            return sendRequest(getStringBodyHandler(),
-                    response -> configuration.getGenericMapper().readResponseBody(new Response<>(response), type));
-        } catch (IOException | InterruptedException e) {
-            throw new RequestExecutionException(e.getMessage(), e);
-        }
+        return asObject(response -> cvurlConfig.getGenericMapper().readResponseBody(new Response<>(response), type));
     }
 
     @Override
@@ -152,24 +142,39 @@ public final class CVurlRequest implements Request {
         return requestConfiguration.isAcceptCompressed() ? new CompressedInputStreamBodyHandler() : BodyHandlers.ofInputStream();
     }
 
+    private <T> T asObject(Function<HttpResponse<String>, T> responseMapper) {
+        try {
+            return sendRequest(getStringBodyHandler(), responseMapper);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            throw new RequestExecutionException(ie.getMessage(), ie);
+        } catch (IOException io) {
+            throw new RequestExecutionException(io.getMessage(), io);
+        }
+    }
+
     private <T, U> Optional<T> sendRequestAndWrapInOptional(HttpResponse.BodyHandler<U> bodyHandler,
                                                             Function<HttpResponse<U>, T> responseMapper) {
         try {
             return Optional.of(sendRequest(bodyHandler, responseMapper));
+        } catch (InterruptedException ie) {
+            LOGGER.error("Error while sending request. Thread execution was interrupted.");
+            Thread.currentThread().interrupt();
+            return Optional.empty();
         } catch (Exception e) {
-            LOGGER.error("Error while sending request: {} exception happened with message {}", e.toString(), e.getMessage());
+            LOGGER.error("Error while sending request: {} exception happened with message {}", e, e.getMessage());
             return Optional.empty();
         }
     }
 
     private <T> T parseResponse(HttpResponse<String> response, Class<T> type, int statusCode) {
         checkIfStatusCodesAreEqual(response, statusCode);
-        return configuration.getGenericMapper().readValue(response.body(), type);
+        return cvurlConfig.getGenericMapper().readValue(response.body(), type);
     }
 
     private <T> T parseResponse(HttpResponse<String> response, BodyType<T> type, int statusCode) {
         checkIfStatusCodesAreEqual(response, statusCode);
-        return configuration.getGenericMapper().readValue(response.body(), type);
+        return cvurlConfig.getGenericMapper().readValue(response.body(), type);
     }
 
     private void checkIfStatusCodesAreEqual(HttpResponse<String> response, int statusCode) {

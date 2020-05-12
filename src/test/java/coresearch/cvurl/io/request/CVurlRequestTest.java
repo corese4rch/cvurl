@@ -11,9 +11,7 @@ import coresearch.cvurl.io.helper.ObjectGenerator;
 import coresearch.cvurl.io.helper.model.User;
 import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
 import coresearch.cvurl.io.mapper.BodyType;
-import coresearch.cvurl.io.mapper.GenericMapper;
-import coresearch.cvurl.io.mapper.MapperFactory;
-import coresearch.cvurl.io.model.Configuration;
+import coresearch.cvurl.io.model.CVurlConfig;
 import coresearch.cvurl.io.model.Response;
 import coresearch.cvurl.io.multipart.MultipartBody;
 import coresearch.cvurl.io.multipart.Part;
@@ -29,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.*;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
@@ -51,7 +48,12 @@ public class CVurlRequestTest extends AbstractRequestTest {
     private static final String EMPTY_STRING = "";
     private static final String MULTIPART_BODY_TEST_JSON = "multipart-body-test.json";
     private static final String MULTIPART_HEADER_TEMPLATE = "multipart/%s;boundary=%s";
-    public static final String BODY_AS_INPUT_STREAM_TXT = "body-as-input-stream-test.txt";
+    private static final String BODY_AS_INPUT_STREAM_TXT = "body-as-input-stream-test.txt";
+    private static final String NOT_A_JSON_STRING = "not a json string";
+    private static final String SECOND_PARAM = "param2";
+    private static final String FIRST_NAME = "name1";
+    private static final String FILE_PATH = "__files/";
+    private static final String TEST_BODY = "Test body";
     private static String url = format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
     @Test
@@ -72,7 +74,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
         wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)
-                        .withBody("not a json string")));
+                        .withBody(NOT_A_JSON_STRING)));
 
         //when
         Optional<User> user = cvurl.get(url).asObject(User.class, HttpStatus.OK);
@@ -146,7 +148,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
     @Test
     public void curlRequestTimeoutTest() {
         //given
-        CVurl cvurl = new CVurl(Configuration.builder()
+        CVurl cvurl = new CVurl(CVurlConfig.builder()
                 .requestTimeout(Duration.ofMillis(100))
                 .build());
 
@@ -180,7 +182,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
     @Test
     public void requestTimeoutOverridesCurlTimeoutTest() {
         //given
-        CVurl cvurl = new CVurl(Configuration.builder()
+        CVurl cvurl = new CVurl(CVurlConfig.builder()
                 .requestTimeout(Duration.ofMillis(200))
                 .build());
 
@@ -234,7 +236,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
 
         //when
         var response = cvurl.get(URI.create(urlWithParameters).toURL())
-                .queryParam("param2", "2")
+                .queryParam(SECOND_PARAM, "2")
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -254,7 +256,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
 
         //when
         var response = cvurl.get(urlWithParameters)
-                .queryParam("param2", "2")
+                .queryParam(SECOND_PARAM, "2")
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
@@ -278,7 +280,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
     @Test
     public void queryParamsTest() {
         //given
-        var queryParams = Map.of("param1", "val1", "param2", "val2");
+        var queryParams = Map.of("param1", "val1", SECOND_PARAM, "val2");
 
         wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT + "?param1=val1&param2=val2"))
                 .willReturn(WireMock.ok()));
@@ -306,7 +308,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
     @Test
     public void sendWithSimpleMultipartBodyTest() {
         //given
-        var plainTextPartName = "name1";
+        var plainTextPartName = FIRST_NAME;
         var filePartName = "name2";
 
         wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
@@ -337,7 +339,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
     public void sendWithFileMultipartBody() throws IOException {
         //given
         Path jsonPath = Resources.get(MULTIPART_BODY_TEST_JSON);
-        var partName = "name1";
+        var partName = FIRST_NAME;
 
         wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
                 .withMultipartRequestBody(aMultipart()
@@ -362,7 +364,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
     public void sendWithFileMultipartBodyCustomTypeShouldOverwriteAutodetectedTest() throws IOException {
         //given
         Path jsonPath = Resources.get(MULTIPART_BODY_TEST_JSON);
-        var partName = "name1";
+        var partName = FIRST_NAME;
 
         wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
                 .withMultipartRequestBody(aMultipart()
@@ -414,7 +416,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
         var value1 = "value1";
         var value2 = "value2";
         var expectedBody = paramName1 + "=" + value1 + "&" + paramName2 + "=" + value2;
-        Map<String, String> paramsMap = new LinkedHashMap<>() {{
+        var paramsMap = new LinkedHashMap<>() {{
             put(paramName1, value1);
             put(paramName2, value2);
         }};
@@ -450,7 +452,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
 
         //then
         assertEquals(HttpStatus.OK, response.status());
-        assertArrayEquals(Files.readAllBytes(Resources.get("__files/" + BODY_AS_INPUT_STREAM_TXT)),
+        assertArrayEquals(Files.readAllBytes(Resources.get(FILE_PATH + BODY_AS_INPUT_STREAM_TXT)),
                 response.getBody().readAllBytes());
 
         response.getBody().close();
@@ -469,7 +471,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
 
         //then
         assertEquals(HttpStatus.OK, response.status());
-        assertLinesMatch(Files.readAllLines(Resources.get("__files/" + BODY_AS_INPUT_STREAM_TXT)),
+        assertLinesMatch(Files.readAllLines(Resources.get(FILE_PATH + BODY_AS_INPUT_STREAM_TXT)),
                 response.getBody().collect(Collectors.toList()));
     }
 
@@ -491,7 +493,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
 
         //then
         assertEquals(HttpStatus.OK, response.status());
-        assertArrayEquals(Files.readAllBytes(Resources.get("__files/" + BODY_AS_INPUT_STREAM_TXT)),
+        assertArrayEquals(Files.readAllBytes(Resources.get(FILE_PATH + BODY_AS_INPUT_STREAM_TXT)),
                 response.getBody().readAllBytes());
         assertTrue(isThenApplyInvoked[0]);
 
@@ -517,7 +519,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
 
         //then
         assertEquals(HttpStatus.OK, response.status());
-        assertLinesMatch(Files.readAllLines(Resources.get("__files/" + BODY_AS_INPUT_STREAM_TXT)),
+        assertLinesMatch(Files.readAllLines(Resources.get(FILE_PATH + BODY_AS_INPUT_STREAM_TXT)),
                 response.getBody().collect(Collectors.toList()));
         assertTrue(isThenApplyInvoked[0]);
     }
@@ -525,7 +527,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
     @Test
     public void gzipEncodedResponseBodyAsStringTest() throws IOException {
         //given
-        var body = "Test body";
+        var body = TEST_BODY;
 
         wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
                 .withHeader(HttpHeader.ACCEPT_ENCODING, equalTo(HttpContentEncoding.GZIP))
@@ -544,7 +546,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
     @Test
     public void gzipEncodedResponseBodyAsStreamTest() throws IOException {
         //given
-        var body = "Test body";
+        var body = TEST_BODY;
 
         wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
                 .withHeader(HttpHeader.ACCEPT_ENCODING, equalTo(HttpContentEncoding.GZIP))
@@ -563,7 +565,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
     @Test
     public void responseWithUnknownEncodingWithAcceptCompressedAsStringTest() throws IOException {
         //given
-        var body = "Test body";
+        var body = TEST_BODY;
 
         wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
                 .willReturn(WireMock.aResponse()
@@ -581,7 +583,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
     @Test
     public void responseWithUnknownEncodingWithAcceptCompressedAsStreamTest() throws IOException {
         //given
-        var body = "Test body";
+        var body = TEST_BODY;
 
         wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
                 .willReturn(WireMock.aResponse()
@@ -637,7 +639,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
     @Test
     public void asObjectOnUnparseableBodyShouldThrowResponseMappingException() {
         //given
-        var body = "not a json string";
+        var body = NOT_A_JSON_STRING;
         wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)
@@ -717,8 +719,8 @@ public class CVurlRequestTest extends AbstractRequestTest {
         request.asString();
 
         //then both executions are done on the same request
-        HttpRequest httpRequest1 = httpClient.requests.get(0);
-        HttpRequest httpRequest2 = httpClient.requests.get(1);
+        HttpRequest httpRequest1 = httpClient.getRequests().get(0);
+        HttpRequest httpRequest2 = httpClient.getRequests().get(1);
 
         assertSame(httpRequest1, httpRequest2);
     }
@@ -850,7 +852,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
     @Test
     public void asObjectWithGenericBodyTypeOnUnparseableBodyShouldThrowResponseMappingExceptionTest() {
         //given
-        var body = "not a json string";
+        var body = NOT_A_JSON_STRING;
         wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK)
@@ -866,14 +868,8 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void overwritingGlobalRequestConfigurationTest() {
+    public void overwritingGlobalRequestConfigurationTest() throws NoSuchFieldException, IllegalAccessException {
         //given
-        var cVurl = new CVurl(Configuration.builderWithDefaultHttpClient()
-                .requestTimeout(Duration.ofSeconds(1))
-                .acceptCompressed(false)
-                .logEnabled(false)
-                .build());
-
         var timeout = Duration.ofSeconds(15);
         var acceptCompressed = true;
         var logEnabled = true;
@@ -893,9 +889,6 @@ public class CVurlRequestTest extends AbstractRequestTest {
         assertEquals(requestConfiguration.isLogEnabled(), logEnabled);
     }
 
-    private HttpClient httpClient = HttpClient.newHttpClient();
-    private GenericMapper genericMapper = MapperFactory.createDefault();
-
     private byte[] compressWithGZIP(String str) throws IOException {
         var out = new ByteArrayOutputStream();
         try (var gzipOutputStream = new GZIPOutputStream(out)) {
@@ -904,13 +897,9 @@ public class CVurlRequestTest extends AbstractRequestTest {
         return out.toByteArray();
     }
 
-    private RequestConfiguration getRequestConfiguration(CVurlRequest request) {
-        try {
-            Field requestConfigurationField = request.getClass().getDeclaredField("requestConfiguration");
-            requestConfigurationField.setAccessible(true);
-            return (RequestConfiguration) requestConfigurationField.get(request);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+    private RequestConfiguration getRequestConfiguration(CVurlRequest request) throws NoSuchFieldException, IllegalAccessException {
+        Field requestConfigurationField = request.getClass().getDeclaredField("requestConfiguration");
+        requestConfigurationField.setAccessible(true);
+        return (RequestConfiguration) requestConfigurationField.get(request);
     }
 }

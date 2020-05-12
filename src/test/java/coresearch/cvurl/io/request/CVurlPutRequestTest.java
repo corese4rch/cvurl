@@ -21,6 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CVurlPutRequestTest extends AbstractRequestTest {
 
+    private static final String TEST_BODY_FOR_TEST = "Test body for test";
+
     @Test
     public void sendPUTTest() {
 
@@ -205,14 +207,14 @@ public class CVurlPutRequestTest extends AbstractRequestTest {
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
         assertTrue(response.headersNames().contains(HttpHeader.AUTHORIZATION));
-        assertEquals(TEST_TOKEN, response.getHeaderValue(HttpHeader.AUTHORIZATION).get());
+        assertEquals(TEST_TOKEN, response.getHeaderValue(HttpHeader.AUTHORIZATION).orElseThrow());
     }
 
     @Test
     public void sendPUT_StringResponseTest() {
 
         //given
-        String body = "Test body for test";
+        String body = TEST_BODY_FOR_TEST;
         String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
         //when
@@ -239,7 +241,7 @@ public class CVurlPutRequestTest extends AbstractRequestTest {
     public void sendPUT_StringRequestBodyTest() {
 
         //given
-        String body = "Test body for test";
+        String body = TEST_BODY_FOR_TEST;
         String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
         //when
@@ -265,7 +267,7 @@ public class CVurlPutRequestTest extends AbstractRequestTest {
     public void sendPUT_BytesRequestBodyTest() {
 
         //given
-        String body = "Test body for test";
+        String body = TEST_BODY_FOR_TEST;
         String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
         //when

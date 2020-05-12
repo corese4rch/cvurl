@@ -38,7 +38,7 @@ public class ConfigurationTest {
         var version = HttpClient.Version.HTTP_1_1;
 
         //when
-        var conf = Configuration.builder()
+        var conf = CVurlConfig.builder()
                 .authenticator(authenticator)
                 .connectTimeout(connectTimeout)
                 .cookieHandler(cookieHandler)
@@ -77,7 +77,7 @@ public class ConfigurationTest {
         var priority = 1;
         var version = HttpClient.Version.HTTP_1_1;
 
-        var conf = Configuration.builder()
+        var conf = CVurlConfig.builder()
                 .authenticator(authenticator)
                 .connectTimeout(connectTimeout)
                 .cookieHandler(cookieHandler)
@@ -113,7 +113,7 @@ public class ConfigurationTest {
         var acceptCompressed = true;
 
         //when
-        var configuration = Configuration.builder(httpClient)
+        var configuration = CVurlConfig.builder(httpClient)
                 .genericMapper(genericMapper)
                 .requestTimeout(requestTimeout)
                 .acceptCompressed(acceptCompressed)
@@ -130,7 +130,7 @@ public class ConfigurationTest {
     @Test
     public void defaultConfigurationTest() {
         //when
-        var configuration = Configuration.defaultConfiguration();
+        var configuration = CVurlConfig.defaultConfiguration();
 
         //then
         assertTrue(httpClientsEquals(configuration.getHttpClient(), HttpClient.newHttpClient()));
@@ -143,7 +143,7 @@ public class ConfigurationTest {
     @Test
     public void preconfiguredBuilderTest() {
         //given
-        var configuration = Configuration.defaultConfiguration();
+        var configuration = CVurlConfig.defaultConfiguration();
 
         //when
         var configurationBuilder = configuration.preconfiguredBuilder();
@@ -161,7 +161,7 @@ public class ConfigurationTest {
     @Test
     public void setLogEnabledIsMutableTest() {
         //given
-        var configuration = Configuration.defaultConfiguration();
+        var configuration = CVurlConfig.defaultConfiguration();
 
         //when
         configuration.setIsLogEnable(true);
@@ -181,7 +181,7 @@ public class ConfigurationTest {
         var logEnabled = true;
 
         //when
-        var configuration = Configuration.builder(httpClient)
+        var configuration = CVurlConfig.builder(httpClient)
                 .genericMapper(genericMapper)
                 .httpClientMode(clientMode)
                 .requestTimeout(timeout)
@@ -203,7 +203,6 @@ public class ConfigurationTest {
                 optionalsEqual(client1.connectTimeout(), client2.connectTimeout()) &&
                 optionalsEqual(client1.cookieHandler(), client2.cookieHandler()) &&
                 optionalsEqual(client1.executor(), client2.executor()) &&
-                optionalsEqual(client1.proxy(), client2.proxy()) &&
                 optionalsEqual(client1.proxy(), client2.proxy()) &&
                 client1.followRedirects().equals(client2.followRedirects()) &&
                 client1.sslContext().equals(client2.sslContext()) &&

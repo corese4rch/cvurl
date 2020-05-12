@@ -8,7 +8,7 @@ import coresearch.cvurl.io.model.Response;
  */
 public class ResponseMappingException extends MappingException {
 
-    private Response<String> response;
+    private final Response<String> response;
 
     /**
      * Constructs a new exception with the specified detail message and

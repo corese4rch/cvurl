@@ -17,8 +17,10 @@ import static java.util.stream.Collectors.toMap;
  * Represent part of multipart data.
  */
 public class Part<T extends Part<T>> {
-    public static final String CRLF = "\r\n";
-    public static final String BOUNDARY_DELIMITER = "--";
+
+    private static final String CRLF = "\r\n";
+    private static final String BOUNDARY_DELIMITER = "--";
+    private static final String CONTENT_ARGUMENT = "content";
     private Map<String, String> headers;
     private byte[] content;
 
@@ -34,7 +36,7 @@ public class Part<T extends Part<T>> {
      * @return this {@link Part}
      */
     public static Part of(byte[] content) {
-        notNullParam(content, "content");
+        notNullParam(content, CONTENT_ARGUMENT);
 
         return new Part(content);
     }
@@ -46,7 +48,7 @@ public class Part<T extends Part<T>> {
      * @return this {@link Part}
      */
     public static Part of(String content) {
-        notNullParam(content, "content");
+        notNullParam(content, CONTENT_ARGUMENT);
 
         return new Part(content.getBytes());
     }
@@ -95,7 +97,7 @@ public class Part<T extends Part<T>> {
     public static PartWithFileContent of(String fileName, String contentType, byte[] content) {
         notNullParam(fileName, "filePath");
         notNullParam(contentType, "contentType");
-        notNullParam(content, "content");
+        notNullParam(content, CONTENT_ARGUMENT);
 
         return new PartWithFileContent(fileName, content).contentType(contentType);
     }
