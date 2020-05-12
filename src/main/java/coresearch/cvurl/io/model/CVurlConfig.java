@@ -27,7 +27,7 @@ import static coresearch.cvurl.io.internal.util.Validation.notNullParams;
 /**
  * Data class that holds configuration of {@link coresearch.cvurl.io.request.CVurl}
  */
-public class Configuration {
+public class CVurlConfig {
 
     private final HttpClient httpClient;
 
@@ -37,8 +37,8 @@ public class Configuration {
 
     private final RequestConfiguration globalRequestConfiguration;
 
-    private Configuration(HttpClient httpClient, GenericMapper genericMapper, HttpClientMode httpClientMode,
-                          RequestConfiguration globalRequestConfiguration) {
+    private CVurlConfig(HttpClient httpClient, GenericMapper genericMapper, HttpClientMode httpClientMode,
+                        RequestConfiguration globalRequestConfiguration) {
         notNullParams(httpClient, genericMapper, globalRequestConfiguration);
 
         this.httpClient = httpClient;
@@ -47,7 +47,7 @@ public class Configuration {
         this.httpClientMode = httpClientMode;
     }
 
-    public Configuration() {
+    public CVurlConfig() {
         this.httpClient = HttpClient.newHttpClient();
         this.genericMapper = MapperFactory.createDefault();
         this.globalRequestConfiguration = RequestConfiguration.defaultConfiguration();
@@ -55,7 +55,7 @@ public class Configuration {
     }
 
     /**
-     * Creates {@link ConfigurationWithClientPropertiesBuilder} used to build {@link Configuration} object.
+     * Creates {@link ConfigurationWithClientPropertiesBuilder} used to build {@link CVurlConfig} object.
      *
      * @return new ConfigurationWithClientPropertiesBuilder
      */
@@ -64,7 +64,7 @@ public class Configuration {
     }
 
     /**
-     * Creates {@link ConfigurationBuilder} with predefined {@link HttpClient} used to build {@link Configuration} object.
+     * Creates {@link ConfigurationBuilder} with predefined {@link HttpClient} used to build {@link CVurlConfig} object.
      *
      * @return new ConfigurationWithClientPropertiesBuilder
      */
@@ -73,7 +73,7 @@ public class Configuration {
     }
 
     /**
-     * Creates {@link ConfigurationBuilder} with default {@link HttpClient} used to build {@link Configuration} object.
+     * Creates {@link ConfigurationBuilder} with default {@link HttpClient} used to build {@link CVurlConfig} object.
      *
      * @return new ConfigurationWithClientPropertiesBuilder
      */
@@ -86,12 +86,12 @@ public class Configuration {
      *
      * @return new configuration
      */
-    public static Configuration defaultConfiguration() {
-        return new Configuration();
+    public static CVurlConfig defaultConfiguration() {
+        return new CVurlConfig();
     }
 
     /**
-     * Creates {@link ConfigurationWithClientPropertiesBuilder} used to build {@link Configuration} object.
+     * Creates {@link ConfigurationWithClientPropertiesBuilder} used to build {@link CVurlConfig} object.
      *
      * @return new ConfigurationWithClientPropertiesBuilder
      */
@@ -226,7 +226,7 @@ public class Configuration {
          * Sets a feature flag that defines if we logging every request url and body with level INFO or not.
          *
          * @param logEnabled flag
-         * @return this {@link Configuration}
+         * @return this {@link CVurlConfig}
          */
         @Override
         public ConfigurationBuilder logEnabled(boolean logEnabled) {
@@ -238,7 +238,7 @@ public class Configuration {
             return this.httpClient;
         }
 
-        public Configuration build() {
+        public CVurlConfig build() {
             if (genericMapper == null) {
                 genericMapper = MapperFactory.createDefault();
             }
@@ -246,12 +246,12 @@ public class Configuration {
             var client = httpClientMode == HttpClientMode.PROTOTYPE ?
                     this.getHttpClient() : HttpClientSingleton.getClient(this.getHttpClient());
 
-            return new Configuration(client, genericMapper, httpClientMode, requestConfigurationBuilder.build());
+            return new CVurlConfig(client, genericMapper, httpClientMode, requestConfigurationBuilder.build());
         }
     }
 
     /**
-     * Builder for {@link Configuration}.
+     * Builder for {@link CVurlConfig}.
      */
     public static class ConfigurationWithClientPropertiesBuilder
             extends ConfigurationBuilder<ConfigurationWithClientPropertiesBuilder> {

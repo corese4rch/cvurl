@@ -5,7 +5,7 @@ import coresearch.cvurl.io.constant.HttpHeader;
 import coresearch.cvurl.io.constant.HttpMethod;
 import coresearch.cvurl.io.internal.configuration.RequestConfigurer;
 import coresearch.cvurl.io.mapper.BodyType;
-import coresearch.cvurl.io.model.Configuration;
+import coresearch.cvurl.io.model.CVurlConfig;
 import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
 import coresearch.cvurl.io.model.Response;
 
@@ -31,7 +31,7 @@ import static java.util.stream.Collectors.joining;
  */
 public class RequestBuilder<T extends RequestBuilder<T>> implements Request, RequestConfigurer<RequestBuilder> {
 
-    protected final Configuration configuration;
+    protected final CVurlConfig cvurlConfig;
     protected final RequestConfiguration.Builder requestConfigurationBuilder;
 
     protected HttpMethod method;
@@ -41,11 +41,11 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
     private Map<String, String> queryParams = new HashMap<>();
     private Map<String, String> headers = new HashMap<>();
 
-    RequestBuilder(String uri, HttpMethod method, Configuration configuration) {
+    RequestBuilder(String uri, HttpMethod method, CVurlConfig cvurlConfig) {
         this.method = method;
         this.uri = uri;
-        this.configuration = configuration;
-        this.requestConfigurationBuilder = configuration.getGlobalRequestConfiguration().preconfiguredBuilder();
+        this.cvurlConfig = cvurlConfig;
+        this.requestConfigurationBuilder = cvurlConfig.getGlobalRequestConfiguration().preconfiguredBuilder();
     }
 
     /**
@@ -151,7 +151,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
      */
     public Request create() {
         RequestConfiguration requestConfiguration = requestConfigurationBuilder.build();
-        return new CVurlRequest(setUpHttpRequestBuilder(requestConfiguration).build(), configuration, requestConfiguration);
+        return new CVurlRequest(setUpHttpRequestBuilder(requestConfiguration).build(), cvurlConfig, requestConfiguration);
     }
 
     private HttpRequest.Builder setUpHttpRequestBuilder(RequestConfiguration requestConfiguration) {
