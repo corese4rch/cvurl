@@ -407,13 +407,13 @@ We try our best to overcome this dozens of lines of code, and here is what we ha
     <dependency>
         <groupId>com.github.corese4rch</groupId>
         <artifactId>cvurl-io</artifactId>
-        <version>1.3</version>
+        <version>1.4</version>
     </dependency>
 </dependencies>
 ```
  **Gradle**
 ```groovy
-compile group: 'com.github.corese4rch', name: 'cvurl-io', version: '1.3'
+compile group: 'com.github.corese4rch', name: 'cvurl-io', version: '1.4'
 ```
    
 ## Examples
@@ -423,5 +423,5 @@ Examples can be found on our [Wiki page](https://github.com/corese4rch/cvurl/wik
 Please see the [change log](https://github.com/corese4rch/cvurl/wiki/Change-Log) page to see what's recently changed.
    
 ## License
- >  Copyright 2019 Core Value, Inc. Licensed under GNU GPLv3 
+ >  Copyright 2020 Avenga. Licensed under GNU GPLv3 
   
