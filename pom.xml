@@ -32,7 +32,7 @@
         <jackson.core.version>2.11.0</jackson.core.version>
         <!-- test -->
         <mockito.version>3.3.3</mockito.version>
-        <wiremock.version>2.23.2</wiremock.version>
+        <wiremock.version>2.27.1</wiremock.version>
         <hamcrest.version>2.1</hamcrest.version>
         <junit-jupiter.version>5.6.0</junit-jupiter.version>
         <mockito-extension.version>1.2.1</mockito-extension.version>
