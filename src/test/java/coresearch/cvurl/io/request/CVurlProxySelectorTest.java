@@ -12,7 +12,7 @@ import java.net.SocketAddress;
 import java.net.URI;
 import java.util.List;
 
-class CVurlProxySelectorTest {
+public class CVurlProxySelectorTest {
 
     private static final String REQUEST_URL = "https://test-url.com/";
     private static final URI REQUEST_URI = URI.create(REQUEST_URL);
@@ -22,12 +22,12 @@ class CVurlProxySelectorTest {
     private CVurlProxySelector selector;
 
     @BeforeEach
-    void setupCvurlProxySelector() {
+    public void setupCvurlProxySelector() {
         selector = new CVurlProxySelector();
     }
 
     @Test
-    void whenSpecifiedProxiesForMultipleURIs_returnProxiesOnlyForRequestedURI() {
+    public void whenSpecifiedProxiesForMultipleURIs_returnProxiesOnlyForRequestedURI() {
         // given
         selector.addProxy(REQUEST_URL, CVurlProxy.of(CVurlProxy.Type.HTTP, PROXY_HOST, PROXY_PORT));
         selector.addProxy(REQUEST_URL + 2, CVurlProxy.of(CVurlProxy.Type.HTTP, PROXY_HOST + 2, PROXY_PORT));
@@ -41,7 +41,7 @@ class CVurlProxySelectorTest {
     }
 
     @Test
-    void whenAddedCVurlProxyForUri_returnCorrectProxyForSameUri() {
+    public void whenAddedCVurlProxyForUri_returnCorrectProxyForSameUri() {
         // given
         final Proxy expectedProxy = makeExpectedHttpProxy(PROXY_HOST, PROXY_PORT);
         selector.addProxy(REQUEST_URL, CVurlProxy.of(CVurlProxy.Type.HTTP, PROXY_HOST, PROXY_PORT));
@@ -55,7 +55,7 @@ class CVurlProxySelectorTest {
     }
 
     @Test
-    void whenAddedTwoCvurlProxiesForSameUri_returnTwoCorrectProxiesForSameUri() {
+    public void whenAddedTwoCvurlProxiesForSameUri_returnTwoCorrectProxiesForSameUri() {
         // given
         final List<Proxy> expectedProxies = List.of(makeExpectedHttpProxy(PROXY_HOST, PROXY_PORT),
                 makeExpectedHttpProxy(PROXY_HOST + 2, PROXY_PORT));
@@ -70,7 +70,7 @@ class CVurlProxySelectorTest {
     }
 
     @Test
-    void whenProxySelectorSpecifiedAndNoPerRequestProxy_returnProxiesFromProxySelector() {
+    public void whenProxySelectorSpecifiedAndNoPerRequestProxy_returnProxiesFromProxySelector() {
         // given
         final List<Proxy> expectedProxies = List.of(makeExpectedHttpProxy(PROXY_HOST, PROXY_PORT));
         selector = new CVurlProxySelector(new ProxySelectorMock(expectedProxies));
@@ -83,7 +83,7 @@ class CVurlProxySelectorTest {
     }
 
     @Test
-    void whenProxySelectorSpecifiedWithPerRequestProxy_returnPerRequestProxy() {
+    public void whenProxySelectorSpecifiedWithPerRequestProxy_returnPerRequestProxy() {
         // given
         selector = new CVurlProxySelector(new ProxySelectorMock(List.of(makeExpectedHttpProxy(PROXY_HOST, PROXY_PORT))));
         selector.addProxy(REQUEST_URL, CVurlProxy.of(CVurlProxy.Type.HTTP, PROXY_HOST + 2, PROXY_PORT));
@@ -97,7 +97,7 @@ class CVurlProxySelectorTest {
     }
 
     @Test
-    void whenNoProxySelectorAndNoPerRequestProxySpecified_returnDefaultProxy() {
+    public void whenNoProxySelectorAndNoPerRequestProxySpecified_returnDefaultProxy() {
         // when
         final List<Proxy> proxies = selector.select(REQUEST_URI);
 
@@ -106,7 +106,7 @@ class CVurlProxySelectorTest {
     }
 
     @Test
-    void whenRemoveProxyForUriCalled_returnDefaultProxyForThisURI() {
+    public void whenRemoveProxyForUriCalled_returnDefaultProxyForThisURI() {
         // given
         selector.addProxy(REQUEST_URL, CVurlProxy.of(CVurlProxy.Type.HTTP, PROXY_HOST, PROXY_PORT));
         selector.removeProxiesForUri(REQUEST_URI);
@@ -119,7 +119,7 @@ class CVurlProxySelectorTest {
     }
 
     @Test
-    void whenCvurlProxyTypeHttp_returnProxyWithTypeHttp() {
+    public void whenCvurlProxyTypeHttp_returnProxyWithTypeHttp() {
         // given
         selector.addProxy(REQUEST_URL, CVurlProxy.of(CVurlProxy.Type.HTTP, PROXY_HOST, PROXY_PORT));
 
@@ -131,7 +131,7 @@ class CVurlProxySelectorTest {
     }
 
     @Test
-    void whenCvurlProxyTypeSocks_returnProxyWithTypeSocks() {
+    public void whenCvurlProxyTypeSocks_returnProxyWithTypeSocks() {
         // given
         selector.addProxy(REQUEST_URL, CVurlProxy.of(CVurlProxy.Type.SOCKS, PROXY_HOST, PROXY_PORT));
 
@@ -143,7 +143,7 @@ class CVurlProxySelectorTest {
     }
 
     @Test
-    void whenNoProxyIsUsed_returnNoProxy() {
+    public void whenNoProxyIsUsed_returnNoProxy() {
         // given
         selector.addProxy(REQUEST_URL, CVurlProxy.noProxy());
 

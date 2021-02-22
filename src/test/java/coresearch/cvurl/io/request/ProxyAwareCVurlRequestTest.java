@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
-class ProxyAwareCVurlRequestTest {
+public class ProxyAwareCVurlRequestTest {
 
     private final URI uri = URI.create("http://localhost:8080");
 
@@ -39,7 +39,7 @@ class ProxyAwareCVurlRequestTest {
 
     @SuppressWarnings("unchecked")
     @BeforeEach
-    void setup() {
+    public void setup() {
         final CVurlConfig config = Mockito.mock(CVurlConfig.class);
         proxySelector = Mockito.mock(CVurlProxySelector.class);
         Mockito.when(config.getProxySelector()).thenReturn(Optional.of(proxySelector));
@@ -62,7 +62,7 @@ class ProxyAwareCVurlRequestTest {
     }
 
     @Test
-    void whenRequestMethodAsyncAsObjectClassWithStatusExecuted_removeProxiesForUriIsCalled() throws ExecutionException, InterruptedException {
+    public void whenRequestMethodAsyncAsObjectClassWithStatusExecuted_removeProxiesForUriIsCalled() throws ExecutionException, InterruptedException {
         final CompletableFuture<Object> future = request.asyncAsObject(Object.class, 0);
 
         future.get();
@@ -71,7 +71,7 @@ class ProxyAwareCVurlRequestTest {
     }
 
     @Test
-    void whenRequestMethodAsyncAsObjectBodyTypeWithStatusExecuted_removeProxiesForUriIsCalled() throws ExecutionException, InterruptedException {
+    public void whenRequestMethodAsyncAsObjectBodyTypeWithStatusExecuted_removeProxiesForUriIsCalled() throws ExecutionException, InterruptedException {
         final CompletableFuture<Object> future = request.asyncAsObject(new BodyType<>() {}, 0);
 
         future.get();
@@ -80,7 +80,7 @@ class ProxyAwareCVurlRequestTest {
     }
 
     @Test
-    void whenRequestMethodAsyncAsObjectClassExecuted_removeProxiesForUriIsCalled() throws ExecutionException, InterruptedException {
+    public void whenRequestMethodAsyncAsObjectClassExecuted_removeProxiesForUriIsCalled() throws ExecutionException, InterruptedException {
         final CompletableFuture<Object> future = request.asyncAsObject(Object.class);
 
         future.get();
@@ -89,7 +89,7 @@ class ProxyAwareCVurlRequestTest {
     }
 
     @Test
-    void whenRequestMethodAsyncAsObjectBodyTypeExecuted_removeProxiesForUriIsCalled() throws ExecutionException, InterruptedException {
+    public void whenRequestMethodAsyncAsObjectBodyTypeExecuted_removeProxiesForUriIsCalled() throws ExecutionException, InterruptedException {
         final CompletableFuture<Object> future = request.asyncAsObject(new BodyType<>() {});
 
         future.get();
@@ -98,7 +98,7 @@ class ProxyAwareCVurlRequestTest {
     }
 
     @Test
-    void whenRequestMethodAsyncAsStringExecuted_removeProxiesForUriIsCalled() throws ExecutionException, InterruptedException {
+    public void whenRequestMethodAsyncAsStringExecuted_removeProxiesForUriIsCalled() throws ExecutionException, InterruptedException {
         final CompletableFuture<Response<String>> future = request.asyncAsString();
 
         future.get();
@@ -107,7 +107,7 @@ class ProxyAwareCVurlRequestTest {
     }
 
     @Test
-    void whenRequestMethodAsyncAsStringWithPphExecuted_removeProxiesForUriIsCalled() throws ExecutionException, InterruptedException {
+    public void whenRequestMethodAsyncAsStringWithPphExecuted_removeProxiesForUriIsCalled() throws ExecutionException, InterruptedException {
         final CompletableFuture<Response<String>> future = request.asyncAsString(stringPph);
 
         future.get();
@@ -116,7 +116,7 @@ class ProxyAwareCVurlRequestTest {
     }
 
     @Test
-    void whenRequestMethodAsyncAsStreamExecuted_removeProxiesForUriIsCalled() throws ExecutionException, InterruptedException {
+    public void whenRequestMethodAsyncAsStreamExecuted_removeProxiesForUriIsCalled() throws ExecutionException, InterruptedException {
         final CompletableFuture<Response<InputStream>> future = request.asyncAsStream();
 
         future.get();
@@ -125,7 +125,7 @@ class ProxyAwareCVurlRequestTest {
     }
 
     @Test
-    void whenRequestMethodAsyncAsStreamWithPphExecuted_removeProxiesForUriIsCalled() throws ExecutionException, InterruptedException {
+    public void whenRequestMethodAsyncAsStreamWithPphExecuted_removeProxiesForUriIsCalled() throws ExecutionException, InterruptedException {
         final CompletableFuture<Response<InputStream>> future = request.asyncAsStream(streamPph);
 
         future.get();
@@ -134,7 +134,7 @@ class ProxyAwareCVurlRequestTest {
     }
 
     @Test
-    void whenRequestMethodAsyncAsBodyHandlerExecuted_removeProxiesForUriIsCalled() throws ExecutionException, InterruptedException {
+    public void whenRequestMethodAsyncAsBodyHandlerExecuted_removeProxiesForUriIsCalled() throws ExecutionException, InterruptedException {
         final CompletableFuture<Response<String>> future =
                 request.asyncAs(HttpResponse.BodyHandlers.ofString());
 
@@ -144,7 +144,7 @@ class ProxyAwareCVurlRequestTest {
     }
 
     @Test
-    void whenRequestMethodAsyncAsBodyHandlerAndPphExecuted_removeProxiesForUriIsCalled() throws ExecutionException, InterruptedException {
+    public void whenRequestMethodAsyncAsBodyHandlerAndPphExecuted_removeProxiesForUriIsCalled() throws ExecutionException, InterruptedException {
         final CompletableFuture<Response<String>> future =
                 request.asyncAs(HttpResponse.BodyHandlers.ofString(), stringPph);
 
@@ -154,49 +154,49 @@ class ProxyAwareCVurlRequestTest {
     }
 
     @Test
-    void whenRequestMethodAsObjectClassWithStatusExecuted_removeProxiesForUriIsCalled() {
+    public void whenRequestMethodAsObjectClassWithStatusExecuted_removeProxiesForUriIsCalled() {
         request.asObject(Object.class, 0);
 
         verifyRemoveProxiesForUriCalledExactlyOnce();
     }
 
     @Test
-    void whenRequestMethodAsObjectBodyTypeWithStatusExecuted_removeProxiesForUriIsCalled() {
+    public void whenRequestMethodAsObjectBodyTypeWithStatusExecuted_removeProxiesForUriIsCalled() {
         request.asObject(new BodyType<>() {}, 0);
 
         verifyRemoveProxiesForUriCalledExactlyOnce();
     }
 
     @Test
-    void whenRequestMethodAsObjectClassExecuted_removeProxiesForUriIsCalled() {
+    public void whenRequestMethodAsObjectClassExecuted_removeProxiesForUriIsCalled() {
         request.asObject(Object.class);
 
         verifyRemoveProxiesForUriCalledExactlyOnce();
     }
 
     @Test
-    void whenRequestMethodAsObjectBodyTypeExecuted_removeProxiesForUriIsCalled() {
+    public void whenRequestMethodAsObjectBodyTypeExecuted_removeProxiesForUriIsCalled() {
         request.asObject(new BodyType<>() {});
 
         verifyRemoveProxiesForUriCalledExactlyOnce();
     }
 
     @Test
-    void whenRequestMethodAsStringExecuted_removeProxiesForUriIsCalled() {
+    public void whenRequestMethodAsStringExecuted_removeProxiesForUriIsCalled() {
         request.asString();
 
         verifyRemoveProxiesForUriCalledExactlyOnce();
     }
 
     @Test
-    void whenRequestMethodAsStreamExecuted_removeProxiesForUriIsCalled() {
+    public void whenRequestMethodAsStreamExecuted_removeProxiesForUriIsCalled() {
         request.asStream();
 
         verifyRemoveProxiesForUriCalledExactlyOnce();
     }
 
     @Test
-    void whenRequestMethodAsExecuted_removeProxiesForUriIsCalled() {
+    public void whenRequestMethodAsExecuted_removeProxiesForUriIsCalled() {
         request.as(HttpResponse.BodyHandlers.ofString());
 
         verifyRemoveProxiesForUriCalledExactlyOnce();
