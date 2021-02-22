@@ -73,17 +73,7 @@ class CVurlProxySelectorTest {
     void whenProxySelectorSpecifiedAndNoPerRequestProxy_returnProxiesFromProxySelector() {
         // given
         final List<Proxy> expectedProxies = List.of(makeExpectedHttpProxy(PROXY_HOST, PROXY_PORT));
-        final ProxySelector specificSelector = new ProxySelector() {
-            @Override
-            public List<Proxy> select(URI uri) {
-                return expectedProxies;
-            }
-            @Override
-            public void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
-                // do nothing
-            }
-        };
-        selector = new CVurlProxySelector(specificSelector);
+        selector = new CVurlProxySelector(new ProxySelectorMock(expectedProxies));
 
         // when
         final List<Proxy> proxies = selector.select(REQUEST_URI);
@@ -95,7 +85,7 @@ class CVurlProxySelectorTest {
     @Test
     void whenProxySelectorSpecifiedWithPerRequestProxy_returnPerRequestProxy() {
         // given
-        selector = new CVurlProxySelector(new ProxySelectorMock());
+        selector = new CVurlProxySelector(new ProxySelectorMock(List.of(makeExpectedHttpProxy(PROXY_HOST, PROXY_PORT))));
         selector.addProxy(REQUEST_URL, CVurlProxy.of(CVurlProxy.Type.HTTP, PROXY_HOST + 2, PROXY_PORT));
 
         // when
@@ -168,10 +158,16 @@ class CVurlProxySelectorTest {
         return new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port));
     }
 
-    private final class ProxySelectorMock extends ProxySelector {
+    private static final class ProxySelectorMock extends ProxySelector {
+        private final List<Proxy> expectedProxies;
+
+        public ProxySelectorMock(List<Proxy> expectedProxies) {
+            this.expectedProxies = expectedProxies;
+        }
+
         @Override
         public List<Proxy> select(URI uri) {
-            return List.of(makeExpectedHttpProxy(PROXY_HOST, PROXY_PORT));
+            return expectedProxies;
         }
 
         @Override
