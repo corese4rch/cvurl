@@ -232,6 +232,26 @@ public class CVurl {
         return createRequestWBody(url.toString(), HttpMethod.PATCH);
     }
 
+    /**
+     * Creates RequestBuilder with specified url and HttpMethod.HEAD.
+     *
+     * @param url specified url.
+     * @return RequestBuilder
+     */
+    public RequestWithBodyBuilder head(String url) {
+        return createRequestWBody(url, HttpMethod.HEAD);
+    }
+
+    /**
+     * Creates RequestBuilder with specified url and HttpMethod.HEAD.
+     *
+     * @param url specified url.
+     * @return RequestBuilder
+     */
+    public RequestWithBodyBuilder head(URL url) {
+        return createRequestWBody(url.toString(), HttpMethod.HEAD);
+    }
+
     private RequestBuilder<?> createGetRequest(String url) {
         return new RequestBuilder<>(url, HttpMethod.GET, cvurlConfig);
     }
