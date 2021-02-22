@@ -5,6 +5,7 @@ import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
 import coresearch.cvurl.io.internal.configuration.RequestConfigurer;
 import coresearch.cvurl.io.mapper.GenericMapper;
 import coresearch.cvurl.io.mapper.MapperFactory;
+import coresearch.cvurl.io.request.CVurlProxySelector;
 import coresearch.cvurl.io.request.HttpClientSingleton;
 
 import javax.net.ssl.SSLContext;
@@ -461,9 +462,9 @@ public class CVurlConfig {
             if (followRedirects != null) {
                 builder.followRedirects(followRedirects);
             }
-            if (proxySelector != null) {
-                builder.proxy(proxySelector);
-            }
+
+            builder.proxy(new CVurlProxySelector(proxySelector));
+
             if (sslContext != null) {
                 builder.sslContext(sslContext);
             }
