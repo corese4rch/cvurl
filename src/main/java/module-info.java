@@ -6,6 +6,7 @@ module coresearch.cvurl.io {
     exports coresearch.cvurl.io.util;
     exports coresearch.cvurl.io.constant;
     exports coresearch.cvurl.io.multipart;
+    exports coresearch.cvurl.io.sse;
     requires java.net.http;
     requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.databind;

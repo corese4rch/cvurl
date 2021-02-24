@@ -1,0 +1,12 @@
+event: stock
+id: 1
+: price change
+retry: 2000
+data: {"symbol":"MSFT","price":15,"delta":"2"}
+
+event: stock
+id: 2
+: price change
+retry: 2000
+data: {"symbol":"MSFT","price":13,"delta":"-2"}
+

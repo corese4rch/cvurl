@@ -32,6 +32,8 @@ public final class MIMEType {
 
     public static final String TEXT_XML = "text/xml";
 
+    public static final String TEXT_EVENT_STREAM = "text/event-stream";
+
     private MIMEType(){
         throw new IllegalStateException(format("Creating of class %s is forbidden", MIMEType.class.getName()));
     }

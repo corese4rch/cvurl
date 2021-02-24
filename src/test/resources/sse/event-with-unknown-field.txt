@@ -1,0 +1,7 @@
+event: stock
+id: 1
+: price change
+retry: 2000
+unknownField: randomstring
+data: {"symbol":"MSFT","price":15,"delta":"2"}
+

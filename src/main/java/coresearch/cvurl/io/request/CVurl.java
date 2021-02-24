@@ -4,6 +4,7 @@ import coresearch.cvurl.io.constant.HttpMethod;
 import coresearch.cvurl.io.mapper.GenericMapper;
 import coresearch.cvurl.io.mapper.MapperFactory;
 import coresearch.cvurl.io.model.CVurlConfig;
+import coresearch.cvurl.io.sse.SseEventSourceBuilder;
 
 import java.net.URL;
 import java.net.http.HttpClient;
@@ -250,6 +251,24 @@ public class CVurl {
      */
     public RequestWithBodyBuilder head(URL url) {
         return createRequestWBody(url.toString(), HttpMethod.HEAD);
+    }
+
+    /**
+     * Creates {@link SseEventSourceBuilder} with a specified url
+     * @param url specified url.
+     * @return SseEventSourceBuilder
+     */
+    public SseEventSourceBuilder sse(String url) {
+        return new SseEventSourceBuilder(url, this);
+    }
+
+    /**
+     * Creates {@link SseEventSourceBuilder} with a specified url
+     * @param url specified url.
+     * @return SseEventSourceBuilder
+     */
+    public SseEventSourceBuilder sse(URL url) {
+        return new SseEventSourceBuilder(url.toString(), this);
     }
 
     private RequestBuilder<?> createGetRequest(String url) {
