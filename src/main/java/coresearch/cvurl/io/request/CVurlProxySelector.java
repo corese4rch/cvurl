@@ -1,7 +1,5 @@
 package coresearch.cvurl.io.request;
 
-import coresearch.cvurl.io.exception.UnhandledProxyTypeException;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -30,16 +28,17 @@ public final class CVurlProxySelector extends ProxySelector {
     @Override
     public List<Proxy> select(URI uri) {
         // proxy-per-request
-        final List<Proxy> proxies = List.copyOf(proxiesByUri.getOrDefault(uri.toString(), List.of()));
-        if (!proxies.isEmpty())
-            return proxies;
+        final List<Proxy> proxies = new ArrayList<>(proxiesByUri.getOrDefault(uri.toString(), List.of()));
 
         // proxy-per-client
-        if (proxySelector != null)
-            return proxySelector.select(uri);
+        if (proxies.isEmpty() && proxySelector != null)
+            proxies.addAll(proxySelector.select(uri));
 
         // default proxy
-        return ProxySelector.getDefault().select(uri);
+        if (proxies.isEmpty())
+            proxies.addAll(ProxySelector.getDefault().select(uri));
+
+        return proxies;
     }
 
     @Override
@@ -74,14 +73,7 @@ public final class CVurlProxySelector extends ProxySelector {
             return Proxy.NO_PROXY;
 
         final InetSocketAddress sa = new InetSocketAddress(cVurlProxy.getHost(), cVurlProxy.getPort());
-        return new Proxy(toProxyType(cVurlProxy.getType()), sa);
+        return new Proxy(cVurlProxy.getType().getJavaProxyType(), sa);
     }
 
-    private Proxy.Type toProxyType(CVurlProxyType type) {
-        switch (type) {
-            case HTTP: return Proxy.Type.HTTP;
-            case SOCKS: return Proxy.Type.SOCKS;
-            default: throw new UnhandledProxyTypeException(type);
-        }
-    }
 }

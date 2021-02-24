@@ -79,7 +79,7 @@ public class CVurlProxySelectorTest {
         final List<Proxy> proxies = selector.select(REQUEST_URI);
 
         // then
-        Assertions.assertSame(expectedProxies, proxies);
+        Assertions.assertEquals(expectedProxies, proxies);
     }
 
     @Test
@@ -102,7 +102,7 @@ public class CVurlProxySelectorTest {
         final List<Proxy> proxies = selector.select(REQUEST_URI);
 
         // then
-        Assertions.assertSame(ProxySelector.getDefault().select(REQUEST_URI), proxies);
+        Assertions.assertEquals(ProxySelector.getDefault().select(REQUEST_URI), proxies);
     }
 
     @Test
@@ -115,7 +115,7 @@ public class CVurlProxySelectorTest {
         final List<Proxy> proxies = selector.select(REQUEST_URI);
 
         // then
-        Assertions.assertSame(ProxySelector.getDefault().select(REQUEST_URI), proxies);
+        Assertions.assertEquals(ProxySelector.getDefault().select(REQUEST_URI), proxies);
     }
 
     @Test
