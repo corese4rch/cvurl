@@ -70,14 +70,14 @@ public final class CVurlProxySelector extends ProxySelector {
     }
 
     private Proxy toProxy(CVurlProxy cVurlProxy) {
-        if (cVurlProxy.getType() == CVurlProxy.Type.DIRECT)
+        if (cVurlProxy.getType() == CVurlProxyType.DIRECT)
             return Proxy.NO_PROXY;
 
         final InetSocketAddress sa = new InetSocketAddress(cVurlProxy.getHost(), cVurlProxy.getPort());
         return new Proxy(toProxyType(cVurlProxy.getType()), sa);
     }
 
-    private Proxy.Type toProxyType(CVurlProxy.Type type) {
+    private Proxy.Type toProxyType(CVurlProxyType type) {
         switch (type) {
             case HTTP: return Proxy.Type.HTTP;
             case SOCKS: return Proxy.Type.SOCKS;

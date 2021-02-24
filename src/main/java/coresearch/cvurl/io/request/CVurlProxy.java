@@ -2,11 +2,11 @@ package coresearch.cvurl.io.request;
 
 public class CVurlProxy {
 
-    private final Type type;
+    private final CVurlProxyType type;
     private final String host;
     private final int port;
 
-    private CVurlProxy(Type type, String host, int port) {
+    private CVurlProxy(CVurlProxyType type, String host, int port) {
         this.type = type;
         this.host = host;
         this.port = port;
@@ -20,22 +20,16 @@ public class CVurlProxy {
         return port;
     }
 
-    public Type getType() {
+    public CVurlProxyType getType() {
         return type;
     }
 
-    public static CVurlProxy of(Type type, String host, int port) {
+    public static CVurlProxy of(CVurlProxyType type, String host, int port) {
         return new CVurlProxy(type, host, port);
     }
 
     public static CVurlProxy noProxy() {
-        return new CVurlProxy(Type.DIRECT, null, -1);
+        return new CVurlProxy(CVurlProxyType.DIRECT, null, -1);
     }
 
-    public enum Type {
-        HTTP,
-        SOCKS,
-        DIRECT,
-        ;
-    }
 }
