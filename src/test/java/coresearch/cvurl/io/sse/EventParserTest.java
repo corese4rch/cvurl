@@ -166,4 +166,5 @@ public class EventParserTest {
         final Path path = Resources.get(SSE_PACKAGE + resource);
         return new FileInputStream(path.toFile());
     }
+
 }
