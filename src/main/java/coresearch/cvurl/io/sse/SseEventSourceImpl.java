@@ -4,6 +4,7 @@ import coresearch.cvurl.io.constant.HttpHeader;
 import coresearch.cvurl.io.constant.HttpStatus;
 import coresearch.cvurl.io.constant.MIMEType;
 import coresearch.cvurl.io.exception.RequestExecutionException;
+import coresearch.cvurl.io.mapper.GenericMapper;
 import coresearch.cvurl.io.model.Response;
 import coresearch.cvurl.io.request.CVurl;
 
@@ -29,8 +30,8 @@ class SseEventSourceImpl implements SseEventSource {
     private final Collection<Runnable> onCompleteCallbacks = new CopyOnWriteArrayList<>();
     private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
-    private final SseEventListener listener = new SseBuildEventsListener(eventConsumers, exceptionConsumers, onCompleteCallbacks);
-    private final EventParser eventParser = new EventParser(listener);
+    private final SseEventListener listener;
+    private final EventParser eventParser;
 
     private final AtomicReference<SseEventSourceState> state = new AtomicReference<>(SseEventSourceState.CONNECTING);
     private final String url;
@@ -38,17 +39,23 @@ class SseEventSourceImpl implements SseEventSource {
     private volatile int reconnectionTime;
     private volatile String lastEventId = "";
 
-    SseEventSourceImpl(String url, CVurl cVurl, int reconnectionTime) {
+    SseEventSourceImpl(String url, CVurl cVurl, int reconnectionTime, GenericMapper genericMapper) {
         this.url = url;
         this.cVurl = cVurl;
         this.reconnectionTime = reconnectionTime;
+        this.listener = new SseBuildEventsListener(eventConsumers, exceptionConsumers, onCompleteCallbacks);
+        this.eventParser = new EventParser(listener, genericMapper);
 
         eventConsumers.add(this::updateReconnectionTime);
         eventConsumers.add(this::updateLastEventId);
     }
 
     @Override
-    public SseEventSource register(Consumer<ServerEvent> eventConsumer, Consumer<Exception> exceptionConsumer, Runnable onComplete) {
+    public SseEventSource register(
+            Consumer<ServerEvent> eventConsumer,
+            Consumer<Exception> exceptionConsumer,
+            Runnable onComplete
+    ) {
         if (eventConsumer != null)
             eventConsumers.add(eventConsumer);
 
@@ -78,7 +85,7 @@ class SseEventSourceImpl implements SseEventSource {
         try {
             state.set(SseEventSourceState.CLOSED);
             executorService.shutdown();
-            executorService.awaitTermination(3, TimeUnit.SECONDS);
+            executorService.awaitTermination(1, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -102,7 +109,7 @@ class SseEventSourceImpl implements SseEventSource {
         final Response<InputStream> response = cVurl.get(url)
                 .headers(prepareHeadersMap())
                 .asStream()
-                .orElseThrow(() -> new RequestExecutionException("Unknown exception", null));
+                .orElseThrow(() -> new RequestExecutionException("Unable to connect for unknown reason", null));
 
         final Optional<String> contentType = response.getHeaderValue(HttpHeader.CONTENT_TYPE);
         if (isStatusNotOK(response.status()) || isNotSupportedContentType(contentType.orElse(""))) {

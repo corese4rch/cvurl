@@ -1,5 +1,7 @@
 package coresearch.cvurl.io.sse;
 
+import coresearch.cvurl.io.mapper.GenericMapper;
+
 import java.util.Objects;
 
 public class InboundServerEvent implements ServerEvent {
@@ -8,12 +10,14 @@ public class InboundServerEvent implements ServerEvent {
     private final String name;
     private final String data;
     private final int reconnectTime;
+    private final GenericMapper mapper;
 
-    public InboundServerEvent(String id, String name, String data, int reconnectTime) {
+    public InboundServerEvent(String id, String name, String data, int reconnectTime, GenericMapper mapper) {
         this.id = id;
         this.name = name;
         this.data = data;
         this.reconnectTime = reconnectTime;
+        this.mapper = mapper;
     }
 
     @Override
@@ -29,6 +33,11 @@ public class InboundServerEvent implements ServerEvent {
     @Override
     public int reconnectTime() {
         return reconnectTime;
+    }
+
+    @Override
+    public <T> T parseData(Class<T> valueType) {
+        return mapper.readValue(data, valueType);
     }
 
     @Override
@@ -62,8 +71,8 @@ public class InboundServerEvent implements ServerEvent {
                 '}';
     }
 
-    public static InboundServerEventBuilder newBuilder() {
-        return new InboundServerEventBuilder();
+    public static InboundServerEventBuilder newBuilder(GenericMapper genericMapper) {
+        return new InboundServerEventBuilder(genericMapper);
     }
 
     public static final class InboundServerEventBuilder {
@@ -71,9 +80,10 @@ public class InboundServerEvent implements ServerEvent {
         private String name;
         private String data;
         private int reconnectTime = -1;
+        private final GenericMapper genericMapper;
 
-        private InboundServerEventBuilder() {
-            // hide from public
+        private InboundServerEventBuilder(GenericMapper genericMapper) {
+            this.genericMapper = genericMapper;
         }
 
         public InboundServerEventBuilder id(String id) {
@@ -101,7 +111,7 @@ public class InboundServerEvent implements ServerEvent {
         }
 
         public InboundServerEvent build() {
-            return new InboundServerEvent(id, name, data, reconnectTime);
+            return new InboundServerEvent(id, name, data, reconnectTime, genericMapper);
         }
     }
 }

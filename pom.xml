@@ -153,6 +153,7 @@
                     <!--suppress UnresolvedMavenProperty -->
                     <argLine>${argLine} --add-opens
                         coresearch.cvurl.io/coresearch.cvurl.io.helper.model=com.fasterxml.jackson.databind
+                        --add-opens coresearch.cvurl.io/coresearch.cvurl.io.sse=ALL-UNNAMED
                     </argLine>
                 </configuration>
             </plugin>

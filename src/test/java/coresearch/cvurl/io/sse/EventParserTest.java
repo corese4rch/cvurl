@@ -1,5 +1,7 @@
 package coresearch.cvurl.io.sse;
 
+import coresearch.cvurl.io.mapper.GenericMapper;
+import coresearch.cvurl.io.mapper.MapperFactory;
 import coresearch.cvurl.io.utils.Resources;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,11 +21,12 @@ public class EventParserTest {
     private static final String SSE_PACKAGE = "sse/";
     private EventParser parser;
     private TestSseEventListener testSseEventListener;
+    private final GenericMapper defaultMapper = MapperFactory.createDefault();
 
     @BeforeEach
     public void setup() {
         testSseEventListener = new TestSseEventListener();
-        parser = new EventParser(testSseEventListener);
+        parser = new EventParser(testSseEventListener, defaultMapper);
     }
 
     @Test
@@ -47,7 +50,7 @@ public class EventParserTest {
 
         parser.parse(eventStream);
 
-        Assertions.assertEquals(List.of(new InboundServerEvent(null, null, data, -1)), testSseEventListener.getEvents());
+        Assertions.assertEquals(List.of(new InboundServerEvent(null, null, data, -1, defaultMapper)), testSseEventListener.getEvents());
     }
 
     @Test
@@ -56,7 +59,7 @@ public class EventParserTest {
 
         parser.parse(eventStream);
 
-        Assertions.assertEquals(List.of(new InboundServerEvent(null, "", null, -1)), testSseEventListener.getEvents());
+        Assertions.assertEquals(List.of(new InboundServerEvent(null, "", null, -1, defaultMapper)), testSseEventListener.getEvents());
     }
 
     @Test
@@ -65,7 +68,7 @@ public class EventParserTest {
 
         parser.parse(eventStream);
 
-        Assertions.assertEquals(List.of(new InboundServerEvent(null, "", null, -1)), testSseEventListener.getEvents());
+        Assertions.assertEquals(List.of(new InboundServerEvent(null, "", null, -1, defaultMapper)), testSseEventListener.getEvents());
     }
 
     @Test
@@ -75,7 +78,7 @@ public class EventParserTest {
 
         parser.parse(eventStream);
 
-        Assertions.assertEquals(List.of(new InboundServerEvent(null, null, data, -1)), testSseEventListener.getEvents());
+        Assertions.assertEquals(List.of(new InboundServerEvent(null, null, data, -1, defaultMapper)), testSseEventListener.getEvents());
     }
 
     @Test
@@ -85,7 +88,7 @@ public class EventParserTest {
 
         parser.parse(eventStream);
 
-        Assertions.assertEquals(List.of(new InboundServerEvent(null, null, data, -1)), testSseEventListener.getEvents());
+        Assertions.assertEquals(List.of(new InboundServerEvent(null, null, data, -1, defaultMapper)), testSseEventListener.getEvents());
     }
 
     @Test
@@ -94,14 +97,14 @@ public class EventParserTest {
 
         parser.parse(eventStream);
 
-        Assertions.assertEquals(List.of(new InboundServerEvent(null, null, "test", -1)), testSseEventListener.getEvents());
+        Assertions.assertEquals(List.of(new InboundServerEvent(null, null, "test", -1, defaultMapper)), testSseEventListener.getEvents());
     }
 
     @Test
     public void whenEventContainsAllFields_returnEventWithParsedFields() throws IOException {
         final InputStream eventStream = resourceAsStream("event-with-single-line-data.txt");
         final String data = "{\"symbol\":\"MSFT\",\"price\":15,\"delta\":\"2\"}";
-        final InboundServerEvent expectedEvent = new InboundServerEvent("1", "stock", data, 2000);
+        final InboundServerEvent expectedEvent = new InboundServerEvent("1", "stock", data, 2000, defaultMapper);
 
         parser.parse(eventStream);
 
@@ -111,7 +114,7 @@ public class EventParserTest {
     @Test
     public void whenEventContainsUnknownField_returnEventWithSupportedFields() throws IOException {
         final String data = "{\"symbol\":\"MSFT\",\"price\":15,\"delta\":\"2\"}";
-        final InboundServerEvent expectedEvent = new InboundServerEvent("1", "stock", data, 2000);
+        final InboundServerEvent expectedEvent = new InboundServerEvent("1", "stock", data, 2000, defaultMapper);
         final InputStream eventStream = resourceAsStream("event-with-unknown-field.txt");
 
         parser.parse(eventStream);
@@ -122,7 +125,7 @@ public class EventParserTest {
     @Test
     public void whenEventContainsDataOnMultipleLines_returnEventWithConcatenatedData() throws IOException {
         final String data = "{\"symbol\":\"MSFT\",\n \"price\":15,\"delta\":\"2\"}";
-        final InboundServerEvent expectedEvent = new InboundServerEvent("1", "stock", data, 2000);
+        final InboundServerEvent expectedEvent = new InboundServerEvent("1", "stock", data, 2000, defaultMapper);
         final InputStream eventStream = resourceAsStream("event-with-two-line-data.txt");
 
         parser.parse(eventStream);
@@ -136,8 +139,8 @@ public class EventParserTest {
         final String secondEventData = "{\"symbol\":\"MSFT\",\"price\":13,\"delta\":\"-2\"}";
         final InputStream eventSteam = resourceAsStream("two-events.txt");
         final List<InboundServerEvent> expectedEvents = List.of(
-                new InboundServerEvent("1", "stock", firstEventData, 2000),
-                new InboundServerEvent("2", "stock", secondEventData, 2000)
+                new InboundServerEvent("1", "stock", firstEventData, 2000, defaultMapper),
+                new InboundServerEvent("2", "stock", secondEventData, 2000, defaultMapper)
             );
 
         parser.parse(eventSteam);

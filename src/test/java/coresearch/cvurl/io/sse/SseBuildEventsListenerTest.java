@@ -1,5 +1,6 @@
 package coresearch.cvurl.io.sse;
 
+import coresearch.cvurl.io.mapper.MapperFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +13,7 @@ import java.util.function.Consumer;
 public class SseBuildEventsListenerTest {
 
     private static final RuntimeException DEFAULT_EXCEPTION = new RuntimeException();
-    private static final InboundServerEvent DEFAULT_EVENT = new InboundServerEvent(null, null, null, -1);
+    private static final InboundServerEvent DEFAULT_EVENT = new InboundServerEvent(null, null, null, -1, MapperFactory.createDefault());
     private final Collection<Consumer<ServerEvent>> eventConsumers = new ArrayList<>();
     private final Collection<Consumer<Exception>> exceptionsConsumers = new ArrayList<>();
     private final Collection<Runnable> onCompleteCallbacks = new ArrayList<>();

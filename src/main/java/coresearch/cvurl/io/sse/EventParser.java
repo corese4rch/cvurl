@@ -1,5 +1,6 @@
 package coresearch.cvurl.io.sse;
 
+import coresearch.cvurl.io.mapper.GenericMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +23,11 @@ class EventParser {
     private static final String DIGITS_ONLY = "^\\d*$";
 
     private final SseEventListener listener;
+    private final GenericMapper genericMapper;
 
-    EventParser(SseEventListener listener) {
+    EventParser(SseEventListener listener, GenericMapper genericMapper) {
         this.listener = listener;
+        this.genericMapper = genericMapper;
     }
 
     public void parse(InputStream eventStream) {
@@ -32,12 +35,12 @@ class EventParser {
             return;
 
         String line;
-        InboundServerEvent.InboundServerEventBuilder builder = InboundServerEvent.newBuilder();
+        InboundServerEvent.InboundServerEventBuilder builder = InboundServerEvent.newBuilder(genericMapper);
         try (final BufferedReader reader = new BufferedReader(new InputStreamReader(eventStream, StandardCharsets.UTF_8))) {
             while ((line = reader.readLine()) != null) {
                 if (line.isEmpty()) {
                     listener.onEvent(builder.build());
-                    builder = InboundServerEvent.newBuilder();
+                    builder = InboundServerEvent.newBuilder(genericMapper);
                     continue;
                 }
 

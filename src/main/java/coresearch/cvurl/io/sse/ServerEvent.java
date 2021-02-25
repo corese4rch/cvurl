@@ -6,5 +6,6 @@ public interface ServerEvent {
     String id();
     String data();
     int reconnectTime();
+    <T> T parseData(Class<T> tClass);
 
 }
