@@ -27,8 +27,10 @@ public final class CVurlProxySelector extends ProxySelector {
 
     @Override
     public List<Proxy> select(URI uri) {
+        final String stringUri = uri.toString();
         // proxy-per-request
-        final List<Proxy> proxies = new ArrayList<>(proxiesByUri.getOrDefault(uri.toString(), List.of()));
+        final List<Proxy> proxies = new ArrayList<>(proxiesByUri.getOrDefault(stringUri, List.of()));
+        proxiesByUri.remove(stringUri);
 
         // proxy-per-client
         if (proxies.isEmpty() && proxySelector != null)
@@ -49,10 +51,6 @@ public final class CVurlProxySelector extends ProxySelector {
     public void addProxy(String uri, CVurlProxy cVurlProxy) {
         proxiesByUri.computeIfAbsent(uri, k -> new ArrayList<>())
                 .add(toProxy(cVurlProxy));
-    }
-
-    public void removeProxiesForUri(URI uri) {
-        proxiesByUri.remove(uri.toString());
     }
 
     @Override

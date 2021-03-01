@@ -41,7 +41,6 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
     private String uri;
     private Map<String, String> queryParams = new HashMap<>();
     private Map<String, String> headers = new HashMap<>();
-    private boolean withProxy = false;
 
     RequestBuilder(String uri, HttpMethod method, CVurlConfig cvurlConfig) {
         this.method = method;
@@ -155,7 +154,6 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
         final ProxySelector selector = proxySelector.get();
         if (selector instanceof CVurlProxySelector) {
             ((CVurlProxySelector) selector).addProxy(uri, cVurlProxy);
-            withProxy = true;
         }
 
         return (T) this;
@@ -169,13 +167,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
     public Request create() {
         final RequestConfiguration requestConfiguration = requestConfigurationBuilder.build();
         final HttpRequest httpRequest = setUpHttpRequestBuilder(requestConfiguration).build();
-        final CVurlRequest request = new CVurlRequest(httpRequest, cvurlConfig, requestConfiguration);
-
-        if (withProxy) {
-            return new ProxyAwareCVurlRequest(request, cvurlConfig, httpRequest.uri());
-        }
-
-        return request;
+        return new CVurlRequest(httpRequest, cvurlConfig, requestConfiguration);
     }
 
     private HttpRequest.Builder setUpHttpRequestBuilder(RequestConfiguration requestConfiguration) {

@@ -106,16 +106,16 @@ public class CVurlProxySelectorTest {
     }
 
     @Test
-    public void whenRemoveProxyForUriCalled_returnDefaultProxyForThisURI() {
+    public void whenSelectForUriCalledTwice_returnDefaultProxyForThisUriForSecondCallForSameUri() {
         // given
         selector.addProxy(REQUEST_URL, CVurlProxy.of(CVurlProxyType.HTTP, PROXY_HOST, PROXY_PORT));
-        selector.removeProxiesForUri(REQUEST_URI);
+        selector.select(REQUEST_URI);
 
         // when
-        final List<Proxy> proxies = selector.select(REQUEST_URI);
+        final List<Proxy> proxiesSecond = selector.select(REQUEST_URI);
 
         // then
-        Assertions.assertEquals(ProxySelector.getDefault().select(REQUEST_URI), proxies);
+        Assertions.assertEquals(ProxySelector.getDefault().select(REQUEST_URI), proxiesSecond);
     }
 
     @Test
