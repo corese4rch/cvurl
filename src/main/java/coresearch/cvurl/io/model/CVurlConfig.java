@@ -49,7 +49,9 @@ public class CVurlConfig {
     }
 
     public CVurlConfig() {
-        this.httpClient = HttpClient.newHttpClient();
+        this.httpClient = HttpClient.newBuilder()
+                .proxy(new CVurlProxySelector())
+                .build();
         this.genericMapper = MapperFactory.createDefault();
         this.globalRequestConfiguration = RequestConfiguration.defaultConfiguration();
         this.httpClientMode = HttpClientMode.PROTOTYPE;
