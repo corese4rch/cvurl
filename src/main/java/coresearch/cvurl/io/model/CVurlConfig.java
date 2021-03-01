@@ -49,9 +49,7 @@ public class CVurlConfig {
     }
 
     public CVurlConfig() {
-        this.httpClient = HttpClient.newBuilder()
-                .proxy(new CVurlProxySelector())
-                .build();
+        this.httpClient = makeDefaultHttpClientWithCVurlProxySelector();
         this.genericMapper = MapperFactory.createDefault();
         this.globalRequestConfiguration = RequestConfiguration.defaultConfiguration();
         this.httpClientMode = HttpClientMode.PROTOTYPE;
@@ -68,9 +66,11 @@ public class CVurlConfig {
 
     /**
      * Creates {@link ConfigurationBuilder} with predefined {@link HttpClient} used to build {@link CVurlConfig} object.
+     * Use {@link CVurlConfig#builderWithDefaultHttpClient()} instead
      *
      * @return new ConfigurationWithClientPropertiesBuilder
      */
+    @Deprecated(since = "1.5", forRemoval = true)
     public static ConfigurationBuilder builder(HttpClient httpClient) {
         return new ConfigurationBuilder(httpClient);
     }
@@ -81,7 +81,7 @@ public class CVurlConfig {
      * @return new ConfigurationWithClientPropertiesBuilder
      */
     public static ConfigurationBuilder builderWithDefaultHttpClient() {
-        return new ConfigurationBuilder(HttpClient.newHttpClient());
+        return new ConfigurationBuilder(makeDefaultHttpClientWithCVurlProxySelector());
     }
 
     /**
@@ -169,6 +169,16 @@ public class CVurlConfig {
 
     public void setIsLogEnable(boolean enabled) {
         this.getGlobalRequestConfiguration().setLogEnabled(enabled);
+    }
+
+    /**
+     * Creates instance of {@link HttpClient} with default settings except ProxySelector
+     * @return HttpClient with CVurlProxySelector
+     */
+    static HttpClient makeDefaultHttpClientWithCVurlProxySelector() {
+        return HttpClient.newBuilder()
+                .proxy(new CVurlProxySelector())
+                .build();
     }
 
     public static class ConfigurationBuilder<T extends ConfigurationBuilder<T>> implements RequestConfigurer<ConfigurationBuilder> {
