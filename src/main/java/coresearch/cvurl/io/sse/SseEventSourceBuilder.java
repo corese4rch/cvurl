@@ -48,6 +48,6 @@ public class SseEventSourceBuilder {
      * @return {@link SseEventSource}
      */
     public SseEventSource build() {
-        return new SseEventSourceImpl(url, cVurl, reconnectionTime, genericMapper);
+        return new DefaultSseEventSource(url, cVurl, reconnectionTime, genericMapper);
     }
 }

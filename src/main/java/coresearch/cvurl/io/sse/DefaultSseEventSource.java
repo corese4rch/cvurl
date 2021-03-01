@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-class SseEventSourceImpl implements SseEventSource {
+class DefaultSseEventSource implements SseEventSource {
 
     private static final String LAST_EVENT_ID_HEADER = "Last-Event-ID";
     private static final String CACHE_NO_STORE = "no-store";
@@ -39,7 +39,7 @@ class SseEventSourceImpl implements SseEventSource {
     private volatile int reconnectionTime;
     private volatile String lastEventId = "";
 
-    SseEventSourceImpl(String url, CVurl cVurl, int reconnectionTime, GenericMapper genericMapper) {
+    DefaultSseEventSource(String url, CVurl cVurl, int reconnectionTime, GenericMapper genericMapper) {
         this.url = url;
         this.cVurl = cVurl;
         this.reconnectionTime = reconnectionTime;
