@@ -29,8 +29,8 @@ public class CVurlProxySelectorTest {
     @Test
     public void whenSpecifiedProxiesForMultipleURIs_returnProxiesOnlyForRequestedURI() {
         // given
-        selector.addProxy(REQUEST_URL, CVurlProxy.of(CVurlProxyType.HTTP, PROXY_HOST, PROXY_PORT));
-        selector.addProxy(REQUEST_URL + 2, CVurlProxy.of(CVurlProxyType.HTTP, PROXY_HOST + 2, PROXY_PORT));
+        selector.addProxy(REQUEST_URL, CVurlProxy.of(Proxy.Type.HTTP, PROXY_HOST, PROXY_PORT));
+        selector.addProxy(REQUEST_URL + 2, CVurlProxy.of(Proxy.Type.HTTP, PROXY_HOST + 2, PROXY_PORT));
         final List<Proxy> expectedProxies = List.of(makeExpectedHttpProxy(PROXY_HOST, PROXY_PORT));
 
         // when
@@ -44,7 +44,7 @@ public class CVurlProxySelectorTest {
     public void whenAddedCVurlProxyForUri_returnCorrectProxyForSameUri() {
         // given
         final Proxy expectedProxy = makeExpectedHttpProxy(PROXY_HOST, PROXY_PORT);
-        selector.addProxy(REQUEST_URL, CVurlProxy.of(CVurlProxyType.HTTP, PROXY_HOST, PROXY_PORT));
+        selector.addProxy(REQUEST_URL, CVurlProxy.of(Proxy.Type.HTTP, PROXY_HOST, PROXY_PORT));
 
         // when
         final List<Proxy> proxies = selector.select(REQUEST_URI);
@@ -59,8 +59,8 @@ public class CVurlProxySelectorTest {
         // given
         final List<Proxy> expectedProxies = List.of(makeExpectedHttpProxy(PROXY_HOST, PROXY_PORT),
                 makeExpectedHttpProxy(PROXY_HOST + 2, PROXY_PORT));
-        selector.addProxy(REQUEST_URL, CVurlProxy.of(CVurlProxyType.HTTP, PROXY_HOST, PROXY_PORT));
-        selector.addProxy(REQUEST_URL, CVurlProxy.of(CVurlProxyType.HTTP, PROXY_HOST + 2, PROXY_PORT));
+        selector.addProxy(REQUEST_URL, CVurlProxy.of(Proxy.Type.HTTP, PROXY_HOST, PROXY_PORT));
+        selector.addProxy(REQUEST_URL, CVurlProxy.of(Proxy.Type.HTTP, PROXY_HOST + 2, PROXY_PORT));
 
         // when
         final List<Proxy> proxies = selector.select(REQUEST_URI);
@@ -86,7 +86,7 @@ public class CVurlProxySelectorTest {
     public void whenProxySelectorSpecifiedWithPerRequestProxy_returnPerRequestProxy() {
         // given
         selector = new CVurlProxySelector(new ProxySelectorMock(List.of(makeExpectedHttpProxy(PROXY_HOST, PROXY_PORT))));
-        selector.addProxy(REQUEST_URL, CVurlProxy.of(CVurlProxyType.HTTP, PROXY_HOST + 2, PROXY_PORT));
+        selector.addProxy(REQUEST_URL, CVurlProxy.of(Proxy.Type.HTTP, PROXY_HOST + 2, PROXY_PORT));
 
         // when
         final List<Proxy> proxies = selector.select(REQUEST_URI);
@@ -108,7 +108,7 @@ public class CVurlProxySelectorTest {
     @Test
     public void whenSelectForUriCalledTwice_returnDefaultProxyForThisUriForSecondCallForSameUri() {
         // given
-        selector.addProxy(REQUEST_URL, CVurlProxy.of(CVurlProxyType.HTTP, PROXY_HOST, PROXY_PORT));
+        selector.addProxy(REQUEST_URL, CVurlProxy.of(Proxy.Type.HTTP, PROXY_HOST, PROXY_PORT));
         selector.select(REQUEST_URI);
 
         // when
@@ -116,30 +116,6 @@ public class CVurlProxySelectorTest {
 
         // then
         Assertions.assertEquals(ProxySelector.getDefault().select(REQUEST_URI), proxiesSecond);
-    }
-
-    @Test
-    public void whenCvurlProxyTypeHttp_returnProxyWithTypeHttp() {
-        // given
-        selector.addProxy(REQUEST_URL, CVurlProxy.of(CVurlProxyType.HTTP, PROXY_HOST, PROXY_PORT));
-
-        // when
-        final List<Proxy> proxies = selector.select(REQUEST_URI);
-
-        // then
-        Assertions.assertSame(Proxy.Type.HTTP, proxies.get(0).type());
-    }
-
-    @Test
-    public void whenCvurlProxyTypeSocks_returnProxyWithTypeSocks() {
-        // given
-        selector.addProxy(REQUEST_URL, CVurlProxy.of(CVurlProxyType.SOCKS, PROXY_HOST, PROXY_PORT));
-
-        // when
-        final List<Proxy> proxies = selector.select(REQUEST_URI);
-
-        // then
-        Assertions.assertSame(Proxy.Type.SOCKS, proxies.get(0).type());
     }
 
     @Test

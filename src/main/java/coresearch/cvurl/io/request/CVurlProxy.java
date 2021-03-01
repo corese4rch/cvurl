@@ -1,12 +1,14 @@
 package coresearch.cvurl.io.request;
 
+import java.net.Proxy;
+
 public class CVurlProxy {
 
-    private final CVurlProxyType type;
+    private final Proxy.Type type;
     private final String host;
     private final int port;
 
-    private CVurlProxy(CVurlProxyType type, String host, int port) {
+    private CVurlProxy(Proxy.Type type, String host, int port) {
         this.type = type;
         this.host = host;
         this.port = port;
@@ -20,16 +22,16 @@ public class CVurlProxy {
         return port;
     }
 
-    public CVurlProxyType getType() {
+    public Proxy.Type getType() {
         return type;
     }
 
-    public static CVurlProxy of(CVurlProxyType type, String host, int port) {
+    public static CVurlProxy of(Proxy.Type type, String host, int port) {
         return new CVurlProxy(type, host, port);
     }
 
     public static CVurlProxy noProxy() {
-        return new CVurlProxy(CVurlProxyType.DIRECT, null, -1);
+        return new CVurlProxy(Proxy.Type.DIRECT, null, -1);
     }
 
 }

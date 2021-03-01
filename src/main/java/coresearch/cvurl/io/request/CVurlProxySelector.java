@@ -67,11 +67,11 @@ public final class CVurlProxySelector extends ProxySelector {
     }
 
     private Proxy toProxy(CVurlProxy cVurlProxy) {
-        if (cVurlProxy.getType() == CVurlProxyType.DIRECT)
+        if (cVurlProxy.getType() == Proxy.Type.DIRECT)
             return Proxy.NO_PROXY;
 
         final InetSocketAddress sa = new InetSocketAddress(cVurlProxy.getHost(), cVurlProxy.getPort());
-        return new Proxy(cVurlProxy.getType().getJavaProxyType(), sa);
+        return new Proxy(cVurlProxy.getType(), sa);
     }
 
 }
