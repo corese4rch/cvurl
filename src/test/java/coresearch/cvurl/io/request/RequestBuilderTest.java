@@ -29,7 +29,7 @@ public class RequestBuilderTest {
     }
 
     @Test
-    void whenHttpClientHasCVurlProxySelector_thenWithProxyInputsPassedToCVurlProxySelector() {
+    public void whenHttpClientHasCVurlProxySelector_thenWithProxyInputsPassedToCVurlProxySelector() {
         Mockito.when(config.getProxySelector()).thenReturn(Optional.of(proxySelectorSpy));
 
         builder.withProxy(CVURL_PROXY);
@@ -38,7 +38,7 @@ public class RequestBuilderTest {
     }
 
     @Test
-    void whenHttpClientHasNoProxySelectorSpecified_thenWithProxyInputsIgnored() {
+    public void whenHttpClientHasNoProxySelectorSpecified_thenWithProxyInputsIgnored() {
         Mockito.when(config.getProxySelector()).thenReturn(Optional.empty());
 
         builder.withProxy(CVURL_PROXY);
@@ -47,7 +47,7 @@ public class RequestBuilderTest {
     }
 
     @Test
-    void whenHttpClientHasNotCVurlProxySelectorSpecified_thenWithProxyInputsIgnored() {
+    public void whenHttpClientHasNotCVurlProxySelectorSpecified_thenWithProxyInputsIgnored() {
         Mockito.when(config.getProxySelector()).thenReturn(Optional.of(ProxySelector.getDefault()));
 
         builder.withProxy(CVURL_PROXY);
