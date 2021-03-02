@@ -175,7 +175,7 @@ public class CVurlConfig {
      * Creates instance of {@link HttpClient} with default settings except ProxySelector
      * @return HttpClient with CVurlProxySelector
      */
-    static HttpClient makeDefaultHttpClientWithCVurlProxySelector() {
+    private static HttpClient makeDefaultHttpClientWithCVurlProxySelector() {
         return HttpClient.newBuilder()
                 .proxy(new CVurlProxySelector())
                 .build();

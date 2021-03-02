@@ -135,7 +135,9 @@ public class ConfigurationTest {
     public void defaultConfigurationTest() {
         //when
         var configuration = CVurlConfig.defaultConfiguration();
-        final HttpClient httpClient = CVurlConfig.makeDefaultHttpClientWithCVurlProxySelector();
+        final HttpClient httpClient = HttpClient.newBuilder()
+                .proxy(new CVurlProxySelector())
+                .build();
 
         //then
         assertTrue(httpClientsEquals(configuration.getHttpClient(), httpClient));

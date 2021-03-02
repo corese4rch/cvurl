@@ -4,11 +4,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.ProxySelector;
-import java.net.SocketAddress;
 import java.net.URI;
 import java.util.List;
 
@@ -132,24 +130,6 @@ public class CVurlProxySelectorTest {
 
     private Proxy makeExpectedHttpProxy(String host, int port) {
         return new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port));
-    }
-
-    private static final class ProxySelectorMock extends ProxySelector {
-        private final List<Proxy> expectedProxies;
-
-        public ProxySelectorMock(List<Proxy> expectedProxies) {
-            this.expectedProxies = expectedProxies;
-        }
-
-        @Override
-        public List<Proxy> select(URI uri) {
-            return expectedProxies;
-        }
-
-        @Override
-        public void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
-            // do nothing
-        }
     }
 
 }
