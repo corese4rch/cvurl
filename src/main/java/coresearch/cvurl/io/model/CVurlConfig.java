@@ -105,17 +105,6 @@ public class CVurlConfig {
         return httpClient;
     }
 
-    /**
-     * Creates {@link HttpClient} based on current configuration.
-     *
-     * @return new {@link HttpClient} build from this configuration
-     * @deprecated Use {@link #getHttpClient()} instead.
-     */
-    @Deprecated(since = "1.2", forRemoval = true)
-    public HttpClient createHttpClient() {
-        return getHttpClient();
-    }
-
     public Optional<ProxySelector> getProxySelector() {
         return httpClient.proxy();
     }

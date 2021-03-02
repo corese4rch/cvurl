@@ -19,7 +19,10 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ConfigurationTest {
 
@@ -64,7 +67,7 @@ public class ConfigurationTest {
     }
 
     @Test
-    public void createHttpClientTest() throws NoSuchAlgorithmException {
+    public void getHttpClientTest() throws NoSuchAlgorithmException {
         //given
         var authenticator = new Authenticator() {};
         var connectTimeout = Duration.ofSeconds(1);
@@ -91,14 +94,14 @@ public class ConfigurationTest {
                 .build();
 
         //when
-        var httpClient = conf.createHttpClient();
+        var httpClient = conf.getHttpClient();
         //then
-        assertSame(authenticator, httpClient.authenticator().get());
-        assertSame(connectTimeout, httpClient.connectTimeout().get());
-        assertSame(cookieHandler, httpClient.cookieHandler().get());
-        assertSame(executor, httpClient.executor().get());
+        assertSame(authenticator, httpClient.authenticator().orElseThrow());
+        assertSame(connectTimeout, httpClient.connectTimeout().orElseThrow());
+        assertSame(cookieHandler, httpClient.cookieHandler().orElseThrow());
+        assertSame(executor, httpClient.executor().orElseThrow());
         assertSame(followRedirects, httpClient.followRedirects());
-        assertSame(proxySelector, httpClient.proxy().get());
+        assertSame(proxySelector, httpClient.proxy().orElseThrow());
         assertSame(sslContext, httpClient.sslContext());
         assertArrayEquals(sslParameters.getCipherSuites(), httpClient.sslParameters().getCipherSuites());
         assertSame(version, httpClient.version());

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import coresearch.cvurl.io.mapper.MapperFactory;
+import coresearch.cvurl.io.model.CVurlConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -26,7 +27,10 @@ public abstract class AbstractRequestTest {
         mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-        cvurl = new CVurl(MapperFactory.from(mapper));
+        final CVurlConfig config = CVurlConfig.builder()
+                .genericMapper(MapperFactory.from(mapper))
+                .build();
+        cvurl = new CVurl(config);
     }
 
     @AfterEach

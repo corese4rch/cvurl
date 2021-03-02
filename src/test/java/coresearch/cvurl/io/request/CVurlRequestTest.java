@@ -3,7 +3,11 @@ package coresearch.cvurl.io.request;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.http.Fault;
-import coresearch.cvurl.io.constant.*;
+import coresearch.cvurl.io.constant.HttpContentEncoding;
+import coresearch.cvurl.io.constant.HttpHeader;
+import coresearch.cvurl.io.constant.HttpStatus;
+import coresearch.cvurl.io.constant.MIMEType;
+import coresearch.cvurl.io.constant.MultipartType;
 import coresearch.cvurl.io.exception.RequestExecutionException;
 import coresearch.cvurl.io.exception.ResponseMappingException;
 import coresearch.cvurl.io.exception.UnexpectedResponseException;
@@ -26,21 +30,33 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.net.*;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.GZIPOutputStream;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aMultipart;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static java.lang.String.format;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertLinesMatch;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class CVurlRequestTest extends AbstractRequestTest {
@@ -173,7 +189,9 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withBody(EMPTY_STRING)));
 
         //when
-        Optional<Response<String>> response = cvurl.get(url).timeout(Duration.ofMillis(100)).asString();
+        Optional<Response<String>> response = cvurl.get(url)
+                .requestTimeout(Duration.ofMillis(100))
+                .asString();
 
         //then
         assertTrue(response.isEmpty());
@@ -192,7 +210,9 @@ public class CVurlRequestTest extends AbstractRequestTest {
                         .withBody(EMPTY_STRING)));
 
         //when
-        Optional<Response<String>> response = cvurl.get(url).timeout(Duration.ofMillis(100)).asString();
+        Optional<Response<String>> response = cvurl.get(url)
+                .requestTimeout(Duration.ofMillis(100))
+                .asString();
 
         //then
         assertTrue(response.isEmpty());

@@ -3,10 +3,10 @@ package coresearch.cvurl.io.request;
 import coresearch.cvurl.io.constant.HttpContentEncoding;
 import coresearch.cvurl.io.constant.HttpHeader;
 import coresearch.cvurl.io.constant.HttpMethod;
+import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
 import coresearch.cvurl.io.internal.configuration.RequestConfigurer;
 import coresearch.cvurl.io.mapper.BodyType;
 import coresearch.cvurl.io.model.CVurlConfig;
-import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
 import coresearch.cvurl.io.model.Response;
 
 import java.io.InputStream;
@@ -95,20 +95,6 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
     @SuppressWarnings("unchecked")
     public T queryParams(Map<String, String> queryParams) {
         this.queryParams.putAll(queryParams);
-        return (T) this;
-    }
-
-    /**
-     * Sets request timeout. Overlaps global timeout set for {@link CVurl}
-     *
-     * @param timeout request timeout
-     * @return this builder
-     * @deprecated Use {@link #requestTimeout(Duration)} instead
-     */
-    @SuppressWarnings("unchecked")
-    @Deprecated(since = "1.2", forRemoval = true)
-    public T timeout(Duration timeout) {
-        this.requestConfigurationBuilder.requestTimeout(timeout);
         return (T) this;
     }
 
