@@ -14,7 +14,7 @@ public class SseEventSourceBuilder {
 
     private final String url;
     private final CVurl cVurl;
-    private int reconnectionTime = 500;
+    private long reconnectionTime = 500L;
     private GenericMapper genericMapper = MapperFactory.createDefault();
 
     public SseEventSourceBuilder(String url, CVurl cVurl) {
@@ -28,8 +28,8 @@ public class SseEventSourceBuilder {
      * @param timeUnit time unit of the duration
      * @return this SseEventSourceBuilder builder
      */
-    public SseEventSourceBuilder withReconnectionTime(int reconnectionTime, TimeUnit timeUnit) {
-        this.reconnectionTime = Long.valueOf(timeUnit.toMillis(reconnectionTime)).intValue();
+    public SseEventSourceBuilder withReconnectionTime(long reconnectionTime, TimeUnit timeUnit) {
+        this.reconnectionTime = timeUnit.toMillis(reconnectionTime);
         return this;
     }
 

@@ -9,10 +9,10 @@ public class InboundServerEvent implements ServerEvent {
     private final String id;
     private final String name;
     private final String data;
-    private final int reconnectTime;
+    private final long reconnectTime;
     private final GenericMapper mapper;
 
-    public InboundServerEvent(String id, String name, String data, int reconnectTime, GenericMapper mapper) {
+    InboundServerEvent(String id, String name, String data, long reconnectTime, GenericMapper mapper) {
         this.id = id;
         this.name = name;
         this.data = data;
@@ -31,7 +31,7 @@ public class InboundServerEvent implements ServerEvent {
     }
 
     @Override
-    public int reconnectTime() {
+    public long reconnectTime() {
         return reconnectTime;
     }
 
@@ -75,43 +75,4 @@ public class InboundServerEvent implements ServerEvent {
         return new InboundServerEventBuilder(genericMapper);
     }
 
-    public static final class InboundServerEventBuilder {
-        private String id;
-        private String name;
-        private String data;
-        private int reconnectTime = -1;
-        private final GenericMapper genericMapper;
-
-        private InboundServerEventBuilder(GenericMapper genericMapper) {
-            this.genericMapper = genericMapper;
-        }
-
-        public InboundServerEventBuilder id(String id) {
-            this.id = id;
-            return this;
-        }
-
-        public InboundServerEventBuilder name(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public InboundServerEventBuilder data(String data) {
-            this.data = data;
-            return this;
-        }
-
-        public InboundServerEventBuilder reconnectTime(int reconnectTime) {
-            this.reconnectTime = reconnectTime;
-            return this;
-        }
-
-        public String getData() {
-            return data;
-        }
-
-        public InboundServerEvent build() {
-            return new InboundServerEvent(id, name, data, reconnectTime, genericMapper);
-        }
-    }
 }

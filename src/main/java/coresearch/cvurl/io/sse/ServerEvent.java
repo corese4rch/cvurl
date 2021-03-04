@@ -5,7 +5,7 @@ public interface ServerEvent {
     String name();
     String id();
     String data();
-    int reconnectTime();
+    long reconnectTime();
     <T> T parseData(Class<T> tClass);
 
 }

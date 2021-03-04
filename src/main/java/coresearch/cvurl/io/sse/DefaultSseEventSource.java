@@ -36,10 +36,10 @@ class DefaultSseEventSource implements SseEventSource {
     private final AtomicReference<SseEventSourceState> state = new AtomicReference<>(SseEventSourceState.CONNECTING);
     private final String url;
     private final CVurl cVurl;
-    private volatile int reconnectionTime;
+    private volatile long reconnectionTime;
     private volatile String lastEventId = "";
 
-    DefaultSseEventSource(String url, CVurl cVurl, int reconnectionTime, GenericMapper genericMapper) {
+    DefaultSseEventSource(String url, CVurl cVurl, long reconnectionTime, GenericMapper genericMapper) {
         this.url = url;
         this.cVurl = cVurl;
         this.reconnectionTime = reconnectionTime;
@@ -153,7 +153,7 @@ class DefaultSseEventSource implements SseEventSource {
     }
 
     private void updateReconnectionTime(ServerEvent event) {
-            final int eventReconnectionTime = event.reconnectTime();
+            final long eventReconnectionTime = event.reconnectTime();
             if (eventReconnectionTime > 0)
                 this.reconnectionTime = eventReconnectionTime;
     }

@@ -6,6 +6,9 @@ import coresearch.cvurl.io.utils.Resources;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
@@ -13,15 +16,17 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class EventParserTest {
 
     private static final String SSE_PACKAGE = "sse/";
+    private static final GenericMapper defaultMapper = MapperFactory.createDefault();
     private EventParser parser;
     private TestSseEventListener testSseEventListener;
-    private final GenericMapper defaultMapper = MapperFactory.createDefault();
 
     @BeforeEach
     public void setup() {
@@ -30,126 +35,14 @@ public class EventParserTest {
     }
 
     @Test
-    public void whenEmptyEventStream_returnEmptyList() {
-        parser.parse(stringAsStream(""));
-
-        Assertions.assertTrue(testSseEventListener.getEvents().isEmpty());
-    }
-
-    @Test
-    public void whenNullEventStream_returnEmptyList() {
+    void whenNullEventStream_returnEmptyList() {
         parser.parse(null);
 
         Assertions.assertTrue(testSseEventListener.getEvents().isEmpty());
     }
 
     @Test
-    public void whenEventContainsSingleDataLine_returnEventWithData() {
-        final InputStream eventStream = stringAsStream("data:test event data\n\n");
-        final String data = "test event data";
-
-        parser.parse(eventStream);
-
-        Assertions.assertEquals(List.of(new InboundServerEvent(null, null, data, -1, defaultMapper)), testSseEventListener.getEvents());
-    }
-
-    @Test
-    public void whenEventContainsOnlyFieldNameWithEmptyFieldValue_returnEventWithEmptyField() {
-        final InputStream eventStream = stringAsStream("event:\n\n");
-
-        parser.parse(eventStream);
-
-        Assertions.assertEquals(List.of(new InboundServerEvent(null, "", null, -1, defaultMapper)), testSseEventListener.getEvents());
-    }
-
-    @Test
-    public void whenEventContainsOnlyFieldName_returnEventWithEmptyField() {
-        final InputStream eventStream = stringAsStream("event\n\n");
-
-        parser.parse(eventStream);
-
-        Assertions.assertEquals(List.of(new InboundServerEvent(null, "", null, -1, defaultMapper)), testSseEventListener.getEvents());
-    }
-
-    @Test
-    public void whenEventContainsSingleDataLineValueWithLeadingSpace_returnEventWithDataStrippedLeadingSpace() {
-        final InputStream eventStream = stringAsStream("data: test event data\n\n");
-        final String data = "test event data";
-
-        parser.parse(eventStream);
-
-        Assertions.assertEquals(List.of(new InboundServerEvent(null, null, data, -1, defaultMapper)), testSseEventListener.getEvents());
-    }
-
-    @Test
-    public void whenEventContainsSingleDataLineValueWithThreeLeadingSpaces_returnEventWithDataStrippedOneLeadingSpace() {
-        final InputStream eventStream = stringAsStream("data:   test event data\n\n");
-        final String data = "  test event data";
-
-        parser.parse(eventStream);
-
-        Assertions.assertEquals(List.of(new InboundServerEvent(null, null, data, -1, defaultMapper)), testSseEventListener.getEvents());
-    }
-
-    @Test
-    public void whenEventContainsNullInIdField_returnEventWithNullId() {
-        final InputStream eventStream = stringAsStream("id:\0\ndata: test\n\n");
-
-        parser.parse(eventStream);
-
-        Assertions.assertEquals(List.of(new InboundServerEvent(null, null, "test", -1, defaultMapper)), testSseEventListener.getEvents());
-    }
-
-    @Test
-    public void whenEventContainsAllFields_returnEventWithParsedFields() throws IOException {
-        final InputStream eventStream = resourceAsStream("event-with-single-line-data.txt");
-        final String data = "{\"symbol\":\"MSFT\",\"price\":15,\"delta\":\"2\"}";
-        final InboundServerEvent expectedEvent = new InboundServerEvent("1", "stock", data, 2000, defaultMapper);
-
-        parser.parse(eventStream);
-
-        Assertions.assertEquals(List.of(expectedEvent), testSseEventListener.getEvents());
-    }
-
-    @Test
-    public void whenEventContainsUnknownField_returnEventWithSupportedFields() throws IOException {
-        final String data = "{\"symbol\":\"MSFT\",\"price\":15,\"delta\":\"2\"}";
-        final InboundServerEvent expectedEvent = new InboundServerEvent("1", "stock", data, 2000, defaultMapper);
-        final InputStream eventStream = resourceAsStream("event-with-unknown-field.txt");
-
-        parser.parse(eventStream);
-
-        Assertions.assertEquals(List.of(expectedEvent), testSseEventListener.getEvents());
-    }
-
-    @Test
-    public void whenEventContainsDataOnMultipleLines_returnEventWithConcatenatedData() throws IOException {
-        final String data = "{\"symbol\":\"MSFT\",\n \"price\":15,\"delta\":\"2\"}";
-        final InboundServerEvent expectedEvent = new InboundServerEvent("1", "stock", data, 2000, defaultMapper);
-        final InputStream eventStream = resourceAsStream("event-with-two-line-data.txt");
-
-        parser.parse(eventStream);
-
-        Assertions.assertEquals(List.of(expectedEvent), testSseEventListener.getEvents());
-    }
-
-    @Test
-    public void whenEventStreamContainsTwoEvents_returnListWithTwoEvents() throws IOException {
-        final String firstEventData = "{\"symbol\":\"MSFT\",\"price\":15,\"delta\":\"2\"}";
-        final String secondEventData = "{\"symbol\":\"MSFT\",\"price\":13,\"delta\":\"-2\"}";
-        final InputStream eventSteam = resourceAsStream("two-events.txt");
-        final List<InboundServerEvent> expectedEvents = List.of(
-                new InboundServerEvent("1", "stock", firstEventData, 2000, defaultMapper),
-                new InboundServerEvent("2", "stock", secondEventData, 2000, defaultMapper)
-            );
-
-        parser.parse(eventSteam);
-
-        Assertions.assertEquals(expectedEvents, testSseEventListener.getEvents());
-    }
-
-    @Test
-    public void whenStreamIsProcessed_assertThatStreamIsClosed() throws IOException {
+    void whenStreamIsProcessed_assertThatStreamIsClosed() throws IOException {
         final InputStream eventSteam = resourceAsStream("two-events.txt");
 
         parser.parse(eventSteam);
@@ -158,8 +51,63 @@ public class EventParserTest {
         Assertions.assertEquals("Stream Closed", exception.getMessage());
     }
 
+    @ParameterizedTest
+    @MethodSource("testEventParsingArgumentsSource")
+    void testEventParsing(String eventStream, List<ServerEvent> expectedEvents) {
+        parser.parse(stringAsStream(eventStream));
+
+        Assertions.assertEquals(expectedEvents, testSseEventListener.getEvents());
+    }
+
+    private static Stream<Arguments> testEventParsingArgumentsSource() {
+        return Stream.of(
+            Arguments.of("", List.of()),
+            Arguments.of("data:test event data\n\n", singleEventWithData("test event data")),
+            Arguments.of("event:\n\n", singleEventWithName("")),
+            Arguments.of("data: test event data\n\n", singleEventWithData("test event data")),
+            Arguments.of("data:   test event data\n\n", singleEventWithData("  test event data")),
+            Arguments.of("id:\0\ndata: test\n\n", singleEventWithData("test")),
+            Arguments.of(resourceAsString("event-with-single-line-data.txt"), List.of(firstExpectedStockEvent())),
+            Arguments.of(resourceAsString("event-with-unknown-field.txt"), List.of(firstExpectedStockEvent())),
+            Arguments.of(resourceAsString("event-with-two-line-data.txt"), List.of(expectedStockEventWithLineFeedInData())),
+            Arguments.of(resourceAsString("two-events.txt"), List.of(
+                    firstExpectedStockEvent(),
+                    makeEvent("2", "stock", "{\"symbol\":\"MSFT\",\"price\":13,\"delta\":\"-2\"}", 2000)
+            ))
+        );
+    }
+
+    private static List<ServerEvent> singleEventWithData(String data) {
+        return List.of(new InboundServerEvent(null, null, data, -1, defaultMapper));
+    }
+
+    private static List<ServerEvent> singleEventWithName(String name) {
+        return List.of(new InboundServerEvent(null, name, null, -1, defaultMapper));
+    }
+
+    private static ServerEvent makeEvent(String id, String name, String data, long reconnectTime) {
+        return new InboundServerEvent(id, name, data, reconnectTime, defaultMapper);
+    }
+
+    private static ServerEvent firstExpectedStockEvent() {
+        return makeEvent("1", "stock", "{\"symbol\":\"MSFT\",\"price\":15,\"delta\":\"2\"}", 2000);
+    }
+
+    private static ServerEvent expectedStockEventWithLineFeedInData() {
+        return makeEvent("1", "stock", "{\"symbol\":\"MSFT\",\n \"price\":15,\"delta\":\"2\"}", 2000);
+    }
+
     private InputStream stringAsStream(String str) {
         return new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private static String resourceAsString(String resource) {
+        try {
+            final Path path = Resources.get(SSE_PACKAGE + resource);
+            return Files.readString(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private InputStream resourceAsStream(String resource) throws FileNotFoundException {
