@@ -10,6 +10,7 @@ import coresearch.cvurl.io.model.CVurlConfig;
 import coresearch.cvurl.io.model.Response;
 
 import java.io.InputStream;
+import java.net.ProxySelector;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpRequest;
@@ -130,14 +131,29 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
         return (T) this;
     }
 
+    @SuppressWarnings("unchecked")
+    public T withProxy(CVurlProxy cVurlProxy) {
+        final Optional<ProxySelector> proxySelector = cvurlConfig.getProxySelector();
+        if (proxySelector.isEmpty())
+            return (T) this;
+
+        final ProxySelector selector = proxySelector.get();
+        if (selector instanceof CVurlProxySelector) {
+            ((CVurlProxySelector) selector).addProxy(uri, cVurlProxy);
+        }
+
+        return (T) this;
+    }
+
     /**
      * Builds new {@link Request}.
      *
      * @return new {@link Request}
      */
     public Request create() {
-        RequestConfiguration requestConfiguration = requestConfigurationBuilder.build();
-        return new CVurlRequest(setUpHttpRequestBuilder(requestConfiguration).build(), cvurlConfig, requestConfiguration);
+        final RequestConfiguration requestConfiguration = requestConfigurationBuilder.build();
+        final HttpRequest httpRequest = setUpHttpRequestBuilder(requestConfiguration).build();
+        return new CVurlRequest(httpRequest, cvurlConfig, requestConfiguration);
     }
 
     private HttpRequest.Builder setUpHttpRequestBuilder(RequestConfiguration requestConfiguration) {
