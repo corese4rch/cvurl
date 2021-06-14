@@ -5,6 +5,7 @@ import coresearch.cvurl.io.mapper.GenericMapper;
 import coresearch.cvurl.io.mapper.MapperFactory;
 import coresearch.cvurl.io.model.CVurlConfig;
 
+import java.net.ProxySelector;
 import java.net.URL;
 import java.net.http.HttpClient;
 import java.time.Duration;
@@ -42,9 +43,12 @@ public class CVurl {
      * Creates CVurl with specified {@link HttpClient} using
      * default mapper created by {@link MapperFactory#createDefault()} and
      * request timeout set to null.
+     * In order for {@link RequestBuilder#withProxy(CVurlProxy)} to work one should specify {@link CVurlProxySelector}
+     * as proxy selector for {@link HttpClient} using {@link HttpClient.Builder#proxy(ProxySelector)}
      *
      * @param httpClient httpClient with which CVurl will be created.
      */
+    @Deprecated(since = "1.5", forRemoval = true)
     public CVurl(HttpClient httpClient) {
         this.cvurlConfig = CVurlConfig.builder(httpClient).build();
     }

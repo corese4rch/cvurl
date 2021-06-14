@@ -4,6 +4,7 @@ import coresearch.cvurl.io.constant.HttpClientMode;
 import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
 import coresearch.cvurl.io.mapper.MapperFactory;
 import coresearch.cvurl.io.mapper.impl.JacksonMapper;
+import coresearch.cvurl.io.request.CVurlProxySelector;
 import coresearch.cvurl.io.utils.MockHttpClient;
 import coresearch.cvurl.io.utils.MockProxySelector;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,10 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ConfigurationTest {
 
@@ -57,7 +61,7 @@ public class ConfigurationTest {
         assertSame(cookieHandler, conf.getCookieHandler().orElseThrow(RuntimeException::new));
         assertSame(executor, conf.getExecutor().orElseThrow(RuntimeException::new));
         assertSame(followRedirects, conf.getFollowRedirects());
-        assertSame(proxySelector, conf.getProxySelector().orElseThrow(RuntimeException::new));
+        assertEquals(new CVurlProxySelector(proxySelector), conf.getProxySelector().orElseThrow(RuntimeException::new));
         assertSame(sslContext, conf.getSslContext());
         assertArrayEquals(sslParameters.getCipherSuites(), conf.getSslParameters().getCipherSuites());
         assertSame(version, conf.getVersion());
@@ -93,12 +97,12 @@ public class ConfigurationTest {
         //when
         var httpClient = conf.createHttpClient();
         //then
-        assertSame(authenticator, httpClient.authenticator().get());
-        assertSame(connectTimeout, httpClient.connectTimeout().get());
-        assertSame(cookieHandler, httpClient.cookieHandler().get());
-        assertSame(executor, httpClient.executor().get());
+        assertSame(authenticator, httpClient.authenticator().orElseThrow(RuntimeException::new));
+        assertSame(connectTimeout, httpClient.connectTimeout().orElseThrow(RuntimeException::new));
+        assertSame(cookieHandler, httpClient.cookieHandler().orElseThrow(RuntimeException::new));
+        assertSame(executor, httpClient.executor().orElseThrow(RuntimeException::new));
         assertSame(followRedirects, httpClient.followRedirects());
-        assertSame(proxySelector, httpClient.proxy().get());
+        assertEquals(new CVurlProxySelector(proxySelector), httpClient.proxy().orElseThrow(RuntimeException::new));
         assertSame(sslContext, httpClient.sslContext());
         assertArrayEquals(sslParameters.getCipherSuites(), httpClient.sslParameters().getCipherSuites());
         assertSame(version, httpClient.version());
@@ -131,9 +135,12 @@ public class ConfigurationTest {
     public void defaultConfigurationTest() {
         //when
         var configuration = CVurlConfig.defaultConfiguration();
+        final HttpClient httpClient = HttpClient.newBuilder()
+                .proxy(new CVurlProxySelector())
+                .build();
 
         //then
-        assertTrue(httpClientsEquals(configuration.getHttpClient(), HttpClient.newHttpClient()));
+        assertTrue(httpClientsEquals(configuration.getHttpClient(), httpClient));
         assertSame(configuration.getGenericMapper().getClass(), JacksonMapper.class);
         assertSame(configuration.getHttpClientMode(), HttpClientMode.PROTOTYPE);
         assertTrue(requestConfigurationsEquals(
