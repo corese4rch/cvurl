@@ -29,21 +29,21 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- main -->
         <slf4j-api.version>2.0.0-alpha1</slf4j-api.version>
-        <jackson.core.version>2.11.0</jackson.core.version>
+        <jackson.core.version>2.12.1</jackson.core.version>
         <!-- test -->
         <mockito.version>3.6.28</mockito.version>
-        <wiremock.version>2.23.2</wiremock.version>
-        <hamcrest.version>2.1</hamcrest.version>
-        <junit-jupiter.version>5.6.0</junit-jupiter.version>
+        <wiremock.version>2.27.2</wiremock.version>
+        <hamcrest.version>2.2</hamcrest.version>
+        <junit-jupiter.version>5.8.0-M1</junit-jupiter.version>
         <mockito-extension.version>1.2.1</mockito-extension.version>
         <!-- plugins -->
-        <maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
-        <maven-failsafe-plugin.version>3.0.0-M4</maven-failsafe-plugin.version>
-        <jacoco-plugin.version>0.8.5</jacoco-plugin.version>
-        <sonar-plugin.version>3.6.0.1398</sonar-plugin.version>
-        <source-plugin.version>3.2.0</source-plugin.version>
-        <release-plugin.version>2.5.3</release-plugin.version>
-        <maven-enforcer-plugin.version>3.0.0-M2</maven-enforcer-plugin.version>
+        <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
+        <maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
+        <jacoco-plugin.version>0.8.6</jacoco-plugin.version>
+        <sonar-plugin.version>3.8.0.2131</sonar-plugin.version>
+        <source-plugin.version>3.2.1</source-plugin.version>
+        <release-plugin.version>3.0.0.M1</release-plugin.version>
+        <maven-enforcer-plugin.version>3.0.0-M3</maven-enforcer-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <coveralls-plugin.version>4.3.0</coveralls-plugin.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
