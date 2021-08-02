@@ -1,7 +1,9 @@
 package coresearch.cvurl.io.multipart;
 
 /**
- * Represent part with file content of multipart data.
+ * Represents a part of the content of multipart data.
+ *
+ * @since 1.0
  */
 public class PartWithFileContent extends Part<PartWithFileContent> {
     private String fileName;
@@ -12,9 +14,7 @@ public class PartWithFileContent extends Part<PartWithFileContent> {
     }
 
     /**
-     * Returns file name.
-     *
-     * @return file name.
+     * Returns the name of the file.
      */
     public String getFileName() {
         return fileName;
