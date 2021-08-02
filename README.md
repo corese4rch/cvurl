@@ -5,7 +5,7 @@
 [![GNU License](https://img.shields.io/badge/license-GNU%20GPL%20v3-green.svg)](https://github.com/corese4rch/cvurl/blob/master/LICENSE)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.corese4rch/cvurl-io/badge.svg?kill_cache=1)](https://search.maven.org/search?q=g:com.github.corese4rch%20AND%20a:cvurl-io)
 
-## cVurl is an open-source wrapper for the [Java HTTP/2 client](https://openjdk.java.net/groups/net/httpclient/intro.html). 
+## cVurl is an open-source wrapper for the [Java HTTP client](https://openjdk.java.net/groups/net/httpclient/intro.html). 
 
 ## Requirements 
  **cVurl** is written in Java 11 and can be used with any JDK 11.0.2 or newer
@@ -212,11 +212,11 @@ As easy as pie.
 
 Interested? We encourage you to try cVurl!
 
-## Java 11 HTTP/2 Client missing features
+## Java 11 HTTP Client missing features
 
 #### Form data
 There is no built-in support to send a POST request with x-www-form-urlencoded,
-and to implement it with plain Java 11 HTTP/2 client, you have to add several lines of code to create a custom BodyPublisher implementation.
+and to implement it with plain Java 11 HTTP client, you have to add several lines of code to create a custom BodyPublisher implementation.
 ```java
 public static HttpRequest.BodyPublisher ofFormData(Map<Object, Object> data) {
     var builder = new StringBuilder();
