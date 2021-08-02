@@ -5,10 +5,10 @@ import coresearch.cvurl.io.constant.MIMEType;
 import coresearch.cvurl.io.exception.MultipartFileFormException;
 import coresearch.cvurl.io.utils.Resources;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,7 +20,7 @@ import static java.util.stream.Collectors.toMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class MultipartBodyTest {
+class MultipartBodyTest {
 
     private static final String BOUNDARY = "BOUNDARY";
     private static final String MULTIPART_BODY_PART_TEMPLATE = "--%s\r\n%s\r\n%s\r\n";
@@ -35,49 +35,46 @@ public class MultipartBodyTest {
     private static final String CONTENT = "content";
 
     @Test
-    public void singlePartWithoutContentTypeTest() {
+    void shouldCreateValidMultipartBodyWhenContentTypeIsNotSpecified() {
         //given
         var partContent = CONTENT;
-        var expectedResult = generateMultipartBody(BOUNDARY,
-                new TestPart(partContent));
+        var expectedResult = generateMultipartBody(new TestPart(partContent));
 
         //when
-        MultipartBody result = MultipartBody.create(BOUNDARY).part(Part.of(partContent));
+        var result = MultipartBody.create(BOUNDARY).part(Part.of(partContent));
 
         //then
         assertEquals(expectedResult, convertToString(result));
     }
 
-
     @Test
-    public void singlePartWithContentTypeTest() {
+    void shouldCreateValidMultipartBodyWhenContentTypeIsSpecified() {
         //given
         var partContent = CONTENT;
         var partContentType = MIMEType.TEXT_PLAIN;
-        var expectedResult = generateMultipartBody(BOUNDARY,
-                new TestPart(partContent, Map.of(
-                        HttpHeader.CONTENT_TYPE, partContentType)));
+        var expectedResult =
+                generateMultipartBody(new TestPart(partContent, Map.of(HttpHeader.CONTENT_TYPE, partContentType)));
 
         //when
-        MultipartBody result = MultipartBody.create(BOUNDARY).part(Part.of(partContent).contentType(partContentType));
+        var result = MultipartBody.create(BOUNDARY).part(Part.of(partContent).contentType(partContentType));
 
         //then
         assertEquals(expectedResult, convertToString(result));
     }
 
     @Test
-    public void singleFormPartTest() {
+    void shouldCreateValidMultipartBodyWhenContentTypeIsTextPlain() {
         //given
         var partName = "name";
         var partContent = CONTENT;
         var partContentType = MIMEType.TEXT_PLAIN;
-        var expectedResult = generateMultipartBody(BOUNDARY,
-                new TestPart(partContent, Map.of(
-                        HttpHeader.CONTENT_DISPOSITION, format(CONTENT_DISPOSITION_TEMPLATE, partName),
-                        HttpHeader.CONTENT_TYPE, partContentType)));
+        var expectedResult =
+                generateMultipartBody(new TestPart(partContent,
+                        Map.of(HttpHeader.CONTENT_DISPOSITION, format(CONTENT_DISPOSITION_TEMPLATE, partName),
+                                HttpHeader.CONTENT_TYPE, partContentType)));
 
         //when
-        MultipartBody result = MultipartBody.create(BOUNDARY)
+        var result = MultipartBody.create(BOUNDARY)
                 .formPart(partName, Part.of(partContent).contentType(partContentType));
 
         //then
@@ -85,79 +82,73 @@ public class MultipartBodyTest {
     }
 
     @Test
-    public void mixedPartsTest() {
+    void shouldCreateValidMultipartBodyWhenMultiplePartsArePresent() {
         //given
         var partName = "name";
         var partContent1 = "content1";
         var partContent2 = "content2";
         var partContentType = MIMEType.TEXT_PLAIN;
-        var expectedResult = generateMultipartBody(BOUNDARY,
-                new TestPart(partContent1, Map.of(
-                        HttpHeader.CONTENT_DISPOSITION, format(CONTENT_DISPOSITION_TEMPLATE, partName),
-                        HttpHeader.CONTENT_TYPE, partContentType)),
-                new TestPart(partContent2));
+        var expectedResult =
+                generateMultipartBody(new TestPart(partContent1,
+                        Map.of(HttpHeader.CONTENT_DISPOSITION, format(CONTENT_DISPOSITION_TEMPLATE, partName),
+                                HttpHeader.CONTENT_TYPE, partContentType)), new TestPart(partContent2));
 
         //when
-        MultipartBody result = MultipartBody.create(BOUNDARY)
-                .formPart(partName, Part.of(partContent1).contentType(partContentType))
-                .part(Part.of(partContent2));
+        var result = MultipartBody.create(BOUNDARY)
+                .formPart(partName, Part.of(partContent1).contentType(partContentType)).part(Part.of(partContent2));
 
         //then
         assertEquals(expectedResult, convertToString(result));
     }
 
     @Test
-    public void fileFormPartTest() throws IOException {
+    void shouldCreateValidMultipartBodyWhenContentTypeIsJson() throws IOException {
         //given
         var partName = "name";
-        Path jsonPath = Resources.get(MULTIPART_BODY_TEST_JSON);
-        var expectedResult = generateMultipartBody(BOUNDARY,
-                new TestPart(Files.readString(jsonPath), Map.of(
-                        HttpHeader.CONTENT_DISPOSITION, format(CONTENT_DISPOSITION_WITH_FILENAME_TEMPLATE,
-                                partName, MULTIPART_BODY_TEST_JSON),
+        var jsonPath = Resources.get(MULTIPART_BODY_TEST_JSON);
+        var expectedResult =
+                generateMultipartBody(new TestPart(Files.readString(jsonPath), Map.of(HttpHeader.CONTENT_DISPOSITION,
+                        format(CONTENT_DISPOSITION_WITH_FILENAME_TEMPLATE, partName, MULTIPART_BODY_TEST_JSON),
                         HttpHeader.CONTENT_TYPE, JSON_MIME_TYPE)));
 
         //when
-        MultipartBody multipartBody = MultipartBody.create(BOUNDARY).formPart(partName, Part.of(jsonPath));
+        var multipartBody = MultipartBody.create(BOUNDARY).formPart(partName, Part.of(jsonPath));
 
         //then
         assertEquals(expectedResult, convertToString(multipartBody));
     }
 
     @Test
-    public void fileFormPartWithCustomFilenameTest() throws IOException {
+    void shouldCreateValidMultipartBodyWhenFilenameIsProvided() throws IOException {
         //given
         var partName = "name";
-        Path jsonPath = Resources.get(MULTIPART_BODY_TEST_JSON);
+        var jsonPath = Resources.get(MULTIPART_BODY_TEST_JSON);
         var filename = "filename";
-        var expectedResult = generateMultipartBody(BOUNDARY,
-                new TestPart(Files.readString(jsonPath), Map.of(
-                        HttpHeader.CONTENT_DISPOSITION, format(CONTENT_DISPOSITION_WITH_FILENAME_TEMPLATE,
-                                partName, filename),
+        var expectedResult =
+                generateMultipartBody(new TestPart(Files.readString(jsonPath), Map.of(HttpHeader.CONTENT_DISPOSITION,
+                        format(CONTENT_DISPOSITION_WITH_FILENAME_TEMPLATE, partName, filename),
                         HttpHeader.CONTENT_TYPE, JSON_MIME_TYPE)));
 
         //when
-        MultipartBody multipartBody = MultipartBody.create(BOUNDARY)
-                .formPart(partName, Part.of(filename, jsonPath));
+        var multipartBody = MultipartBody.create(BOUNDARY).formPart(partName, Part.of(filename, jsonPath));
 
         //then
         assertEquals(expectedResult, convertToString(multipartBody));
     }
 
     @Test
-    public void fileFormPartByteArrayTest() throws IOException {
+    void shouldCreateValidMultipartBodyFromFileWhenContentIsByteArray() throws IOException {
         //given
         var partName = "name";
-        Path jsonPath = Resources.get(MULTIPART_BODY_TEST_JSON);
+        var jsonPath = Resources.get(MULTIPART_BODY_TEST_JSON);
         var filename = "filename";
-        var expectedResult = generateMultipartBody(BOUNDARY,
-                new TestPart(Files.readString(jsonPath), Map.of(
-                        HttpHeader.CONTENT_DISPOSITION, format(CONTENT_DISPOSITION_WITH_FILENAME_TEMPLATE,
-                                partName, filename),
+        var expectedResult =
+                generateMultipartBody(new TestPart(Files.readString(jsonPath), Map.of(HttpHeader.CONTENT_DISPOSITION,
+                        format(CONTENT_DISPOSITION_WITH_FILENAME_TEMPLATE, partName, filename),
                         HttpHeader.CONTENT_TYPE, JSON_MIME_TYPE)));
 
         //when
-        MultipartBody multipartBody = MultipartBody.create(BOUNDARY)
+        var multipartBody = MultipartBody.create(BOUNDARY)
                 .formPart(partName, Part.of(filename, JSON_MIME_TYPE, Files.readAllBytes(jsonPath)));
 
         //then
@@ -165,44 +156,46 @@ public class MultipartBodyTest {
     }
 
     @Test
-    public void byteArrayPartTest() {
+    void shouldCreateValidMultipartBodyWhenContentIsByteArray() {
         //given
         var partName = "name";
         var strContent = CONTENT;
         var content = strContent.getBytes();
-        var expectedResult = generateMultipartBody(BOUNDARY,
-                new TestPart(strContent, Map.of(
-                        HttpHeader.CONTENT_DISPOSITION, format(CONTENT_DISPOSITION_TEMPLATE, partName))));
+        var expectedResult =
+                generateMultipartBody(new TestPart(strContent,
+                        Map.of(HttpHeader.CONTENT_DISPOSITION, format(CONTENT_DISPOSITION_TEMPLATE, partName))));
 
         //when
-        MultipartBody multipartBody = MultipartBody.create(BOUNDARY).formPart(partName, Part.of(content));
+        var multipartBody = MultipartBody.create(BOUNDARY).formPart(partName, Part.of(content));
 
         //then
         assertEquals(expectedResult, convertToString(multipartBody));
     }
 
     @Test
-    public void filePartIOErrorTest() {
+    void shouldThrowMultipartFileFormExceptionWhenIOExceptionIsOccurred() {
         //given
-        Path path = Paths.get("non-existing-file");
+        var path = Paths.get("non-existing-file");
+
+        //when
+        Executable executable = () -> MultipartBody.create().formPart("name", Part.of(path));
 
         //then
-        assertThrows(MultipartFileFormException.class,
-                () -> MultipartBody.create().formPart("name", Part.of(path)));
+        assertThrows(MultipartFileFormException.class, executable);
     }
 
     @Test
-    public void filePartWithUnknownContentTypeTest() throws IOException {
+    void shouldCreateValidMultipartBodyFromFileWhenContentTypeIsNotSpecified() throws IOException {
         //given
         var partName = "name";
-        Path path = Resources.get(MULTIPART_BODY_TEST_UNKNOWN_EXTENSION);
-        var expectedResult = generateMultipartBody(BOUNDARY,
+        var path = Resources.get(MULTIPART_BODY_TEST_UNKNOWN_EXTENSION);
+        var expectedResult = generateMultipartBody(
                 new TestPart(Files.readString(path), Map.of(
                         HttpHeader.CONTENT_DISPOSITION, format(CONTENT_DISPOSITION_WITH_FILENAME_TEMPLATE,
                                 partName, MULTIPART_BODY_TEST_UNKNOWN_EXTENSION))));
 
         //when
-        MultipartBody multipartBody = MultipartBody.create(BOUNDARY).formPart(partName, Part.of(path));
+        var multipartBody = MultipartBody.create(BOUNDARY).formPart(partName, Part.of(path));
 
         //then no content type should be set
         assertEquals(expectedResult, convertToString(multipartBody));
@@ -213,15 +206,15 @@ public class MultipartBodyTest {
     }
 
     //generates multipart body as defined by RFС1341
-    private String generateMultipartBody(String boundary, TestPart... testParts) {
+    private String generateMultipartBody(TestPart... testParts) {
         return Arrays.stream(testParts)
                 .map(part -> format(MULTIPART_BODY_PART_TEMPLATE,
-                        boundary,
+                        MultipartBodyTest.BOUNDARY,
                         part.headers.isEmpty() ? "" : part.headers.entrySet().stream()
                                 .map(entry -> entry.getKey() + ":" + entry.getValue())
                                 .collect(Collectors.joining(CRLF, "", CRLF)),
                         part.content))
-                .collect(Collectors.joining("", "", "--" + boundary + "--"));
+                .collect(Collectors.joining("", "", "--" + MultipartBodyTest.BOUNDARY + "--"));
     }
 
     private static class TestPart {

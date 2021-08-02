@@ -10,38 +10,40 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class JacksonMapperTest {
+class JacksonMapperTest {
 
     private static JacksonMapper jacksonMapper;
 
     @BeforeAll
     public static void setUp() {
-        ObjectMapper mapper = new ObjectMapper();
+        var mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         jacksonMapper = new JacksonMapper(mapper);
     }
 
     @Test
-    public void writeValueTest() throws JsonProcessingException {
+    void shouldWriteToValidJson() throws JsonProcessingException {
+        //given
+        var user = ObjectGenerator.generateTestObject();
+        var expected = new ObjectMapper().writeValueAsString(user);
 
-        User user = ObjectGenerator.generateTestObject();
+        //when
+        var actual = jacksonMapper.writeValue(user);
 
-        String actual = jacksonMapper.writeValue(user);
-
-        String expected = new ObjectMapper().writeValueAsString(user);
-
+        //then
         assertEquals(expected, actual);
     }
 
     @Test
-    public void readValueTest() throws JsonProcessingException {
+    void shouldReadToUserWhenJsonIsValid() throws JsonProcessingException {
+        //given
+        var expected = ObjectGenerator.generateTestObject();
+        var jsonString = new ObjectMapper().writeValueAsString(expected);
 
-        User expected = ObjectGenerator.generateTestObject();
+        //when
+        var actual = jacksonMapper.readValue(jsonString, User.class);
 
-        String jsonString = new ObjectMapper().writeValueAsString(expected);
-
-        User actual = jacksonMapper.readValue(jsonString, User.class);
-
+        //then
         assertEquals(expected, actual);
     }
 

@@ -2,15 +2,15 @@ package coresearch.cvurl.io.util.urlbuilder;
 
 import coresearch.cvurl.io.exception.BadUrlException;
 import coresearch.cvurl.io.util.Url;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UrlTest {
+class UrlTest {
 
     private static final String VALIDATION_ERROR_MESSAGE = "%s parameter cannot be null";
     private static final String URL = "http://www.google.com";
@@ -18,9 +18,10 @@ public class UrlTest {
     @ParameterizedTest
     @ValueSource(strings = {
             "http://www.google.com/",
-            "http://www.google.com// "
+            "http://www.google.com// ",
+            "http://www.google.com///"
     })
-    public void ofBasicUrlTest(String url) {
+    void shouldReturnValidUrlWhenProvidedUrlIsValid(String url) {
         //given
         var expectedResult = "http://www.google.com/";
 
@@ -37,7 +38,7 @@ public class UrlTest {
             "http /www.google.com/",
             "http /www.google.com// "
     }, delimiter = ' ')
-    public void ofSchemaAndHostTest(String schema, String host) {
+    void shouldReturnValidUrlWhenSchemaAndHostAreValid(String schema, String host) {
         //given
         var expectedResult = "http://www.google.com/";
 
@@ -50,7 +51,7 @@ public class UrlTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"path/", " /path/", " //path// "})
-    public void pathTest(String path) {
+    void shouldReturnValidUrlWhenUrlAndPathAreValid(String path) {
         //given
         var url = URL;
         var expectedResult = url + "/path/";
@@ -63,7 +64,7 @@ public class UrlTest {
     }
 
     @Test
-    public void nestedPathTest() {
+    void shouldReturnValidUrlWhenPathContainsSlashes() {
         //given
         var url = URL;
         var path = "path1/path2";
@@ -77,16 +78,19 @@ public class UrlTest {
     }
 
     @Test
-    public void createThrowsBadUrlExceptionTest() {
+    void shouldThrowBadUrlExceptionWhenProtocolIsInvalid() {
         //given
         var badUrl = "shttp://www.google.com";
 
+        //when
+        Executable executable = () -> Url.of(badUrl).create();
+
         //then
-        Assertions.assertThrows(BadUrlException.class, () -> Url.of(badUrl).create());
+        assertThrows(BadUrlException.class, executable);
     }
 
     @Test
-    public void pathReturnsNewObjectTest() {
+    void shouldReturnNewInstanceWhenAdditionalPathIsAdded() {
         //given
         var urlStr = URL;
         var path = "path";
@@ -98,43 +102,48 @@ public class UrlTest {
         //then
         assertNotSame(url, urlWithPath);
         assertEquals(url.create().toString(), urlStr);
-        assertEquals(urlWithPath.create().toString(), urlStr + "/" + path);
+        assertEquals(urlStr + "/" + path, urlWithPath.create().toString());
     }
 
     @Test
-    public void ofWithNullUrlShouldThrowNPEWithMessage() {
+    void shouldThrowNullPointerExceptionWhenUrlValueIsNull() {
         //when
-        var nullPointerException = assertThrows(NullPointerException.class, () -> Url.of(null));
+        Executable executable = () -> Url.of(null);
 
         //then
-        assertEquals(nullPointerException.getMessage(), getValidationErrorMessage("url"));
+        var nullPointerException = assertThrows(NullPointerException.class, executable);
+        assertEquals(getValidationErrorMessage("url"), nullPointerException.getMessage());
+
     }
 
     @Test
-    public void ofWithNullSchemaShouldThrowNPEWithMessage() {
+    void shouldThrowNullPointerExceptionWhenSchemaIsNull() {
         //when
-        var nullPointerException = assertThrows(NullPointerException.class, () -> Url.of(null, ""));
+        Executable executable = () -> Url.of(null, "");
 
         //then
-        assertEquals(nullPointerException.getMessage(), getValidationErrorMessage("schema"));
+        var nullPointerException = assertThrows(NullPointerException.class, executable);
+        assertEquals(getValidationErrorMessage("schema"), nullPointerException.getMessage());
     }
 
     @Test
-    public void ofWithNullHostShouldThrowNPEWithMessage() {
+    void shouldThrowNullPointerExceptionWhenHostIsNull() {
         //when
-        var nullPointerException = assertThrows(NullPointerException.class, () -> Url.of("", null));
+        Executable executable = () -> Url.of("", null);
 
         //then
-        assertEquals(nullPointerException.getMessage(), getValidationErrorMessage("host"));
+        var nullPointerException = assertThrows(NullPointerException.class, executable);
+        assertEquals(getValidationErrorMessage("host"), nullPointerException.getMessage());
     }
 
     @Test
-    public void pathWithNullPathShouldThrowNPEWithMessage() {
+    void shouldThrowNullPointerExceptionWhenPathIsNull() {
         //when
-        var nullPointerException = assertThrows(NullPointerException.class, () -> Url.of("url").path(null));
+        Executable executable = () -> Url.of("url").path(null);
 
         //then
-        assertEquals(nullPointerException.getMessage(), getValidationErrorMessage("path"));
+        var nullPointerException = assertThrows(NullPointerException.class, executable);
+        assertEquals(getValidationErrorMessage("path"), nullPointerException.getMessage());
     }
 
     private String getValidationErrorMessage(String paramName) {

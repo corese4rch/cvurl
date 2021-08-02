@@ -10,8 +10,7 @@
 
     <name>cVurl</name>
     <description>
-        cVurl is an open-source java wrapper for an HTTP/2 Client. Written in Java11 and can be used with any
-        jdk11.0.2 and higher
+        cVurl is written in Java 11 and can be used with any JDK 11.0.2 or newer
     </description>
     <url>https://github.com/corese4rch/cvurl</url>
 
@@ -150,9 +149,13 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
-                    <!--suppress UnresolvedMavenProperty -->
-                    <argLine>${argLine} --add-opens
-                        coresearch.cvurl.io/coresearch.cvurl.io.helper.model=com.fasterxml.jackson.databind
+                    <argLine>
+                        --add-opens coresearch.cvurl.io/coresearch.cvurl.io.model=ALL-UNNAMED
+                        --add-opens coresearch.cvurl.io/coresearch.cvurl.io.request=ALL-UNNAMED
+                        --add-opens coresearch.cvurl.io/coresearch.cvurl.io.multipart=ALL-UNNAMED
+                        --add-opens coresearch.cvurl.io/coresearch.cvurl.io.helper.model=com.fasterxml.jackson.databind
+                        --add-opens coresearch.cvurl.io/coresearch.cvurl.io.mapper.impl=ALL-UNNAMED
+                        --add-opens coresearch.cvurl.io/coresearch.cvurl.io.util.urlbuilder=ALL-UNNAMED
                     </argLine>
                 </configuration>
             </plugin>
@@ -301,13 +304,12 @@
         </profile>
     </profiles>
 
-
     <developers>
         <developer>
             <id>0</id>
             <name>Andrew Petryk</name>
             <email>andrew.petryk@avenga.com</email>
-            <organization>CoreValue powered by Avenga</organization>
+            <organization>Avenga</organization>
             <roles>
                 <role>Product Owner/Team Lead</role>
             </roles>
@@ -316,7 +318,7 @@
             <id>1</id>
             <name>Mykhailo Voloshchuk</name>
             <email>mykhailo.voloshchuk@avenga.com</email>
-            <organization>CoreValue powered by Avenga</organization>
+            <organization>Avenga</organization>
             <roles>
                 <role>Developer</role>
             </roles>
@@ -325,7 +327,7 @@
             <id>2</id>
             <name>Ivan Mahlatii</name>
             <email>ivan.mahlatii@avenga.com</email>
-            <organization>CoreValue powered by Avenga</organization>
+            <organization>Avenga</organization>
             <roles>
                 <role>Developer</role>
             </roles>
@@ -334,7 +336,7 @@
             <id>3</id>
             <name>Yurii Kaplun</name>
             <email>yurii.kaplun@avenga.com</email>
-            <organization>CoreValue powered by Avenga</organization>
+            <organization>Avenga</organization>
             <roles>
                 <role>Developer</role>
             </roles>
@@ -343,7 +345,16 @@
             <id>4</id>
             <name>Dmytro Tarianyk</name>
             <email>dmytro.tarianyk@avenga.com</email>
-            <organization>CoreValue powered by Avenga</organization>
+            <organization>Avenga</organization>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>5</id>
+            <name>Ievgenii Ishchenko</name>
+            <email>ievgenii.ishchenko@avenga.com</email>
+            <organization>Avenga</organization>
             <roles>
                 <role>Developer</role>
             </roles>
