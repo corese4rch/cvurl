@@ -39,7 +39,7 @@
         <!-- plugins -->
         <maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
         <maven-failsafe-plugin.version>3.0.0-M4</maven-failsafe-plugin.version>
-        <jacoco-plugin.version>0.8.5</jacoco-plugin.version>
+        <jacoco-plugin.version>0.8.7</jacoco-plugin.version>
         <sonar-plugin.version>3.6.0.1398</sonar-plugin.version>
         <source-plugin.version>3.2.0</source-plugin.version>
         <release-plugin.version>2.5.3</release-plugin.version>
