@@ -101,20 +101,6 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
     }
 
     /**
-     * Sets request timeout. Overlaps global timeout set for {@link CVurl}
-     *
-     * @param timeout request timeout
-     * @return this builder
-     * @deprecated Use {@link #requestTimeout(Duration)} instead
-     */
-    @SuppressWarnings("unchecked")
-    @Deprecated(since = "1.2", forRemoval = true)
-    public T timeout(Duration timeout) {
-        this.requestConfigurationBuilder.requestTimeout(timeout);
-        return (T) this;
-    }
-
-    /**
      * Sets whether the client should accept the compressed response body or not.
      *
      * @return this builder

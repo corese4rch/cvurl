@@ -68,48 +68,6 @@ class ConfigurationTest {
     }
 
     @Test
-    void shouldReturnValidHttpClientWhenCVurlConfigIsUsed() throws NoSuchAlgorithmException {
-        //given
-        var authenticator = new Authenticator() {};
-        var connectTimeout = Duration.ofSeconds(1);
-        var cookieHandler = new CookieManager();
-        var executor = Executors.newFixedThreadPool(1);
-        var followRedirects = HttpClient.Redirect.NEVER;
-        var proxySelector = MockProxySelector.create();
-        var sslContext = SSLContext.getDefault();
-        var sslParameters = new SSLParameters(new String[]{"test"});
-        var priority = 1;
-        var version = HttpClient.Version.HTTP_1_1;
-
-        var conf = CVurlConfig.builder()
-                .authenticator(authenticator)
-                .connectTimeout(connectTimeout)
-                .cookieHandler(cookieHandler)
-                .executor(executor)
-                .followRedirects(followRedirects)
-                .proxySelector(proxySelector)
-                .sslContext(sslContext)
-                .sslParameters(sslParameters)
-                .priority(priority)
-                .version(version)
-                .build();
-
-        //when
-        var httpClient = conf.createHttpClient();
-
-        //then
-        assertSame(authenticator, httpClient.authenticator().orElseThrow(RuntimeException::new));
-        assertSame(connectTimeout, httpClient.connectTimeout().orElseThrow(RuntimeException::new));
-        assertSame(cookieHandler, httpClient.cookieHandler().orElseThrow(RuntimeException::new));
-        assertSame(executor, httpClient.executor().orElseThrow(RuntimeException::new));
-        assertSame(followRedirects, httpClient.followRedirects());
-        assertEquals(new CVurlProxySelector(proxySelector), httpClient.proxy().orElseThrow(RuntimeException::new));
-        assertSame(sslContext, httpClient.sslContext());
-        assertArrayEquals(sslParameters.getCipherSuites(), httpClient.sslParameters().getCipherSuites());
-        assertSame(version, httpClient.version());
-    }
-
-    @Test
     void shouldReturnValidCVurlConfigWhenBuilderWithHttpClientIsUsed() {
         //given
         var httpClient = MockHttpClient.create();

@@ -174,7 +174,7 @@ class CVurlRequestTest extends AbstractRequestTest {
                         .withBody(EMPTY_STRING)));
 
         //when
-        var response = cVurl.get(URL).timeout(Duration.ofMillis(100)).asString();
+        var response = cVurl.get(URL).requestTimeout(Duration.ofMillis(100)).asString();
 
         //then
         assertTrue(response.isEmpty());
@@ -193,7 +193,7 @@ class CVurlRequestTest extends AbstractRequestTest {
                         .withBody(EMPTY_STRING)));
 
         //when
-        var response = cVurl.get(URL).timeout(Duration.ofMillis(100)).asString();
+        var response = cVurl.get(URL).requestTimeout(Duration.ofMillis(100)).asString();
 
         //then
         assertTrue(response.isEmpty());
