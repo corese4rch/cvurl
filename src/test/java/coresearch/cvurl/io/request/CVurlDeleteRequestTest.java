@@ -1,10 +1,7 @@
 package coresearch.cvurl.io.request;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.tomakehurst.wiremock.client.WireMock;
 import coresearch.cvurl.io.helper.ObjectGenerator;
-import coresearch.cvurl.io.helper.model.User;
-import coresearch.cvurl.io.model.Response;
 import coresearch.cvurl.io.constant.HttpHeader;
 import coresearch.cvurl.io.constant.HttpStatus;
 import coresearch.cvurl.io.constant.MIMEType;
@@ -13,183 +10,168 @@ import org.junit.jupiter.api.Test;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CVurlDeleteRequestTest extends AbstractRequestTest {
+class CVurlDeleteRequestTest extends AbstractRequestTest {
 
     private static final String TEST_BODY_FOR_TEST = "Test body for test";
 
     @Test
-    public void sendDeleteTest() {
-
+    void shouldReturnStatusCodeOkWhenRequestIsValid() {
         //given
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
-        //when
-        wiremock.stubFor(WireMock.delete(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(delete(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.delete(url).asString().orElseThrow(RuntimeException::new);
+        //when
+        var response = cVurl.delete(url).asString().orElseThrow(RuntimeException::new);
+
         //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
+        verify(exactly(1), deleteRequestedFor(urlEqualTo(TEST_ENDPOINT)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
-    public void sendDELETE_URLTest() throws MalformedURLException {
-
+    void shouldReturnStatusCodeOkWhenUrlIsValid() throws MalformedURLException {
         //given
-        String strURL = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
-        URL url = new URL(strURL);
+        var strURL = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        var url = new URL(strURL);
 
-        //when
-        WireMock.stubFor(WireMock.delete(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        stubFor(delete(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.delete(url).asString().orElseThrow(RuntimeException::new);
+        //when
+        var response = cVurl.delete(url).asString().orElseThrow(RuntimeException::new);
 
         //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
+        verify(exactly(1), deleteRequestedFor(urlEqualTo(TEST_ENDPOINT)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
-    public void sendDELETE_QueryParamTest() {
-
+    void shouldReturnStatusCodeOkWhenQueryParameterIsSpecified() {
         //given
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
-        String testParam = "param";
+        var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        var testParam = "param";
 
-        //when
-        wiremock.stubFor(WireMock.delete(WireMock.urlEqualTo(TEST_ENDPOINT + "?param=param"))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(delete(urlEqualTo(TEST_ENDPOINT + "?param=param"))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.delete(url)
+        //when
+        var response = cVurl.delete(url)
                 .queryParam(testParam, testParam)
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
         //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT + "?param=param")));
+        verify(exactly(1), deleteRequestedFor(urlEqualTo(TEST_ENDPOINT + "?param=param")));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
-    public void sendDELETE_HeaderRequiredTest() {
-
+    void shouldReturnStatusCodeOkWhenHeaderIsProvided() {
         //given
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
-        //when
-        wiremock.stubFor(WireMock.delete(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .withHeader(HttpHeader.AUTHORIZATION, WireMock.equalTo(TEST_TOKEN))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(delete(urlEqualTo(TEST_ENDPOINT))
+                .withHeader(HttpHeader.AUTHORIZATION, equalTo(TEST_TOKEN))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.delete(url)
+        //when
+        var response = cVurl.delete(url)
                 .header(HttpHeader.AUTHORIZATION, TEST_TOKEN)
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
         //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT))
-                        .withHeader(HttpHeader.AUTHORIZATION, WireMock.equalTo(TEST_TOKEN)));
+        verify(exactly(1), deleteRequestedFor(urlEqualTo(TEST_ENDPOINT))
+                .withHeader(HttpHeader.AUTHORIZATION, equalTo(TEST_TOKEN)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
-    public void sendDELETE_QueryParamsTest() {
-
+    void shouldReturnStatusCodeOkWhenQueryParametersAreSpecified() {
         //given
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
-        String testParam = "param";
-        String testParam2 = "param2";
+        var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        var testParam = "param";
+        var testParam2 = "param2";
 
-        //when
-        wiremock.stubFor(WireMock.delete(WireMock.urlEqualTo(TEST_ENDPOINT + "?param=param&param2=param2"))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(delete(urlEqualTo(TEST_ENDPOINT + "?param=param&param2=param2"))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.delete(url)
+        //when
+        var response = cVurl.delete(url)
                 .queryParam(testParam, testParam)
                 .queryParam(testParam2, testParam2)
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
-
         //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT + "?param=param&param2=param2")));
+        verify(exactly(1), deleteRequestedFor(urlEqualTo(TEST_ENDPOINT + "?param=param&param2=param2")));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
-    public void sendDELETE_HeadersRequiredTest() {
-
+    void shouldReturnStatusCodeOkWhenHeadersAreProvided() {
         //given
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
-        Map<String, String> headers = new HashMap<>();
+        var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        var headers = new HashMap<String, String>();
         headers.put(HttpHeader.AUTHORIZATION, TEST_TOKEN);
         headers.put(HttpHeader.ACCEPT, "xml");
 
-        //when
-        wiremock.stubFor(WireMock.delete(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .withHeader(HttpHeader.AUTHORIZATION, WireMock.equalTo(TEST_TOKEN))
-                .withHeader(HttpHeader.ACCEPT, WireMock.equalTo("xml"))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(delete(urlEqualTo(TEST_ENDPOINT))
+                .withHeader(HttpHeader.AUTHORIZATION, equalTo(TEST_TOKEN))
+                .withHeader(HttpHeader.ACCEPT, equalTo("xml"))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
-
-        Response<String> response = cvurl.delete(url)
+        //when
+        var response = cVurl.delete(url)
                 .headers(headers)
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
         //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
+        verify(exactly(1), deleteRequestedFor(urlEqualTo(TEST_ENDPOINT)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
-    public void sendDELETE_checkResponseHeaderTest() {
-
+    void shouldReturnAuthorizationHeaderWhenRequestIsValid() {
         //given
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
-        //when
-        wiremock.stubFor(WireMock.delete(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(delete(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withHeader(HttpHeader.AUTHORIZATION, TEST_TOKEN)
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.delete(url).asString().orElseThrow(RuntimeException::new);
+        //when
+        var response = cVurl.delete(url).asString().orElseThrow(RuntimeException::new);
 
         //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
+        verify(exactly(1), deleteRequestedFor(urlEqualTo(TEST_ENDPOINT)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
@@ -198,23 +180,20 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void sendDELETE_StringResponseTest() {
-
+    void shouldReturnStringBodyWhenRequestIsValid() {
         //given
-        String body = TEST_BODY_FOR_TEST;
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        var body = TEST_BODY_FOR_TEST;
+        var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
-        //when
-        wiremock.stubFor(WireMock.delete(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(delete(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)
                         .withBody(body)));
-
-        Response<String> response = cvurl.delete(url).asString().orElseThrow(RuntimeException::new);
+        //when
+        var response = cVurl.delete(url).asString().orElseThrow(RuntimeException::new);
 
         //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
+        verify(exactly(1), deleteRequestedFor(urlEqualTo(TEST_ENDPOINT)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
@@ -222,107 +201,97 @@ public class CVurlDeleteRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void sendDELETE_StringRequestBodyTest() {
-
+    void shouldReturnStatusCodeOkWhenBodyIsSpecified() {
         //given
-        String body = TEST_BODY_FOR_TEST;
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        var body = TEST_BODY_FOR_TEST;
+        var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
-        //when
-        wiremock.stubFor(WireMock.delete(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .withRequestBody(WireMock.equalTo(body))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(delete(urlEqualTo(TEST_ENDPOINT))
+                .withRequestBody(equalTo(body))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
-
-        Response<String> response = cvurl.delete(url)
+        //when
+        var response = cVurl.delete(url)
                 .body(body)
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
         //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
+        verify(exactly(1), deleteRequestedFor(urlEqualTo(TEST_ENDPOINT)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
-    public void sendDELETE_BytesRequestBodyTest() {
-
+    void shouldReturnStatusCodeOkWhenBodyInBytesIsSpecified() {
         //given
-        String body = TEST_BODY_FOR_TEST;
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        var body = TEST_BODY_FOR_TEST;
+        var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
-        //when
-        wiremock.stubFor(WireMock.delete(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .withRequestBody(WireMock.equalTo(body))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(delete(urlEqualTo(TEST_ENDPOINT))
+                .withRequestBody(equalTo(body))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
-
-        Response<String> response = cvurl.delete(url)
+        //when
+        var response = cVurl.delete(url)
                 .body(body.getBytes())
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
         //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
+        verify(exactly(1), deleteRequestedFor(urlEqualTo(TEST_ENDPOINT)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
-    public void sendDELETE_CollectionsRequestBodyTest() throws JsonProcessingException {
-
+    void shouldReturnStatusCodeOkWhenBodyIsList() throws JsonProcessingException {
         //given
-        List<User> users = ObjectGenerator.generateListOfTestObjects();
+        var users = ObjectGenerator.generateListOfTestObjects();
 
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
-        //when
-        wiremock.stubFor(WireMock.delete(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .withRequestBody(WireMock.equalTo(mapper.writeValueAsString(users)))
-                .withHeader(HttpHeader.CONTENT_TYPE, WireMock.equalTo(MIMEType.APPLICATION_JSON))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(delete(urlEqualTo(TEST_ENDPOINT))
+                .withRequestBody(equalTo(mapper.writeValueAsString(users)))
+                .withHeader(HttpHeader.CONTENT_TYPE, equalTo(MIMEType.APPLICATION_JSON))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.delete(url)
+        //when
+        var response = cVurl.delete(url)
                 .body(users)
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
         //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
+        verify(exactly(1), deleteRequestedFor(urlEqualTo(TEST_ENDPOINT)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
-    public void sendDELETE_ObjectRequestBodyTest() throws JsonProcessingException {
-
+    void shouldReturnStatusCodeOkWhenBodyIsObject() throws JsonProcessingException {
         //given
-        User user = ObjectGenerator.generateTestObject();
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        var user = ObjectGenerator.generateTestObject();
+        var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
-        //when
-        wiremock.stubFor(WireMock.delete(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .withRequestBody(WireMock.equalTo(mapper.writeValueAsString(user)))
-                .withHeader(HttpHeader.CONTENT_TYPE, WireMock.equalTo(MIMEType.APPLICATION_JSON))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(delete(urlEqualTo(TEST_ENDPOINT))
+                .withRequestBody(equalTo(mapper.writeValueAsString(user)))
+                .withHeader(HttpHeader.CONTENT_TYPE, equalTo(MIMEType.APPLICATION_JSON))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.delete(url)
+        //when
+        var response = cVurl.delete(url)
                 .body(user)
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
         //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.deleteRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
+        verify(exactly(1), deleteRequestedFor(urlEqualTo(TEST_ENDPOINT)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());

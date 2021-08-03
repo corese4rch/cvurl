@@ -3,6 +3,7 @@ package coresearch.cvurl.io.helper.model;
 import java.util.Objects;
 
 public class User {
+
     private String name;
     private int age;
 

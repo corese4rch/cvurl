@@ -2,7 +2,6 @@ package coresearch.cvurl.io.utils;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
-import java.io.IOException;
 import java.net.Authenticator;
 import java.net.CookieHandler;
 import java.net.ProxySelector;
@@ -18,9 +17,7 @@ import java.util.concurrent.Executor;
 
 public class MockHttpClient extends HttpClient {
 
-    private List<HttpRequest> requests = new ArrayList<>();
-
-    private MockHttpClient() { }
+    private final List<HttpRequest> requests = new ArrayList<>();
 
     public static MockHttpClient create() {
         return new MockHttpClient();
@@ -72,18 +69,21 @@ public class MockHttpClient extends HttpClient {
     }
 
     @Override
-    public <T> HttpResponse<T> send(HttpRequest request, HttpResponse.BodyHandler<T> responseBodyHandler) throws IOException, InterruptedException {
+    public <T> HttpResponse<T> send(HttpRequest request, HttpResponse.BodyHandler<T> responseBodyHandler)  {
         getRequests().add(request);
         return null;
     }
 
     @Override
-    public <T> CompletableFuture<HttpResponse<T>> sendAsync(HttpRequest request, HttpResponse.BodyHandler<T> responseBodyHandler) {
+    public <T> CompletableFuture<HttpResponse<T>> sendAsync(HttpRequest request,
+                                                            HttpResponse.BodyHandler<T> responseBodyHandler) {
         return null;
     }
 
     @Override
-    public <T> CompletableFuture<HttpResponse<T>> sendAsync(HttpRequest request, HttpResponse.BodyHandler<T> responseBodyHandler, HttpResponse.PushPromiseHandler<T> pushPromiseHandler) {
+    public <T> CompletableFuture<HttpResponse<T>> sendAsync(HttpRequest request,
+                                                            HttpResponse.BodyHandler<T> responseBodyHandler,
+                                                            HttpResponse.PushPromiseHandler<T> pushPromiseHandler) {
         return null;
     }
 

@@ -10,9 +10,6 @@ import java.util.List;
 
 public class MockProxySelector extends ProxySelector {
 
-    private MockProxySelector() {
-    }
-
     public static MockProxySelector create(){
         return new MockProxySelector();
     }

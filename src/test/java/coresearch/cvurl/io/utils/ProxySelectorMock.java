@@ -1,4 +1,4 @@
-package coresearch.cvurl.io.request;
+package coresearch.cvurl.io.utils;
 
 import java.io.IOException;
 import java.net.Proxy;
@@ -7,7 +7,8 @@ import java.net.SocketAddress;
 import java.net.URI;
 import java.util.List;
 
-final class ProxySelectorMock extends ProxySelector {
+public final class ProxySelectorMock extends ProxySelector {
+
     private final List<Proxy> expectedProxies;
 
     public ProxySelectorMock(List<Proxy> expectedProxies) {

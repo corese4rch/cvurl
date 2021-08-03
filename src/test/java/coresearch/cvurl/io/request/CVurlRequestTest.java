@@ -1,7 +1,6 @@
 package coresearch.cvurl.io.request;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.http.Fault;
 import coresearch.cvurl.io.constant.*;
 import coresearch.cvurl.io.exception.RequestExecutionException;
@@ -12,38 +11,32 @@ import coresearch.cvurl.io.helper.model.User;
 import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
 import coresearch.cvurl.io.mapper.BodyType;
 import coresearch.cvurl.io.model.CVurlConfig;
-import coresearch.cvurl.io.model.Response;
 import coresearch.cvurl.io.multipart.MultipartBody;
 import coresearch.cvurl.io.multipart.Part;
 import coresearch.cvurl.io.utils.MockHttpClient;
 import coresearch.cvurl.io.utils.Resources;
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.net.*;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.zip.GZIPOutputStream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
 
-
-public class CVurlRequestTest extends AbstractRequestTest {
+class CVurlRequestTest extends AbstractRequestTest {
 
     private static final String EMPTY_STRING = "";
     private static final String MULTIPART_BODY_TEST_JSON = "multipart-body-test.json";
@@ -54,188 +47,198 @@ public class CVurlRequestTest extends AbstractRequestTest {
     private static final String FIRST_NAME = "name1";
     private static final String FILE_PATH = "__files/";
     private static final String TEST_BODY = "Test body";
-    private static String url = format(URL_PATTERN, PORT, TEST_ENDPOINT);
+    private static final String URL = format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
     @Test
-    public void emptyResponseTest() {
-
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+    void shouldReturnEmptyStringInBodyWhenResponseContainsEmptyString() {
+        //given
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withBody(EMPTY_STRING)));
 
-        Response<String> response = cvurl.get(url).asString().orElseThrow(RuntimeException::new);
+        //when
+        var response = cVurl.get(URL).asString().orElseThrow(RuntimeException::new);
 
+        //then
         assertEquals(EMPTY_STRING, response.getBody());
     }
 
     @Test
-    public void asObjectWithStatusCodeOnUnparseableBodyShouldReturnEmptyOptional() {
+    void shouldReturnEmptyOptionalWhenStatusCodeIsOkAndResponseBodyIsInvalidJson() {
         //given
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)
                         .withBody(NOT_A_JSON_STRING)));
 
         //when
-        Optional<User> user = cvurl.get(url).asObject(User.class, HttpStatus.OK);
+        var user = cVurl.get(URL).asObject(User.class, HttpStatus.OK);
 
         //then
         assertTrue(user.isEmpty());
     }
 
     @Test
-    public void asObjectWithStatusCodeTest() throws JsonProcessingException {
-        User user = ObjectGenerator.generateTestObject();
+    void shouldReturnUserWhenStatusCodeOkAndResponseBodyIsValidJson() throws JsonProcessingException {
+        //given
+        var user = ObjectGenerator.generateTestObject();
 
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)
                         .withBody(mapper.writeValueAsString(user))));
 
-        User resultUser = cvurl.get(url)
+        //when
+        var resultUser = cVurl.get(URL)
                 .asObject(User.class, HttpStatus.OK)
                 .orElseThrow(RuntimeException::new);
 
+        //then
         assertEquals(user, resultUser);
     }
 
     @Test
-    public void asyncAsStringTest() throws ExecutionException, InterruptedException {
+    void shouldReturnExpectedBodyWhenExecutionModeIsAsync() throws ExecutionException, InterruptedException {
+        //given
+        var body = "I am a string";
+        var isThenApplyInvoked = new boolean[]{false};
 
-        String body = "I am a string";
-        boolean[] isThenApplyInvoked = {false};
-
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withBody(body)));
 
-        Response<String> response = cvurl.get(url).asyncAsString()
-                .thenApply(res ->
-                {
+        //when
+        var response = cVurl.get(URL).asyncAsString()
+                .thenApply(res -> {
                     isThenApplyInvoked[0] = true;
                     return res;
                 })
                 .get();
 
+        //then
         assertTrue(isThenApplyInvoked[0]);
         assertEquals(body, response.getBody());
     }
 
 
     @Test
-    public void asyncAsObjectWithStatusCodeTest() throws JsonProcessingException, ExecutionException, InterruptedException {
+    void shouldReturnExpectedBodyWhenExecutionModeIsAsyncAndStatusCodeIsOk() throws JsonProcessingException,
+            ExecutionException, InterruptedException {
+        //given
+        var user = ObjectGenerator.generateTestObject();
+        var isThenApplyInvoked = new boolean[]{false};
 
-        User user = ObjectGenerator.generateTestObject();
-        boolean[] isThenApplyInvoked = {false};
-
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)
                         .withBody(mapper.writeValueAsString(user))));
 
-        User resultUser = cvurl.get(url).asyncAsObject(User.class, HttpStatus.OK)
-                .thenApply(res ->
-                {
+        //when
+        var resultUser = cVurl.get(URL).asyncAsObject(User.class, HttpStatus.OK)
+                .thenApply(res -> {
                     isThenApplyInvoked[0] = true;
                     return res;
                 })
                 .get();
 
+        //then
         assertTrue(isThenApplyInvoked[0]);
         assertEquals(user, resultUser);
     }
 
     @Test
-    public void curlRequestTimeoutTest() {
+    void shouldReturnEmptyOptionalWhenGlobalTimeoutExpired() {
         //given
-        CVurl cvurl = new CVurl(CVurlConfig.builder()
+        var cVurl = new CVurl(CVurlConfig.builder()
                 .requestTimeout(Duration.ofMillis(100))
                 .build());
 
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withFixedDelay(200)
                         .withBody(EMPTY_STRING)));
 
         //when
-        Optional<Response<String>> response = cvurl.get(url).asString();
+        var response = cVurl.get(URL).asString();
 
         //then
         assertTrue(response.isEmpty());
     }
 
     @Test
-    public void requestTimeoutTest() {
+    void shouldReturnEmptyOptionalWhenRequestTimeoutExpired() {
         //given
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withFixedDelay(200)
                         .withBody(EMPTY_STRING)));
 
         //when
-        Optional<Response<String>> response = cvurl.get(url).timeout(Duration.ofMillis(100)).asString();
+        var response = cVurl.get(URL).timeout(Duration.ofMillis(100)).asString();
 
         //then
         assertTrue(response.isEmpty());
     }
 
     @Test
-    public void requestTimeoutOverridesCurlTimeoutTest() {
+    void shouldReturnEmptyOptionalWhenGlobalTimeoutGreaterThanRequestTimeoutAndRequestTimeoutExpired() {
         //given
-        CVurl cvurl = new CVurl(CVurlConfig.builder()
+        var cVurl = new CVurl(CVurlConfig.builder()
                 .requestTimeout(Duration.ofMillis(200))
                 .build());
 
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withFixedDelay(200)
                         .withBody(EMPTY_STRING)));
 
         //when
-        Optional<Response<String>> response = cvurl.get(url).timeout(Duration.ofMillis(100)).asString();
+        var response = cVurl.get(URL).timeout(Duration.ofMillis(100)).asString();
 
         //then
         assertTrue(response.isEmpty());
     }
 
     @Test
-    public void failedRequestTest() {
+    void shouldReturnEmptyOptionalWhenRequestFailed() {
         //given
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse().withFault(Fault.RANDOM_DATA_THEN_CLOSE)));
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse().
+                        withFault(Fault.RANDOM_DATA_THEN_CLOSE)));
 
         //when
-        Optional<Response<String>> response = cvurl.get(url).asString();
+        var response = cVurl.get(URL).asString();
 
         //then
         assertTrue(response.isEmpty());
     }
 
     @Test
-    public void differentResponseStatusCodeTest() {
+    void shouldReturnEmptyOptionalWhenStatusCodeOkIsExpectedAndActualStatusCodeIsBadRequest() {
         //given
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse().withStatus(HttpStatus.BAD_REQUEST)));
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.BAD_REQUEST)));
 
         //when
-        Optional<User> user = cvurl.get(url).asObject(User.class, HttpStatus.OK);
+        var user = cVurl.get(URL).asObject(User.class, HttpStatus.OK);
 
         //then
         assertTrue(user.isEmpty());
     }
 
     @Test
-    public void urlWithParametersAsURLTest() throws MalformedURLException {
+    void shouldReturnStatusCodeOkWhenUrlContainsQueryParametersAndUrlIsInstanceOfURL() throws MalformedURLException {
         //given
         var params = "?params=1";
-        var urlWithParameters = url + params;
+        var urlWithParameters = URL + params;
 
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT + params + "&param2=2"))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT + params + "&param2=2"))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
 
         //when
-        var response = cvurl.get(URI.create(urlWithParameters).toURL())
+        var response = cVurl.get(URI.create(urlWithParameters).toURL())
                 .queryParam(SECOND_PARAM, "2")
                 .asString()
                 .orElseThrow(RuntimeException::new);
@@ -245,17 +248,17 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void urlWithParametersAsStringTest() {
+    void shouldReturnStatusCodeOkWhenUrlContainsQueryParametersAndUrlIsInstanceOfString() {
         //given
         var params = "?param1=1";
-        var urlWithParameters = url + params;
+        var urlWithParameters = URL + params;
 
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT + params + "&param2=2"))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT + params + "&param2=2"))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
 
         //when
-        var response = cvurl.get(urlWithParameters)
+        var response = cVurl.get(urlWithParameters)
                 .queryParam(SECOND_PARAM, "2")
                 .asString()
                 .orElseThrow(RuntimeException::new);
@@ -265,53 +268,54 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void responseWithStatusCode204AndNoContentLengthHeaderTest() {
+    void shouldReturnStatusCodeNoContentWhenServerResponseStatusCodeIsNoContent() {
         //given
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse().withStatus(HttpStatus.NO_CONTENT)));
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse().withStatus(HttpStatus.NO_CONTENT)));
 
         //when
-        var response = cvurl.get(url).asString().orElseThrow(RuntimeException::new);
+        var response = cVurl.get(URL).asString().orElseThrow(RuntimeException::new);
 
         //then
         assertEquals(HttpStatus.NO_CONTENT, response.status());
     }
 
     @Test
-    public void queryParamsTest() {
+    void shouldReturnStatusCodeOkWhenQueryParametersArePassedAsMap() {
         //given
         var queryParams = Map.of("param1", "val1", SECOND_PARAM, "val2");
 
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT + "?param1=val1&param2=val2"))
-                .willReturn(WireMock.ok()));
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT + "?param1=val1&param2=val2"))
+                .willReturn(ok()));
 
         //when
-        var response = cvurl.get(url).queryParams(queryParams).asString().orElseThrow(RuntimeException::new);
+        var response = cVurl.get(URL).queryParams(queryParams).asString().orElseThrow(RuntimeException::new);
 
         //then
         assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
-    public void onSendErrorAsObjectWithStatusCodeShouldReturnEmptyOptionalTest() {
+    void shouldReturnEmptyOptionalWhenStatusCodeOkIsExpectedAndConnectionWasClosed() {
         //given
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse().withFault(Fault.RANDOM_DATA_THEN_CLOSE)));
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
+                        .withFault(Fault.RANDOM_DATA_THEN_CLOSE)));
 
         //when
-        Optional<User> user = cvurl.get(url).asObject(User.class, HttpStatus.OK);
+        var user = cVurl.get(URL).asObject(User.class, HttpStatus.OK);
 
         //then
         assertTrue(user.isEmpty());
     }
 
     @Test
-    public void sendWithSimpleMultipartBodyTest() {
+    void shouldSuccessfullySendMultipartBodyRequestWhenParametersAreValid() {
         //given
         var plainTextPartName = FIRST_NAME;
         var filePartName = "name2";
 
-        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+        wireMockServer.stubFor(post(urlEqualTo(TEST_ENDPOINT))
                 .withMultipartRequestBody(aMultipart()
                         .withName(plainTextPartName)
                         .withHeader(HttpHeader.CONTENT_TYPE, equalTo(MIMEType.TEXT_PLAIN))
@@ -323,7 +327,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                 .willReturn(aResponse().withStatus(HttpStatus.OK)));
 
         //when
-        var response = cvurl.post(url)
+        var response = cVurl.post(URL)
                 .body(MultipartBody.create()
                         .type(MultipartType.FORM)
                         .formPart(plainTextPartName, Part.of("content").contentType(MIMEType.TEXT_PLAIN))
@@ -336,12 +340,12 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void sendWithFileMultipartBody() throws IOException {
+    void shouldSuccessfullySendMultipartBodyRequestWhenContentStoredInFile() throws IOException {
         //given
-        Path jsonPath = Resources.get(MULTIPART_BODY_TEST_JSON);
+        var jsonPath = Resources.get(MULTIPART_BODY_TEST_JSON);
         var partName = FIRST_NAME;
 
-        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+        wireMockServer.stubFor(post(urlEqualTo(TEST_ENDPOINT))
                 .withMultipartRequestBody(aMultipart()
                         .withName(partName)
                         .withHeader(HttpHeader.CONTENT_TYPE, equalTo("application/json"))
@@ -349,7 +353,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                 .willReturn(aResponse().withStatus(HttpStatus.OK)));
 
         //when
-        var response = cvurl.post(url)
+        var response = cVurl.post(URL)
                 .body(MultipartBody.create()
                         .type(MultipartType.FORM)
                         .formPart(partName, Part.of(jsonPath)))
@@ -361,12 +365,12 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void sendWithFileMultipartBodyCustomTypeShouldOverwriteAutodetectedTest() throws IOException {
+    void shouldSuccessfullySendMultipartBodyRequestWhenContentTypeIsRedefined() throws IOException {
         //given
-        Path jsonPath = Resources.get(MULTIPART_BODY_TEST_JSON);
+        var jsonPath = Resources.get(MULTIPART_BODY_TEST_JSON);
         var partName = FIRST_NAME;
 
-        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+        wireMockServer.stubFor(post(urlEqualTo(TEST_ENDPOINT))
                 .withMultipartRequestBody(aMultipart()
                         .withName(partName)
                         .withHeader(HttpHeader.CONTENT_TYPE, equalTo(MIMEType.APPLICATION_XML))
@@ -374,7 +378,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
                 .willReturn(aResponse().withStatus(HttpStatus.OK)));
 
         //when
-        var response = cvurl.post(url)
+        var response = cVurl.post(URL)
                 .body(MultipartBody.create()
                         .type(MultipartType.FORM)
                         .formPart(partName, Part.of(jsonPath).contentType(MIMEType.APPLICATION_XML)))
@@ -388,17 +392,17 @@ public class CVurlRequestTest extends AbstractRequestTest {
     @ParameterizedTest
     @ValueSource(strings = {MultipartType.FORM, MultipartType.MIXED,
             MultipartType.ALTERNATIVE, MultipartType.DIGEST, MultipartType.PARALLEL})
-    public void settingMultipartBodyShouldGenerateProperHeader(String multipartType) {
+    void shouldGenerateProperHeaderWhenRequestTypeIsMultipart(String multipartType) {
         //given
         var boundary = "BOUNDARY";
         var contentType = format(MULTIPART_HEADER_TEMPLATE, multipartType, boundary);
 
-        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+        wireMockServer.stubFor(post(urlEqualTo(TEST_ENDPOINT))
                 .withHeader(HttpHeader.CONTENT_TYPE, equalTo(contentType))
                 .willReturn(aResponse().withStatus(HttpStatus.OK)));
 
         //when
-        var response = cvurl.post(url).body(MultipartBody
+        var response = cVurl.post(URL).body(MultipartBody
                 .create(boundary)
                 .type(multipartType))
                 .asString()
@@ -409,7 +413,7 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void bodyAsUrlEncodedFormDataTest() {
+    void shouldSuccessfullySendFormDataRequestWhenParametersAreValid() {
         //given
         var paramName1 = "paramName1";
         var paramName2 = "paramName2";
@@ -421,13 +425,13 @@ public class CVurlRequestTest extends AbstractRequestTest {
             put(paramName2, value2);
         }};
 
-        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+        wireMockServer.stubFor(post(urlEqualTo(TEST_ENDPOINT))
                 .withHeader(HttpHeader.CONTENT_TYPE, equalTo(MIMEType.APPLICATION_FORM))
                 .withRequestBody(equalTo(expectedBody))
-                .willReturn(WireMock.aResponse()));
+                .willReturn(aResponse()));
 
         //when
-        var response = cvurl.post(url)
+        var response = cVurl.post(URL)
                 .formData(paramsMap)
                 .asString()
                 .orElseThrow(RuntimeException::new);
@@ -437,18 +441,23 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void bodyAsUrlEncodedFormDataWithEmptyMapTest() {
-        assertThrows(IllegalStateException.class, () -> cvurl.post(url).formData(Map.of()));
+    void shouldThrowIllegalStateExceptionWhenFormDataIsEmptyMap() {
+        //when
+        Executable executable = () -> cVurl.post(URL).formData(Map.of());
+
+        //then
+        assertThrows(IllegalStateException.class, executable);
     }
 
     @Test
-    public void bodyAsInputStreamTest() throws IOException {
+    void shouldReturnValidResponseWhenInputStreamIsExpected() throws IOException {
         //given
-        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse().withBodyFile(BODY_AS_INPUT_STREAM_TXT)));
+        wireMockServer.stubFor(post(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
+                        .withBodyFile(BODY_AS_INPUT_STREAM_TXT)));
 
         //when
-        Response<InputStream> response = cvurl.post(url).asStream().orElseThrow(RuntimeException::new);
+        var response = cVurl.post(URL).asStream().orElseThrow(RuntimeException::new);
 
         //then
         assertEquals(HttpStatus.OK, response.status());
@@ -459,13 +468,13 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void responseBodyHandlingWithArbitraryBodyHandlerTest() throws IOException {
+    void shouldReturnValidResponseWhenDefaultBodyHandlerIsUsed() throws IOException {
         //given
-        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse().withBodyFile(BODY_AS_INPUT_STREAM_TXT)));
+        wireMockServer.stubFor(post(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse().withBodyFile(BODY_AS_INPUT_STREAM_TXT)));
 
         //when
-        Response<Stream<String>> response = cvurl.post(url)
+        var response = cVurl.post(URL)
                 .as(HttpResponse.BodyHandlers.ofLines())
                 .orElseThrow(RuntimeException::new);
 
@@ -476,16 +485,16 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void asyncBodyAsInputStreamTest() throws IOException, ExecutionException, InterruptedException {
+    void shouldReturnValidResponseWhenInputStreamIsExpectedAndExecutionModeIsAsync() throws IOException,
+            ExecutionException, InterruptedException {
         //given
-        boolean[] isThenApplyInvoked = {false};
-        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse().withBodyFile(BODY_AS_INPUT_STREAM_TXT)));
+        var isThenApplyInvoked = new boolean[]{false};
+        wireMockServer.stubFor(post(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse().withBodyFile(BODY_AS_INPUT_STREAM_TXT)));
 
         //when
-        Response<InputStream> response = cvurl.post(url).asyncAsStream()
-                .thenApply(res ->
-                {
+        var response = cVurl.post(URL).asyncAsStream()
+                .thenApply(res -> {
                     isThenApplyInvoked[0] = true;
                     return res;
                 })
@@ -501,17 +510,17 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void asyncResponseBodyHandlingWithArbitraryBodyHandlerTest() throws IOException, ExecutionException, InterruptedException {
+    void shouldReturnValidResponseWhenDefaultBodyHandlerIsUsedAndExecutionModeIsAsync() throws IOException,
+            ExecutionException, InterruptedException {
         //given
-        boolean[] isThenApplyInvoked = {false};
-        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse().withBodyFile(BODY_AS_INPUT_STREAM_TXT)));
+        var isThenApplyInvoked = new boolean[]{false};
+        wireMockServer.stubFor(post(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse().withBodyFile(BODY_AS_INPUT_STREAM_TXT)));
 
         //when
-        Response<Stream<String>> response = cvurl.post(url)
+        var response = cVurl.post(URL)
                 .asyncAs(HttpResponse.BodyHandlers.ofLines())
-                .thenApply(res ->
-                {
+                .thenApply(res -> {
                     isThenApplyInvoked[0] = true;
                     return res;
                 })
@@ -525,18 +534,18 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void gzipEncodedResponseBodyAsStringTest() throws IOException {
+    void shouldReturnResponseBodyAsStringWhenBodyIsCompressedWithGZIP() throws IOException {
         //given
         var body = TEST_BODY;
 
-        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+        wireMockServer.stubFor(post(urlEqualTo(TEST_ENDPOINT))
                 .withHeader(HttpHeader.ACCEPT_ENCODING, equalTo(HttpContentEncoding.GZIP))
-                .willReturn(WireMock.aResponse()
+                .willReturn(aResponse()
                         .withBody(compressWithGZIP(body))
                         .withHeader(HttpHeader.CONTENT_ENCODING, HttpContentEncoding.GZIP)));
 
         //when
-        var response = cvurl.post(url).acceptCompressed().asString().orElseThrow(RuntimeException::new);
+        var response = cVurl.post(URL).acceptCompressed().asString().orElseThrow(RuntimeException::new);
 
         //then
         assertEquals(HttpStatus.OK, response.status());
@@ -544,36 +553,38 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void gzipEncodedResponseBodyAsStreamTest() throws IOException {
+    void shouldReturnResponseBodyAsStreamWhenBodyIsCompressedWithGZIP() throws IOException {
         //given
         var body = TEST_BODY;
 
-        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
+        wireMockServer.stubFor(post(urlEqualTo(TEST_ENDPOINT))
                 .withHeader(HttpHeader.ACCEPT_ENCODING, equalTo(HttpContentEncoding.GZIP))
-                .willReturn(WireMock.aResponse()
+                .willReturn(aResponse()
                         .withBody(compressWithGZIP(body))
                         .withHeader(HttpHeader.CONTENT_ENCODING, HttpContentEncoding.GZIP)));
 
         //when
-        var response = cvurl.post(url).acceptCompressed().asStream().orElseThrow(RuntimeException::new);
+        var response = cVurl.post(URL).acceptCompressed().asStream().orElseThrow(RuntimeException::new);
 
         //then
         assertEquals(HttpStatus.OK, response.status());
         assertEquals(body, new String(response.getBody().readAllBytes()));
+
+        response.getBody().close();
     }
 
     @Test
-    public void responseWithUnknownEncodingWithAcceptCompressedAsStringTest() throws IOException {
+    void shouldReturnResponseBodyAsStringWhenResponseWithUnknownEncoding() {
         //given
         var body = TEST_BODY;
 
-        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(post(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withBody(body)
                         .withHeader(HttpHeaders.CONTENT_ENCODING, "unknown")));
 
         //when
-        var response = cvurl.post(url).acceptCompressed().asString().orElseThrow(RuntimeException::new);
+        var response = cVurl.post(URL).acceptCompressed().asString().orElseThrow(RuntimeException::new);
 
         //then
         assertEquals(HttpStatus.OK, response.status());
@@ -581,17 +592,17 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void responseWithUnknownEncodingWithAcceptCompressedAsStreamTest() throws IOException {
+    void shouldReturnResponseBodyAsStreamWhenResponseWithUnknownEncoding() throws IOException {
         //given
         var body = TEST_BODY;
 
-        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(post(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withBody(body)
                         .withHeader(HttpHeaders.CONTENT_ENCODING, "unknown")));
 
         //when
-        var response = cvurl.post(url).acceptCompressed().asStream().orElseThrow(RuntimeException::new);
+        var response = cVurl.post(URL).acceptCompressed().asStream().orElseThrow(RuntimeException::new);
 
         //then
         assertEquals(HttpStatus.OK, response.status());
@@ -599,76 +610,82 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void requestWithAcceptCompressedFaultTest() throws IOException {
+    void shouldReturnEmptyOptionalWhenAcceptedCompressedAndRequestFailed() {
         //given
-        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(post(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withFault(Fault.RANDOM_DATA_THEN_CLOSE)));
 
-        //then
-        var response = cvurl.post(url).acceptCompressed().asStream();
+        //when
+        var response = cVurl.post(URL).acceptCompressed().asStream();
 
+        //then
         assertTrue(response.isEmpty());
     }
 
     @Test
-    public void asObjectTest() throws JsonProcessingException {
-        User user = ObjectGenerator.generateTestObject();
+    void shouldReturnBodyConvertedToUserWhenResponseContainsValidJson() throws JsonProcessingException {
+        //given
+        var user = ObjectGenerator.generateTestObject();
 
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)
                         .withBody(mapper.writeValueAsString(user))));
 
-        User resultUser = cvurl.get(url)
-                .asObject(User.class);
+        //when
+        var resultUser = cVurl.get(URL).asObject(User.class);
 
+        //then
         assertEquals(user, resultUser);
     }
 
     @Test
-    public void onSendErrorAsObjectShouldThrowRequestExecutionExceptionTest() {
+    void shouldThrowRequestExecutionExceptionWhenResponseBodyConvertedToUserIsExpected() {
         //given
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse().withFault(Fault.RANDOM_DATA_THEN_CLOSE)));
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse().withFault(Fault.RANDOM_DATA_THEN_CLOSE)));
+
+        //when
+        Executable executable = () -> cVurl.get(URL).asObject(User.class);
 
         //then
-        assertThrows(RequestExecutionException.class, () -> cvurl.get(url).asObject(User.class));
+        assertThrows(RequestExecutionException.class, executable);
     }
 
     @Test
-    public void asObjectOnUnparseableBodyShouldThrowResponseMappingException() {
+    void shouldThrowResponseMappingExceptionWhenResponseBodyIsNotJson() {
         //given
         var body = NOT_A_JSON_STRING;
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)
                         .withBody(body)));
 
         //when
-        ResponseMappingException responseMappingException = assertThrows(ResponseMappingException.class,
-                () -> cvurl.get(url).asObject(User.class));
+        Executable executable = () -> cVurl.get(URL).asObject(User.class);
 
         //then
+        var responseMappingException = assertThrows(ResponseMappingException.class, executable);
         assertEquals(HttpStatus.OK, responseMappingException.getResponse().status());
         assertEquals(body, responseMappingException.getResponse().getBody());
     }
 
     @Test
-    public void asyncAsObjectTest() throws JsonProcessingException, ExecutionException, InterruptedException {
+    void shouldReturnResponseBodyConvertedToUserWhenExecutionModeIsAsync() throws JsonProcessingException,
+            ExecutionException, InterruptedException {
         //given
-        User user = ObjectGenerator.generateTestObject();
-        boolean[] isThenApplyInvoked = {false};
+        var user = ObjectGenerator.generateTestObject();
+        var isThenApplyInvoked = new boolean[]{false};
 
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)
                         .withBody(mapper.writeValueAsString(user))));
 
         //when
-        User resultUser = cvurl.get(url).asyncAsObject(User.class)
-                .thenApply(res ->
-                {
+        var resultUser = cVurl.get(URL).asyncAsObject(User.class)
+                .thenApply(res -> {
                     isThenApplyInvoked[0] = true;
                     return res;
                 })
@@ -680,20 +697,20 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void asyncAsObjectWithUnparseableBodyTest() throws JsonProcessingException, ExecutionException, InterruptedException {
+    void shouldThrowResponseMappingExceptionWhenResponseBodyIsNotJsonAndExecutionModeIsAsync() throws ExecutionException,
+            InterruptedException {
         //given
         var body = "response body";
-        boolean[] isExceptionallyInvoked = {false};
+        var isExceptionallyInvoked = new boolean[]{false};
 
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)
                         .withBody(body)));
 
-        //then
-        cvurl.get(url).asyncAsObject(User.class)
-                .exceptionally(exception ->
-                {
+        //when-then
+        cVurl.get(URL).asyncAsObject(User.class)
+                .exceptionally(exception -> {
                     assertTrue(exception.getCause() instanceof ResponseMappingException);
                     var responseMappingException = ((ResponseMappingException) exception.getCause());
                     assertEquals(body, responseMappingException.getResponse().getBody());
@@ -708,34 +725,34 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void reusableRequestCreationTest() throws IOException, InterruptedException {
+    void shouldUseSameHttpRequestInstanceWhenExecutedMultipleTimes() {
         //given
-        MockHttpClient httpClient = MockHttpClient.create();
-        Request request = new CVurl(httpClient).get(url).create();
-
+        var httpClient = MockHttpClient.create();
+        var request = new CVurl(httpClient).get(URL).create();
 
         //when
         request.asString();
         request.asString();
 
-        //then both executions are done on the same request
-        HttpRequest httpRequest1 = httpClient.getRequests().get(0);
-        HttpRequest httpRequest2 = httpClient.getRequests().get(1);
+        //then
+        var httpRequest1 = httpClient.getRequests().get(0);
+        var httpRequest2 = httpClient.getRequests().get(1);
 
         assertSame(httpRequest1, httpRequest2);
     }
 
     @Test
-    public void unexpectedResponseTest() throws ExecutionException, InterruptedException {
+    void shouldThrowUnexpectedResponseExceptionWhenReceiveUnexpectedResponseAndExecutionModeIsAsync()
+            throws ExecutionException, InterruptedException {
         //given
-        boolean[] isExceptionallyInvoked = {false};
+        var isExceptionallyInvoked = new boolean[]{false};
 
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.NO_CONTENT)));
 
-        //when
-        cvurl.get(url).asyncAsObject(User.class, HttpStatus.OK)
+        //when-then
+        cVurl.get(URL).asyncAsObject(User.class, HttpStatus.OK)
                 .exceptionally(throwable -> {
                     isExceptionallyInvoked[0] = true;
                     assertTrue(throwable.getCause() instanceof UnexpectedResponseException);
@@ -747,75 +764,77 @@ public class CVurlRequestTest extends AbstractRequestTest {
                 })
                 .get();
 
-        //then
         assertTrue(isExceptionallyInvoked[0]);
     }
 
     @Test
-    public void asObjectWithGenericBodyTypeTest() throws JsonProcessingException {
+    void shouldReturnListOfUsersWhenBodyTypeIsUsed() throws JsonProcessingException {
         //given
-        List<User> users = ObjectGenerator.generateListOfTestObjects();
+        var users = ObjectGenerator.generateListOfTestObjects();
 
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)
                         .withBody(mapper.writeValueAsString(users))));
 
         //when
-        List<User> resultUsers = cvurl.get(url).asObject(new BodyType<>() {});
+        var resultUsers = cVurl.get(URL).asObject(new BodyType<List<User>>() {});
 
         //then
         assertEquals(users, resultUsers);
     }
 
     @Test
-    public void asObjectWithGenericBodyTypeWithNestedGenericsTest() throws JsonProcessingException {
+    void shouldReturnListOfUsersWrappedInSetWhenBodyTypeIsUsed() throws JsonProcessingException {
         //given
-        Set<List<User>> users = Set.of(ObjectGenerator.generateListOfTestObjects());
+        var users = Set.of(ObjectGenerator.generateListOfTestObjects());
 
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)
                         .withBody(mapper.writeValueAsString(users))));
 
         //when
-        Set<List<User>> resultUsers = cvurl.get(url).asObject(new BodyType<>() {});
+        var resultUsers = cVurl.get(URL).asObject(new BodyType<Set<List<User>>>() {});
 
         //then
         assertEquals(users, resultUsers);
     }
 
     @Test
-    public void asObjectWithStatusCodeWithGenericBodyTypeTest() throws JsonProcessingException {
-        List<User> users = ObjectGenerator.generateListOfTestObjects();
+    void shouldReturnListOfUsersWhenBodyTypeIsUsedAndStatusCodeOkIsExpected() throws JsonProcessingException {
+        //given
+        var users = ObjectGenerator.generateListOfTestObjects();
 
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)
                         .withBody(mapper.writeValueAsString(users))));
 
-        List<User> resultUsers = cvurl.get(url)
+        //when
+        var resultUsers = cVurl.get(URL)
                 .asObject(new BodyType<List<User>>() {}, HttpStatus.OK)
                 .orElseThrow(RuntimeException::new);
 
+        //then
         assertEquals(users, resultUsers);
     }
 
     @Test
-    public void asyncAsObjectWithGenericBodyTypeTest() throws JsonProcessingException, ExecutionException, InterruptedException {
+    void shouldReturnListOfUsersWhenBodyTypeIsUsedAndExecutionModeIsAsync() throws JsonProcessingException,
+            ExecutionException, InterruptedException {
         //given
-        List<User> users = ObjectGenerator.generateListOfTestObjects();
-        boolean[] isThenApplyInvoked = {false};
+        var users = ObjectGenerator.generateListOfTestObjects();
+        var isThenApplyInvoked = new boolean[]{false};
 
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)
                         .withBody(mapper.writeValueAsString(users))));
 
         //when
-        List<User> resultUsers = cvurl.get(url).asyncAsObject(new BodyType<List<User>>() {})
-                .thenApply(res ->
-                {
+        var resultUsers = cVurl.get(URL).asyncAsObject(new BodyType<List<User>>() {})
+                .thenApply(res -> {
                     isThenApplyInvoked[0] = true;
                     return res;
                 })
@@ -827,66 +846,66 @@ public class CVurlRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void asyncAsObjectWithStatusCodeWithGenericBodyTypeTest() throws JsonProcessingException, ExecutionException, InterruptedException {
+    void shouldReturnListOfUsersWhenBodyTypeIsUsedAndStatusCodeOkIsExpectedAndExecutionModeIsAsync()
+            throws JsonProcessingException, ExecutionException, InterruptedException {
         //given
-        List<User> users = ObjectGenerator.generateListOfTestObjects();
-        boolean[] isThenApplyInvoked = {false};
+        var users = ObjectGenerator.generateListOfTestObjects();
+        var isThenApplyInvoked = new boolean[]{false};
 
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)
                         .withBody(mapper.writeValueAsString(users))));
 
-        List<User> resultUsers = cvurl.get(url).asyncAsObject(new BodyType<List<User>>() {}, HttpStatus.OK)
-                .thenApply(res ->
-                {
+        //when
+        var resultUsers = cVurl.get(URL).asyncAsObject(new BodyType<List<User>>() {}, HttpStatus.OK)
+                .thenApply(res -> {
                     isThenApplyInvoked[0] = true;
                     return res;
                 })
                 .get();
 
+        //then
         assertTrue(isThenApplyInvoked[0]);
         assertEquals(users, resultUsers);
     }
 
     @Test
-    public void asObjectWithGenericBodyTypeOnUnparseableBodyShouldThrowResponseMappingExceptionTest() {
+    void shouldThrowResponseMappingExceptionWhenResponseBodyIsNotValidAndBodyTypeIsUsed() {
         //given
         var body = NOT_A_JSON_STRING;
-        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(get(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)
                         .withBody(body)));
 
         //when
-        ResponseMappingException responseMappingException = assertThrows(ResponseMappingException.class,
-                () -> cvurl.get(url).asObject(new BodyType<List<User>>() {}));
+        Executable executable = () -> cVurl.get(URL).asObject(new BodyType<List<User>>() {});
 
         //then
+        var responseMappingException = assertThrows(ResponseMappingException.class, executable);
         assertEquals(HttpStatus.OK, responseMappingException.getResponse().status());
         assertEquals(body, responseMappingException.getResponse().getBody());
     }
 
     @Test
-    public void overwritingGlobalRequestConfigurationTest() throws NoSuchFieldException, IllegalAccessException {
+    void shouldOverrideGlobalRequestConfigurationWhenRequestConfigurationIsProvided() throws NoSuchFieldException,
+            IllegalAccessException {
         //given
         var timeout = Duration.ofSeconds(15);
-        var acceptCompressed = true;
-        var logEnabled = true;
 
         //when
-        Request request = cvurl.get(url)
+        var requestConfiguration = getRequestConfiguration((CVurlRequest) cVurl.get(URL)
                 .requestTimeout(timeout)
-                .acceptCompressed(acceptCompressed)
-                .logEnabled(logEnabled)
-                .create();
+                .acceptCompressed(true)
+                .logEnabled(true)
+                .create());
 
         //then
-        var requestConfiguration = getRequestConfiguration((CVurlRequest) request);
-        assertEquals(requestConfiguration.getRequestTimeout()
-                .orElseThrow(() -> new IllegalStateException("No request timeout, it should be set")), timeout);
-        assertEquals(requestConfiguration.isAcceptCompressed(), acceptCompressed);
-        assertEquals(requestConfiguration.isLogEnabled(), logEnabled);
+        assertEquals(timeout, requestConfiguration.getRequestTimeout()
+                .orElseThrow(() -> new IllegalStateException("No request timeout. It must be set.")));
+        assertTrue(requestConfiguration.isAcceptCompressed());
+        assertTrue(requestConfiguration.isLogEnabled());
     }
 
     private byte[] compressWithGZIP(String str) throws IOException {
@@ -897,8 +916,9 @@ public class CVurlRequestTest extends AbstractRequestTest {
         return out.toByteArray();
     }
 
-    private RequestConfiguration getRequestConfiguration(CVurlRequest request) throws NoSuchFieldException, IllegalAccessException {
-        Field requestConfigurationField = request.getClass().getDeclaredField("requestConfiguration");
+    private RequestConfiguration getRequestConfiguration(CVurlRequest request) throws NoSuchFieldException,
+            IllegalAccessException {
+        var requestConfigurationField = request.getClass().getDeclaredField("requestConfiguration");
         requestConfigurationField.setAccessible(true);
         return (RequestConfiguration) requestConfigurationField.get(request);
     }

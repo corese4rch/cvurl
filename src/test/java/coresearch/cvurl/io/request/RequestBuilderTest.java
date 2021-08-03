@@ -5,57 +5,67 @@ import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
 import coresearch.cvurl.io.model.CVurlConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.net.Proxy;
 import java.net.ProxySelector;
 import java.util.Optional;
 
+import static org.mockito.Mockito.*;
+
 @SuppressWarnings("rawtypes")
-public class RequestBuilderTest {
+class RequestBuilderTest {
 
     private static final CVurlProxy CVURL_PROXY = CVurlProxy.of(Proxy.Type.HTTP, "proxy.host", 90);
-    private static final String uri = "http://localhost:8080/";
+    private static final String uri = "http://localhost:8181/";
     private CVurlProxySelector proxySelectorSpy;
     private RequestBuilder builder;
     private CVurlConfig config;
 
     @BeforeEach
     public void setup() {
-        proxySelectorSpy = Mockito.spy(CVurlProxySelector.class);
-        config = Mockito.mock(CVurlConfig.class);
-        Mockito.when(config.getGlobalRequestConfiguration()).thenReturn(new RequestConfiguration());
-        builder = new RequestBuilder(uri, HttpMethod.GET, config);
+        this.proxySelectorSpy = spy(CVurlProxySelector.class);
+        this.config = mock(CVurlConfig.class);
+        when(config.getGlobalRequestConfiguration()).thenReturn(new RequestConfiguration());
+        this.builder = new RequestBuilder(uri, HttpMethod.GET, config);
     }
 
     @Test
-    public void whenHttpClientHasCVurlProxySelector_thenWithProxyInputsPassedToCVurlProxySelector() {
-        Mockito.when(config.getProxySelector()).thenReturn(Optional.of(proxySelectorSpy));
+    void shouldAddNewProxyWhenProxySelectorIsNotEmpty() {
+        //given
+        when(config.getProxySelector()).thenReturn(Optional.of(proxySelectorSpy));
 
+        //when
         builder.withProxy(CVURL_PROXY);
 
+        //then
         verifyAddProxyCalled(1);
     }
 
     @Test
-    public void whenHttpClientHasNoProxySelectorSpecified_thenWithProxyInputsIgnored() {
-        Mockito.when(config.getProxySelector()).thenReturn(Optional.empty());
+    void doNothingWhenProxySelectorIsEmpty() {
+        //given
+        when(config.getProxySelector()).thenReturn(Optional.empty());
 
+        //when
         builder.withProxy(CVURL_PROXY);
 
+        //then
         verifyAddProxyCalled(0);
     }
 
     @Test
-    public void whenHttpClientHasNotCVurlProxySelectorSpecified_thenWithProxyInputsIgnored() {
-        Mockito.when(config.getProxySelector()).thenReturn(Optional.of(ProxySelector.getDefault()));
+    void doNothingWhenProxySelectorIsNotInstanceOfCVurlProxySelector() {
+        //given
+        when(config.getProxySelector()).thenReturn(Optional.of(ProxySelector.getDefault()));
 
+        //when
         builder.withProxy(CVURL_PROXY);
 
+        //then
         verifyAddProxyCalled(0);
     }
 
     private void verifyAddProxyCalled(int times) {
-        Mockito.verify(proxySelectorSpy, Mockito.times(times)).addProxy(uri, CVURL_PROXY);
+        verify(proxySelectorSpy, times(times)).addProxy(uri, CVURL_PROXY);
     }
 }

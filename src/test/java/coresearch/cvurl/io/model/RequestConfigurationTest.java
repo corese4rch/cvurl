@@ -5,10 +5,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class RequestConfigurationTest {
+class RequestConfigurationTest {
 
     @Test
-    public void defaultConfigurationTest() {
+    void shouldReturnValidRequestConfigurationWhenDefaultConfigurationMethodIsUsed() {
         //when
         var requestConfiguration = RequestConfiguration.defaultConfiguration();
 
@@ -19,7 +19,7 @@ public class RequestConfigurationTest {
     }
 
     @Test
-    public void logEnabledIsMutableTest() {
+    void shouldChangeLogEnabledValueToTrue() {
         //given
         var requestConfiguration = RequestConfiguration.defaultConfiguration();
 
