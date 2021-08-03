@@ -12,6 +12,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * An implementation of the {@link ProxySelector} class.
+ *
+ * @since 1.5
+ */
 public final class CVurlProxySelector extends ProxySelector {
 
     private final Map<String, List<Proxy>> proxiesByUri = new ConcurrentHashMap<>();

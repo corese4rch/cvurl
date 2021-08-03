@@ -11,34 +11,33 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Wrapper around Java 11 {@link HttpResponse}.
+ * Wrapper for the {@link HttpResponse} class.
  *
- * @param <T>
+ * @since 0.9
+ * @param <T> the response body type
  */
 public class Response<T> {
 
     private HttpResponse<T> rawResponse;
 
     /**
-     * Creates new Response from specified body and raw {@link HttpResponse}.
+     * Creates an instance of the {@link Response} class from the specified {@link HttpResponse} instance.
      *
-     * @param rawResponse response
+     * @param rawResponse - the HTTP request response
      */
     public Response(HttpResponse<T> rawResponse) {
         this.rawResponse = rawResponse;
     }
 
     /**
-     * Returns the status code for this response.
-     *
-     * @return the response code
+     * Returns the {@link HttpResponse#statusCode()} value.
      */
     public int status() {
         return rawResponse.statusCode();
     }
 
     /**
-     * Returns the {@link HttpRequest} corresponding to this response.
+     * Returns the {@link HttpRequest} instance corresponding to this response.
      *
      * <p> The returned {@code HttpRequest} may not be the initiating request
      * provided when {@linkplain HttpClient#send(HttpRequest, HttpResponse.BodyHandler)
@@ -46,7 +45,6 @@ public class Response<T> {
      * request returned by this method will have the redirected URI, which will
      * be different from the initiating request URI.
      *
-     * @return the request
      * @see #previousResponse()
      */
     public HttpRequest request() {
@@ -58,17 +56,13 @@ public class Response<T> {
      * if one was received. An intermediate response is one that is received
      * as a result of redirection or authentication. If no previous response
      * was received then an empty {@code Optional} is returned.
-     *
-     * @return an Optional containing the HttpResponse, if any.
      */
     public Optional<HttpResponse<T>> previousResponse() {
         return rawResponse.previousResponse();
     }
 
     /**
-     * Returns the received response headers.
-     *
-     * @return the response headers
+     * Returns the {@link HttpResponse#headers()} value.
      */
     public HttpHeaders headers() {
         return rawResponse.headers();
@@ -79,9 +73,6 @@ public class Response<T> {
      * Returns an {@link Optional} containing the {@link SSLSession} in effect
      * for this response. Returns an empty {@code Optional} if this is not a
      * <i>HTTPS</i> response.
-     *
-     * @return an {@code Optional} containing the {@code SSLSession} associated
-     * with the response
      */
     public Optional<SSLSession> sslSession() {
         return rawResponse.sslSession();
@@ -90,45 +81,36 @@ public class Response<T> {
     /**
      * Returns the {@code URI} that the response was received from. This may be
      * different from the request {@code URI} if redirection occurred.
-     *
-     * @return the URI of the response
      */
     public URI uri() {
         return rawResponse.uri();
     }
 
     /**
-     * Returns the HTTP protocol version that was used for this response.
-     *
-     * @return HTTP protocol version
+     * Returns the {@link HttpResponse#headers()} value.
      */
     public HttpClient.Version version() {
         return rawResponse.version();
     }
 
     /**
-     * Checks if response is successful (status code is 2XX)
-     *
-     * @return whether response is successful.
+     * Returns true if {@link Response#status()} is in the range [200..300).
      */
     public boolean isSuccessful() {
         return status() >= 200 && status() < 300;
     }
 
     /**
-     * Returns headers names.
-     *
-     * @return headers names
+     * Returns header names.
      */
     public Set<String> headersNames() {
         return headers().map().keySet();
     }
 
     /**
-     * Returns value for specified header name.
+     * Returns the value for the specified header name. Returns an empty {@code Optional} if no title with that name exists.
      *
-     * @param headerName header name.
-     * @return optional of header value. Is empty if no header with such name exists.
+     * @param headerName - the name of the header
      */
     public Optional<String> getHeaderValue(String headerName) {
         List<String> headerValues = headers().map().get(headerName);
@@ -137,19 +119,24 @@ public class Response<T> {
     }
 
     /**
-     * Return header values as list.
+     * Returns the header values as a list.
      *
-     * @param headerName header name.
-     * @return header values as list.
+     * @param headerName - the name of the header
      */
     public List<String> getHeaderValuesAsList(String headerName) {
         return headers().allValues(headerName);
     }
 
+    /**
+     * Returns the {@link HttpResponse#body()} value.
+     */
     public T getBody() {
         return rawResponse.body();
     }
 
+    /**
+     * Returns the {@link HttpResponse#toString()} value.
+     */
     @Override
     public String toString() {
         return rawResponse.toString();

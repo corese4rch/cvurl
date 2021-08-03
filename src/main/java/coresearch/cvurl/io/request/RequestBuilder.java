@@ -26,9 +26,10 @@ import java.util.stream.Collector;
 import static java.util.stream.Collectors.joining;
 
 /**
- * Builder used to build {@link Request}
+ * The builder class used to build an instance of the {@link Request} class.
  *
- * @param <T>
+ * @param <T> the type of the builder
+ * @since 0.9
  */
 public class RequestBuilder<T extends RequestBuilder<T>> implements Request, RequestConfigurer<RequestBuilder> {
 
@@ -50,11 +51,11 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
     }
 
     /**
-     * Add request header.
+     * Adds a header.
      *
-     * @param key   header key
-     * @param value header value
-     * @return this builder
+     * @param key - the header key
+     * @param value - the header value
+     * @return the builder
      */
     @SuppressWarnings("unchecked")
     public T header(String key, String value) {
@@ -63,10 +64,10 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
     }
 
     /**
-     * Add request headers.
+     * Adds headers.
      *
-     * @param headers headers name/value map
-     * @return this builder
+     * @param headers - the name/value map
+     * @return the builder
      */
     @SuppressWarnings("unchecked")
     public T headers(Map<String, String> headers) {
@@ -75,11 +76,11 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
     }
 
     /**
-     * Adds query parameter.
+     * Adds a query parameter.
      *
-     * @param name  query parameter name
-     * @param value query parameter value
-     * @return this builder
+     * @param name - the query parameter name
+     * @param value - the query parameter value
+     * @return the builder
      */
     @SuppressWarnings("unchecked")
     public T queryParam(String name, String value) {
@@ -90,8 +91,8 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
     /**
      * Adds query parameters.
      *
-     * @param queryParams query parameters name/value map
-     * @return this builder
+     * @param queryParams - the name/value map
+     * @return the builder
      */
     @SuppressWarnings("unchecked")
     public T queryParams(Map<String, String> queryParams) {
@@ -114,7 +115,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
     }
 
     /**
-     * Sets whether this client should accept compressed response body.
+     * Sets whether the client should accept the compressed response body or not.
      *
      * @return this builder
      */
@@ -145,13 +146,22 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
         return (T) this;
     }
 
+    /**
+     * Sets a proxy.
+     *
+     * @param cVurlProxy - the instance of the {@link CVurlProxy} class
+     * @return this builder
+     */
     @SuppressWarnings("unchecked")
     public T withProxy(CVurlProxy cVurlProxy) {
         final Optional<ProxySelector> proxySelector = cvurlConfig.getProxySelector();
-        if (proxySelector.isEmpty())
+
+        if (proxySelector.isEmpty()) {
             return (T) this;
+        }
 
         final ProxySelector selector = proxySelector.get();
+
         if (selector instanceof CVurlProxySelector) {
             ((CVurlProxySelector) selector).addProxy(uri, cVurlProxy);
         }
@@ -160,9 +170,9 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
     }
 
     /**
-     * Builds new {@link Request}.
+     * Builds a new instance of the {@link Request} class.
      *
-     * @return new {@link Request}
+     * @return a new instance of the {@link Request} class.
      */
     public Request create() {
         final RequestConfiguration requestConfiguration = requestConfigurationBuilder.build();

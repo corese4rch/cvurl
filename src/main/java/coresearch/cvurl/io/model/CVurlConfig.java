@@ -26,7 +26,9 @@ import static coresearch.cvurl.io.internal.util.Validation.notNullParam;
 import static coresearch.cvurl.io.internal.util.Validation.notNullParams;
 
 /**
- * Data class that holds configuration of {@link coresearch.cvurl.io.request.CVurl}
+ * The class that contains the configuration for the HTTP client.
+ *
+ * @since 0.9
  */
 public class CVurlConfig {
 
@@ -56,19 +58,20 @@ public class CVurlConfig {
     }
 
     /**
-     * Creates {@link ConfigurationWithClientPropertiesBuilder} used to build {@link CVurlConfig} object.
+     * Creates an instance of the {@link ConfigurationWithClientPropertiesBuilder} class used to build the {@link CVurlConfig} object.
      *
-     * @return new ConfigurationWithClientPropertiesBuilder
+     * @return an instance of the {@link ConfigurationWithClientPropertiesBuilder} class
      */
     public static ConfigurationWithClientPropertiesBuilder builder() {
         return new ConfigurationWithClientPropertiesBuilder();
     }
 
     /**
-     * Creates {@link ConfigurationBuilder} with predefined {@link HttpClient} used to build {@link CVurlConfig} object.
-     * Use {@link CVurlConfig#builderWithDefaultHttpClient()} instead
+     * Creates an instance of the {@link ConfigurationBuilder} class with
+     * the predefined {@link HttpClient} instance used to build the {@link CVurlConfig} object.
      *
-     * @return new ConfigurationWithClientPropertiesBuilder
+     * @return an instance of the {@link ConfigurationBuilder} class
+     * @deprecated use the {@link CVurlConfig#builderWithDefaultHttpClient()} method instead.
      */
     @Deprecated(since = "1.5", forRemoval = true)
     public static ConfigurationBuilder builder(HttpClient httpClient) {
@@ -76,27 +79,28 @@ public class CVurlConfig {
     }
 
     /**
-     * Creates {@link ConfigurationBuilder} with default {@link HttpClient} used to build {@link CVurlConfig} object.
+     * Creates an instance of the {@link ConfigurationBuilder} class with
+     * the default {@link HttpClient} instance used to build the {@link CVurlConfig} object.
      *
-     * @return new ConfigurationWithClientPropertiesBuilder
+     * @return an instance of the {@link ConfigurationBuilder} class
      */
     public static ConfigurationBuilder builderWithDefaultHttpClient() {
         return new ConfigurationBuilder(makeDefaultHttpClientWithCVurlProxySelector());
     }
 
     /**
-     * Creates configuration with default properties.
+     * Creates an instance of the {@link CVurlConfig} class with default properties.
      *
-     * @return new configuration
+     * @return an instance of the {@link CVurlConfig} class
      */
     public static CVurlConfig defaultConfiguration() {
         return new CVurlConfig();
     }
 
     /**
-     * Creates {@link ConfigurationWithClientPropertiesBuilder} used to build {@link CVurlConfig} object.
+     * Creates an instance of the {@link ConfigurationBuilder} class used to build the {@link CVurlConfig} instance.
      *
-     * @return new ConfigurationWithClientPropertiesBuilder
+     * @return an instance of the {@link ConfigurationBuilder} class
      */
     public ConfigurationBuilder preconfiguredBuilder() {
         return new ConfigurationBuilder(getHttpClient())
@@ -104,76 +108,119 @@ public class CVurlConfig {
                 .requestTimeout(getGlobalRequestConfiguration().getRequestTimeout().orElse(null));
     }
 
+    /**
+     * Returns the {@code httpClient} value.
+     */
     public HttpClient getHttpClient() {
         return httpClient;
     }
 
     /**
-     * Creates {@link HttpClient} based on current configuration.
+     * Creates an instance of the {@link HttpClient} class based on the current configuration.
      *
-     * @return new {@link HttpClient} build from this configuration
-     * @deprecated Use {@link #getHttpClient()} instead.
+     * @return an instance of the {@link HttpClient} class
+     * @deprecated Use the {@link #getHttpClient()} method instead.
      */
     @Deprecated(since = "1.2", forRemoval = true)
     public HttpClient createHttpClient() {
         return getHttpClient();
     }
 
+    /**
+     * Returns the {@link HttpClient#proxy()} value.
+     */
     public Optional<ProxySelector> getProxySelector() {
         return httpClient.proxy();
     }
 
+    /**
+     * Returns the {@link HttpClient#sslContext()} value.
+     */
     public SSLContext getSslContext() {
         return httpClient.sslContext();
     }
 
+    /**
+     * Returns the {@link HttpClient#version()} value.
+     */
     public HttpClient.Version getVersion() {
         return httpClient.version();
     }
 
+    /**
+     * Returns the {@link HttpClient#sslParameters()} value.
+     */
     public SSLParameters getSslParameters() {
         return httpClient.sslParameters();
     }
 
+    /**
+     * Returns the {@link HttpClient#authenticator()} value.
+     */
     public Optional<Authenticator> getAuthenticator() {
         return httpClient.authenticator();
     }
 
+    /**
+     * Returns the {@link HttpClient#connectTimeout()} value.
+     */
     public Optional<Duration> getConnectTimeout() {
         return httpClient.connectTimeout();
     }
 
+    /**
+     * Returns the {@link HttpClient#cookieHandler()} value.
+     */
     public Optional<CookieHandler> getCookieHandler() {
         return httpClient.cookieHandler();
     }
 
+    /**
+     * Returns the {@link HttpClient#executor()} value.
+     */
     public Optional<Executor> getExecutor() {
         return httpClient.executor();
     }
 
+    /**
+     * Returns the {@link HttpClient#followRedirects()} value.
+     */
     public HttpClient.Redirect getFollowRedirects() {
         return httpClient.followRedirects();
     }
 
+    /**
+     * Returns the {@code genericMapper} value.
+     */
     public GenericMapper getGenericMapper() {
         return genericMapper;
     }
 
+    /**
+     * Returns the {@code globalRequestConfiguration} value.
+     */
     public RequestConfiguration getGlobalRequestConfiguration() {
         return globalRequestConfiguration;
     }
 
+    /**
+     * Returns the {@code httpClientMode} value.
+     */
     public HttpClientMode getHttpClientMode() {
         return httpClientMode;
     }
 
+    /**
+     * Sets the value of the {@code logEnabled} field.
+     * @param enabled - the value of the logEnabled field
+     */
     public void setIsLogEnable(boolean enabled) {
         this.getGlobalRequestConfiguration().setLogEnabled(enabled);
     }
 
     /**
-     * Creates instance of {@link HttpClient} with default settings except ProxySelector
-     * @return HttpClient with CVurlProxySelector
+     * Creates an instance of the {@link HttpClient} class with the default settings and the CVurl proxy selector.
+     * @return an instance of the {@link HttpClient} class with the CVurl proxy selector
      */
     private static HttpClient makeDefaultHttpClientWithCVurlProxySelector() {
         return HttpClient.newBuilder()
@@ -181,7 +228,13 @@ public class CVurlConfig {
                 .build();
     }
 
-    public static class ConfigurationBuilder<T extends ConfigurationBuilder<T>> implements RequestConfigurer<ConfigurationBuilder> {
+    /**
+     * A mutable builder for the {@link CVurlConfig} class.
+     *
+     * @since 0.9
+     */
+    public static class ConfigurationBuilder<T extends ConfigurationBuilder<T>> implements RequestConfigurer<ConfigurationBuilder<T>> {
+
         private GenericMapper genericMapper;
         private HttpClient httpClient;
         private HttpClientMode httpClientMode = HttpClientMode.PROTOTYPE;
@@ -195,12 +248,22 @@ public class CVurlConfig {
             this.httpClient = httpClient;
         }
 
+        /**
+         * Sets the value of the {@code genericMapper} field. The value must not be null.
+         * @param genericMapper - the value of the genericMapper field
+         * @return the builder
+         */
         @SuppressWarnings("unchecked")
         public T genericMapper(GenericMapper genericMapper) {
             this.genericMapper = notNullParam(genericMapper);
             return (T) this;
         }
 
+        /**
+         * Sets the value of the {@code httpClientMode} field. The value must not be null.
+         * @param httpClientMode - the value of the httpClientMode field
+         * @return the builder
+         */
         @SuppressWarnings("unchecked")
         public T httpClientMode(HttpClientMode httpClientMode) {
             this.httpClientMode = notNullParam(httpClientMode);
@@ -208,13 +271,11 @@ public class CVurlConfig {
         }
 
         /**
-         * Sets a global timeout for requests created by {@link coresearch.cvurl.io.request.CVurl}
-         * from this configuration.The effect
-         * of not setting a timeout is the same as setting an infinite Duration, ie.
-         * block forever.
+         * Sets the value of the global timeout.
+         * The effect of no timeout is the same as setting the infinite duration.
          *
-         * @param requestTimeout the timeout duration
-         * @return this builder
+         * @param requestTimeout - the timeout duration
+         * @return the builder
          */
         @Override
         public ConfigurationBuilder requestTimeout(Duration requestTimeout) {
@@ -223,11 +284,11 @@ public class CVurlConfig {
         }
 
         /**
-         * Sets property that defines whether decompression should be applied to the
-         * response body and corresponding header should be added to request.
+         * Sets a property that determines whether decompression should be applied to the response body,
+         * and an appropriate header should be added to the request.
          *
-         * @param acceptCompressed property
-         * @return this {@link ConfigurationBuilder}
+         * @param acceptCompressed - the value of the property
+         * @return the builder
          */
         @Override
         public ConfigurationBuilder acceptCompressed(boolean acceptCompressed) {
@@ -236,10 +297,10 @@ public class CVurlConfig {
         }
 
         /**
-         * Sets a feature flag that defines if we logging every request url and body with level INFO or not.
+         * Sets the value of the global logging. If enabled, then each request is logged.
          *
-         * @param logEnabled flag
-         * @return this {@link CVurlConfig}
+         * @param logEnabled -the value of the log enabled flag
+         * @return the builder
          */
         @Override
         public ConfigurationBuilder logEnabled(boolean logEnabled) {
@@ -251,6 +312,10 @@ public class CVurlConfig {
             return this.httpClient;
         }
 
+        /**
+         * Builds the CVurl configuration.
+         * @return an instance of the {@link CVurlConfig} class
+         */
         public CVurlConfig build() {
             if (genericMapper == null) {
                 genericMapper = MapperFactory.createDefault();
@@ -264,7 +329,7 @@ public class CVurlConfig {
     }
 
     /**
-     * Builder for {@link CVurlConfig}.
+     * Extended builder for the {@link CVurlConfig} class.
      */
     public static class ConfigurationWithClientPropertiesBuilder
             extends ConfigurationBuilder<ConfigurationWithClientPropertiesBuilder> {
@@ -288,7 +353,7 @@ public class CVurlConfig {
         }
 
         /**
-         * Sets the connect timeout duration for this client.
+         * Sets the duration of the connection timeout for this client.
          *
          * <p> In the case where a new connection needs to be established, if
          * the connection cannot be established within the given {@code
@@ -300,9 +365,9 @@ public class CVurlConfig {
          * need to be established, for example if a connection can be reused
          * from a previous request, then this timeout duration has no effect.
          *
-         * @param connectTimeout the duration to allow the underlying connection to be
+         * @param connectTimeout - the duration to allow the underlying connection to be
          *                       established
-         * @return this builder
+         * @return the builder
          */
         public ConfigurationWithClientPropertiesBuilder connectTimeout(Duration connectTimeout) {
             this.connectTimeout = connectTimeout;
@@ -312,8 +377,8 @@ public class CVurlConfig {
         /**
          * Sets a cookie handler.
          *
-         * @param cookieHandler the cookie handler
-         * @return this builder
+         * @param cookieHandler - the cookie handler
+         * @return the builder
          */
         public ConfigurationWithClientPropertiesBuilder cookieHandler(CookieHandler cookieHandler) {
             this.cookieHandler = cookieHandler;
@@ -327,8 +392,8 @@ public class CVurlConfig {
          * building}, a default executor is created for each newly built {@code
          * HttpClient}.
          *
-         * @param executor the Executor
-         * @return this builder
+         * @param executor - the executor
+         * @return the builder
          */
         public ConfigurationWithClientPropertiesBuilder executor(Executor executor) {
             this.executor = executor;
@@ -343,8 +408,8 @@ public class CVurlConfig {
          * building}, then newly built clients will use a default redirection
          * policy of {@link HttpClient.Redirect#NEVER NEVER}.
          *
-         * @param followRedirects the redirection policy
-         * @return this builder
+         * @param followRedirects - the redirection policy
+         * @return the builder
          */
         public ConfigurationWithClientPropertiesBuilder followRedirects(HttpClient.Redirect followRedirects) {
             this.followRedirects = followRedirects;
@@ -356,7 +421,7 @@ public class CVurlConfig {
          * client. The value provided must be between {@code 1} and {@code 256}
          * (inclusive).
          *
-         * @param priority the priority weighting
+         * @param priority - the priority value
          * @return this builder
          */
         public ConfigurationWithClientPropertiesBuilder priority(int priority) {
@@ -365,10 +430,10 @@ public class CVurlConfig {
         }
 
         /**
-         * Sets a {@link ProxySelector}.
+         * Sets a {@link ProxySelector} instance.
          *
-         * @param proxySelector the ProxySelector
-         * @return this builder
+         * @param proxySelector - the instance of the {@link ProxySelector} class
+         * @return the builder
          * @apiNote {@link ProxySelector#of(InetSocketAddress) ProxySelector::of}
          * provides a {@code ProxySelector} which uses a single proxy for all
          * requests. The system-wide proxy selector can be retrieved by
@@ -390,7 +455,7 @@ public class CVurlConfig {
         }
 
         /**
-         * Sets an {@code SSLContext}.
+         * Sets an instance of the {@link SSLContext} class.
          *
          * <p> If this method is not invoked prior to {@linkplain #build()
          * building}, then newly built clients will use the {@linkplain
@@ -398,8 +463,8 @@ public class CVurlConfig {
          * for client applications that do not need to specify protocols, or
          * require client authentication.
          *
-         * @param sslContext the SSLContext
-         * @return this builder
+         * @param sslContext - the instance of the {@link SSLContext} class
+         * @return the builder
          */
         public ConfigurationWithClientPropertiesBuilder sslContext(SSLContext sslContext) {
             this.sslContext = sslContext;
@@ -421,8 +486,8 @@ public class CVurlConfig {
          * will use HTTP/2. If the upgrade fails, then the response will be
          * handled using HTTP/1.1
          *
-         * @param version the requested HTTP protocol version
-         * @return this builder
+         * @param version - the requested HTTP protocol version
+         * @return the builder
          * @implNote Constraints may also affect the selection of protocol version.
          * For example, if HTTP/2 is requested through a proxy, and if the implementation
          * does not support this mode, then HTTP/1.1 may be used
@@ -444,8 +509,8 @@ public class CVurlConfig {
          * set by callers, as they may be ignored. The contents of the given
          * object are copied.
          *
-         * @param sslParameters the SSLParameters
-         * @return this builder
+         * @param sslParameters - the instance of the {@link SSLParameters} class
+         * @return the builder
          */
         public ConfigurationWithClientPropertiesBuilder sslParameters(SSLParameters sslParameters) {
             this.sslParameters = sslParameters;

@@ -2,6 +2,11 @@ package coresearch.cvurl.io.constant;
 
 import static java.lang.String.format;
 
+/**
+ * Contains constant definitions for the HTTP status codes.
+ *
+ * @since 0.9
+ */
 public final class HttpStatus {
 
     // --- 1xx Informational ---
@@ -207,6 +212,6 @@ public final class HttpStatus {
     public static final int INSUFFICIENT_STORAGE = 507;
 
     private HttpStatus() {
-        throw new IllegalStateException(format("Creating of class %s is forbidden", HttpStatus.class.getName()));
+        throw new IllegalStateException(format("The creation of the %s class is prohibited", HttpStatus.class.getName()));
     }
 }

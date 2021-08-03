@@ -11,6 +11,11 @@ import java.net.http.HttpResponse;
 import java.util.Optional;
 import java.util.zip.GZIPInputStream;
 
+/**
+ * The body handler that can decompress GZIP data to an instance of the {@link InputStream} class.
+ *
+ * @since 0.9
+ */
 public class CompressedInputStreamBodyHandler implements HttpResponse.BodyHandler<InputStream> {
 
     @Override
