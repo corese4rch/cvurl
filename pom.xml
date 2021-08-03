@@ -29,7 +29,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- main -->
         <slf4j-api.version>2.0.0-alpha1</slf4j-api.version>
-        <jackson.core.version>2.11.0</jackson.core.version>
+        <jackson.core.version>2.12.4</jackson.core.version>
         <!-- test -->
         <mockito.version>3.3.3</mockito.version>
         <wiremock.version>2.23.2</wiremock.version>
