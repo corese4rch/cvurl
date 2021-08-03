@@ -28,7 +28,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- main -->
-        <slf4j-api.version>2.0.0-alpha1</slf4j-api.version>
+        <slf4j-api.version>2.0.0-alpha2</slf4j-api.version>
         <jackson.core.version>2.11.0</jackson.core.version>
         <!-- test -->
         <mockito.version>3.3.3</mockito.version>
