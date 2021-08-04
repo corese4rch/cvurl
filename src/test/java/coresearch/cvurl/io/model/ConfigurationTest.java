@@ -123,12 +123,24 @@ class ConfigurationTest {
     }
 
     @Test
-    void shouldChangeLogEnabledValueToTrue() {
+    void shouldChangeLogEnabledValueToTrueUsingDeprecatedMethod() {
         //given
         var configuration = CVurlConfig.defaultConfiguration();
 
         //when
         configuration.setIsLogEnable(true);
+
+        //then
+        assertTrue(configuration.getGlobalRequestConfiguration().isLogEnabled());
+    }
+
+    @Test
+    void shouldChangeLogEnabledValueToTrue() {
+        //given
+        var configuration = CVurlConfig.defaultConfiguration();
+
+        //when
+        configuration.setLogEnabled(true);
 
         //then
         assertTrue(configuration.getGlobalRequestConfiguration().isLogEnabled());
