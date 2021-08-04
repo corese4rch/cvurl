@@ -25,6 +25,7 @@ public final class HttpClientSingleton {
      */
     public static HttpClient getClient(HttpClient fromClient) {
         HttpClient client = httpClient;
+
         if (null == client) {
             synchronized (HttpClientSingleton.class) {
                 client = httpClient;
@@ -33,6 +34,7 @@ public final class HttpClientSingleton {
                 }
             }
         }
+
         return client;
     }
 }

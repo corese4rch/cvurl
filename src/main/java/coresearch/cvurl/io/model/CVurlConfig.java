@@ -513,18 +513,23 @@ public class CVurlConfig {
             if (connectTimeout != null) {
                 builder.connectTimeout(connectTimeout);
             }
+
             if (authenticator != null) {
                 builder.authenticator(authenticator);
             }
+
             if (cookieHandler != null) {
                 builder.cookieHandler(cookieHandler);
             }
+
             if (executor != null) {
                 builder.executor(executor);
             }
+
             if (priority != NO_PRIORITY) {
                 builder.priority(priority);
             }
+
             if (followRedirects != null) {
                 builder.followRedirects(followRedirects);
             }
@@ -534,9 +539,11 @@ public class CVurlConfig {
             if (sslContext != null) {
                 builder.sslContext(sslContext);
             }
+
             if (sslParameters != null) {
                 builder.sslParameters(sslParameters);
             }
+
             if (version != null) {
                 builder.version(version);
             }

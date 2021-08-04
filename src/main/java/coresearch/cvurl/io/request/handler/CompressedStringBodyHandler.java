@@ -34,8 +34,8 @@ public class CompressedStringBodyHandler implements HttpResponse.BodyHandler<Str
              var outputStream = new ByteArrayOutputStream()) {
 
             gzipInputStream.transferTo(outputStream);
-            return new String(outputStream.toByteArray());
 
+            return outputStream.toString();
         } catch (IOException e) {
             throw new ResponseBodyHandlingException(e.getMessage(), e);
         }

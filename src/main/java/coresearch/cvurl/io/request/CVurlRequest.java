@@ -35,7 +35,7 @@ public final class CVurlRequest implements Request {
     private final RequestConfiguration requestConfiguration;
     private final HttpClient httpClient;
 
-    private HttpRequest httpRequest;
+    private final HttpRequest httpRequest;
 
     CVurlRequest(HttpRequest httpRequest, CVurlConfig cvurlConfig,
                  RequestConfiguration requestConfiguration) {
@@ -192,7 +192,9 @@ public final class CVurlRequest implements Request {
         if (requestConfiguration.isLogEnabled()) {
             LOGGER.info("Sending request {}", this.httpRequest);
         }
+
         HttpResponse<U> response = httpClient.send(this.httpRequest, bodyHandler);
+
         return responseMapper.apply(response);
     }
 }

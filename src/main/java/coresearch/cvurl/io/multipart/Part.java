@@ -23,8 +23,8 @@ public class Part<T extends Part<T>> {
     private static final String CRLF = "\r\n";
     private static final String BOUNDARY_DELIMITER = "--";
     private static final String CONTENT_ARGUMENT = "content";
-    private Map<String, String> headers;
-    private byte[] content;
+    private final Map<String, String> headers;
+    private final byte[] content;
 
     protected Part(byte[] content) {
         this.headers = new HashMap<>();
@@ -86,6 +86,7 @@ public class Part<T extends Part<T>> {
             PartWithFileContent part = new PartWithFileContent(fileName, Files.readAllBytes(filePath));
             Optional.ofNullable(Files.probeContentType(filePath))
                     .ifPresent(part::contentType);
+
             return part;
         } catch (IOException e) {
             throw new MultipartFileFormException(e.getMessage(), e);

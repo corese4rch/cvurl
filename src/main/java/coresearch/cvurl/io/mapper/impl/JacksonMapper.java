@@ -15,7 +15,7 @@ import java.io.IOException;
  */
 public class JacksonMapper extends GenericMapper {
 
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     public JacksonMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;

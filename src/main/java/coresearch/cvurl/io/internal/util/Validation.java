@@ -9,7 +9,7 @@ import static java.lang.String.format;
  *
  * @since 0.9
  */
-public class Validation {
+public final class Validation {
 
     private static final String ERROR_MESSAGE = "%s parameter cannot be null";
 

@@ -19,7 +19,7 @@ import static coresearch.cvurl.io.internal.util.Validation.notNullParam;
  */
 public class CVurl {
 
-    private CVurlConfig cvurlConfig;
+    private final CVurlConfig cVurlConfig;
 
     /**
      * Creates an instance of the {@link CVurl} class
@@ -27,7 +27,7 @@ public class CVurl {
      * the default client created by the {@link HttpClient#newHttpClient()} method, and the request timeout is null.
      */
     public CVurl() {
-        this.cvurlConfig = CVurlConfig.defaultConfiguration();
+        this.cVurlConfig = CVurlConfig.defaultConfiguration();
     }
 
     /**
@@ -38,7 +38,7 @@ public class CVurl {
      */
     public CVurl(CVurlConfig cVurlConfig) {
         notNullParam(cVurlConfig);
-        this.cvurlConfig = cVurlConfig;
+        this.cVurlConfig = cVurlConfig;
     }
 
     /**
@@ -54,14 +54,14 @@ public class CVurl {
      */
     @Deprecated(since = "1.5", forRemoval = true)
     public CVurl(HttpClient httpClient) {
-        this.cvurlConfig = CVurlConfig.builder(httpClient).build();
+        this.cVurlConfig = CVurlConfig.builder(httpClient).build();
     }
 
     /**
      * Returns the {@code cvurlConfig} value.
      */
     public CVurlConfig getCvurlConfig() {
-        return cvurlConfig;
+        return cVurlConfig;
     }
 
     /**
@@ -205,10 +205,10 @@ public class CVurl {
     }
 
     private RequestBuilder<?> createRequestWithoutBody(String url, HttpMethod httpMethod) {
-        return new RequestBuilder<>(url, httpMethod, cvurlConfig);
+        return new RequestBuilder<>(url, httpMethod, cVurlConfig);
     }
 
     private RequestWithBodyBuilder createRequestWithBody(String url, HttpMethod httpMethod) {
-        return new RequestWithBodyBuilder(url, httpMethod, cvurlConfig);
+        return new RequestWithBodyBuilder(url, httpMethod, cVurlConfig);
     }
 }
