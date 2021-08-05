@@ -142,6 +142,7 @@
                         --add-opens coresearch.cvurl.io/coresearch.cvurl.io.helper.model=com.fasterxml.jackson.databind
                         --add-opens coresearch.cvurl.io/coresearch.cvurl.io.mapper.impl=ALL-UNNAMED
                         --add-opens coresearch.cvurl.io/coresearch.cvurl.io.util.urlbuilder=ALL-UNNAMED
+                        --add-opens coresearch.cvurl.io/coresearch.cvurl.io.request.proxy=ALL-UNNAMED
                     </argLine>
                 </configuration>
             </plugin>

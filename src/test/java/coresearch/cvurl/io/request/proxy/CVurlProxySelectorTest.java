@@ -1,5 +1,6 @@
-package coresearch.cvurl.io.request;
+package coresearch.cvurl.io.request.proxy;
 
+import coresearch.cvurl.io.model.CVurlProxy;
 import coresearch.cvurl.io.utils.ProxySelectorMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,8 +30,8 @@ class CVurlProxySelectorTest {
     @Test
     void shouldReturnProxiesOnlyForRequestedURIWhenSpecifiedProxiesForMultipleURIs() {
         //given
-        selector.addProxy(REQUEST_URL, CVurlProxy.of(Proxy.Type.HTTP, PROXY_HOST, PROXY_PORT));
-        selector.addProxy(REQUEST_URL + 2, CVurlProxy.of(Proxy.Type.HTTP, PROXY_HOST + 2, PROXY_PORT));
+        selector.addProxy(REQUEST_URL, CVurlProxy.of(PROXY_HOST, PROXY_PORT));
+        selector.addProxy(REQUEST_URL + 2, CVurlProxy.of(PROXY_HOST + 2, PROXY_PORT));
         final var expectedProxies = List.of(makeExpectedHttpProxy(PROXY_HOST));
 
         //when
@@ -44,7 +45,7 @@ class CVurlProxySelectorTest {
     void shouldReturnCorrectProxyForSameUriWhenAddedCVurlProxyForUri() {
         //given
         final var expectedProxy = makeExpectedHttpProxy(PROXY_HOST);
-        selector.addProxy(REQUEST_URL, CVurlProxy.of(Proxy.Type.HTTP, PROXY_HOST, PROXY_PORT));
+        selector.addProxy(REQUEST_URL, CVurlProxy.of(PROXY_HOST, PROXY_PORT));
 
         //when
         final var proxies = selector.select(REQUEST_URI);
@@ -59,8 +60,8 @@ class CVurlProxySelectorTest {
         //given
         final var expectedProxies = List.of(makeExpectedHttpProxy(PROXY_HOST),
                 makeExpectedHttpProxy(PROXY_HOST + 2));
-        selector.addProxy(REQUEST_URL, CVurlProxy.of(Proxy.Type.HTTP, PROXY_HOST, PROXY_PORT));
-        selector.addProxy(REQUEST_URL, CVurlProxy.of(Proxy.Type.HTTP, PROXY_HOST + 2, PROXY_PORT));
+        selector.addProxy(REQUEST_URL, CVurlProxy.of(PROXY_HOST, PROXY_PORT));
+        selector.addProxy(REQUEST_URL, CVurlProxy.of(PROXY_HOST + 2, PROXY_PORT));
 
         //when
         final var proxies = selector.select(REQUEST_URI);
@@ -86,7 +87,7 @@ class CVurlProxySelectorTest {
     void shouldReturnPerRequestProxyWhenProxySelectorSpecifiedWithPerRequestProxy() {
         //given
         selector = new CVurlProxySelector(new ProxySelectorMock(List.of(makeExpectedHttpProxy(PROXY_HOST))));
-        selector.addProxy(REQUEST_URL, CVurlProxy.of(Proxy.Type.HTTP, PROXY_HOST + 2, PROXY_PORT));
+        selector.addProxy(REQUEST_URL, CVurlProxy.of(PROXY_HOST + 2, PROXY_PORT));
 
         //when
         final var proxies = selector.select(REQUEST_URI);
@@ -108,7 +109,7 @@ class CVurlProxySelectorTest {
     @Test
     void shouldReturnDefaultProxyForThisUriForSecondCallForSameUriWhenSelectForUriCalledTwice() {
         //given
-        selector.addProxy(REQUEST_URL, CVurlProxy.of(Proxy.Type.HTTP, PROXY_HOST, PROXY_PORT));
+        selector.addProxy(REQUEST_URL, CVurlProxy.of(PROXY_HOST, PROXY_PORT));
         selector.select(REQUEST_URI);
 
         //when

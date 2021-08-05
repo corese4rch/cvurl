@@ -7,7 +7,9 @@ import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
 import coresearch.cvurl.io.internal.configuration.RequestConfigurer;
 import coresearch.cvurl.io.mapper.BodyType;
 import coresearch.cvurl.io.model.CVurlConfig;
+import coresearch.cvurl.io.model.CVurlProxy;
 import coresearch.cvurl.io.model.Response;
+import coresearch.cvurl.io.request.proxy.CVurlProxySelector;
 
 import java.io.InputStream;
 import java.net.ProxySelector;
@@ -139,7 +141,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
      * @return this builder
      */
     @SuppressWarnings("unchecked")
-    public T withProxy(CVurlProxy cVurlProxy) {
+    public T proxy(CVurlProxy cVurlProxy) {
         final Optional<ProxySelector> proxySelector = cvurlConfig.getProxySelector();
 
         if (proxySelector.isEmpty()) {
