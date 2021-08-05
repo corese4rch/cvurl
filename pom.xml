@@ -32,9 +32,7 @@
         <!-- test -->
         <mockito.version>3.11.2</mockito.version>
         <wiremock.version>2.27.2</wiremock.version>
-        <hamcrest.version>2.2</hamcrest.version>
         <junit-jupiter.version>5.8.0-M1</junit-jupiter.version>
-        <mockito-extension.version>1.2.1</mockito-extension.version>
         <!-- plugins -->
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
@@ -69,18 +67,6 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <version>${mockito.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-core</artifactId>
-            <version>${hamcrest.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>name.falgout.jeffrey.testing.junit5</groupId>
-            <artifactId>mockito-extension</artifactId>
-            <version>${mockito-extension.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
