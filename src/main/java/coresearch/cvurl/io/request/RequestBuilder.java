@@ -31,7 +31,7 @@ import static java.util.stream.Collectors.joining;
  * @param <T> the type of the builder
  * @since 0.9
  */
-public class RequestBuilder<T extends RequestBuilder<T>> implements Request, RequestConfigurer<RequestBuilder> {
+public class RequestBuilder<T extends RequestBuilder<T>> implements Request, RequestConfigurer<RequestBuilder<T>> {
 
     protected final CVurlConfig cvurlConfig;
     protected final RequestConfiguration.Builder requestConfigurationBuilder;
@@ -39,9 +39,9 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
     protected HttpMethod method;
     protected HttpRequest.BodyPublisher bodyPublisher = HttpRequest.BodyPublishers.noBody();
 
-    private String uri;
-    private Map<String, String> queryParams = new HashMap<>();
-    private Map<String, String> headers = new HashMap<>();
+    private final String uri;
+    private final Map<String, String> queryParams = new HashMap<>();
+    private final Map<String, String> headers = new HashMap<>();
 
     RequestBuilder(String uri, HttpMethod method, CVurlConfig cvurlConfig) {
         this.method = method;
@@ -163,6 +163,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
     public Request create() {
         final RequestConfiguration requestConfiguration = requestConfigurationBuilder.build();
         final HttpRequest httpRequest = setUpHttpRequestBuilder(requestConfiguration).build();
+
         return new CVurlRequest(httpRequest, cvurlConfig, requestConfiguration);
     }
 
@@ -246,7 +247,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
     }
 
     @Override
-    public <T> CompletableFuture<Response<T>> asyncAs(HttpResponse.BodyHandler<T> bodyHandler, HttpResponse.PushPromiseHandler<T> pph) {
+    public <U> CompletableFuture<Response<U>> asyncAs(HttpResponse.BodyHandler<U> bodyHandler, HttpResponse.PushPromiseHandler<U> pph) {
         return create().asyncAs(bodyHandler, pph);
     }
 
@@ -266,7 +267,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
     }
 
     @Override
-    public <T> T asObject(BodyType<T> type) {
+    public <U> U asObject(BodyType<U> type) {
         return create().asObject(type);
     }
 

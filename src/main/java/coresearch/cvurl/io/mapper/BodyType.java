@@ -17,13 +17,15 @@ public abstract class BodyType<T> {
 
     private static final String ERROR_MESSAGE = "The type must be a direct child of the BodyType class.";
 
-    private Type type;
+    private final Type type;
 
     protected BodyType() {
         ParameterizedType superclass = (ParameterizedType) this.getClass().getGenericSuperclass();
+
         if (superclass.getRawType() != BodyType.class) {
             throw new IllegalStateException(ERROR_MESSAGE);
         }
+
         this.type = superclass.getActualTypeArguments()[0];
     }
 

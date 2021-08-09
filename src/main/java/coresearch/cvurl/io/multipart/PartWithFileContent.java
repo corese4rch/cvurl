@@ -6,7 +6,8 @@ package coresearch.cvurl.io.multipart;
  * @since 1.0
  */
 public class PartWithFileContent extends Part<PartWithFileContent> {
-    private String fileName;
+
+    private final String fileName;
 
     PartWithFileContent(String fileName, byte[] content) {
         super(content);

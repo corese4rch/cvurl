@@ -23,9 +23,9 @@ public class MultipartBody {
     private static final String CONTENT_DISPOSITION_WITH_FILENAME_TEMPLATE = CONTENT_DISPOSITION_TEMPLATE + "; filename=\"%s\"";
     private static final String BOUNDARY_DELIMITER = "--";
 
-    private String boundary;
+    private final String boundary;
     private String multipartType;
-    private List<Part> parts;
+    private final List<Part> parts;
 
     private MultipartBody(String boundary, String multipartType, List<Part> parts) {
         this.boundary = boundary;
@@ -63,7 +63,9 @@ public class MultipartBody {
         var result = parts.stream()
                 .flatMap(part -> (Stream<byte[]>) part.asByteArrays(boundary).stream())
                 .collect(Collectors.toList());
+
         result.add((BOUNDARY_DELIMITER + boundary + BOUNDARY_DELIMITER).getBytes(UTF_8));
+
         return result;
     }
 
@@ -135,6 +137,7 @@ public class MultipartBody {
 
         part.header(HttpHeader.CONTENT_DISPOSITION, getContentDispositionHeader(name, part.getFileName()));
         this.parts.add(part);
+
         return this;
     }
 

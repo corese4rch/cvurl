@@ -33,17 +33,20 @@ public final class CVurlProxySelector extends ProxySelector {
     @Override
     public List<Proxy> select(URI uri) {
         final String stringUri = uri.toString();
+
         // proxy-per-request
         final List<Proxy> proxies = new ArrayList<>(proxiesByUri.getOrDefault(stringUri, List.of()));
         proxiesByUri.remove(stringUri);
 
         // proxy-per-client
-        if (proxies.isEmpty() && proxySelector != null)
+        if (proxies.isEmpty() && proxySelector != null) {
             proxies.addAll(proxySelector.select(uri));
+        }
 
         // default proxy
-        if (proxies.isEmpty())
+        if (proxies.isEmpty()) {
             proxies.addAll(ProxySelector.getDefault().select(uri));
+        }
 
         return proxies;
     }
@@ -72,10 +75,12 @@ public final class CVurlProxySelector extends ProxySelector {
     }
 
     private Proxy toProxy(CVurlProxy cVurlProxy) {
-        if (cVurlProxy.getType() == Proxy.Type.DIRECT)
+        if (cVurlProxy.getType() == Proxy.Type.DIRECT) {
             return Proxy.NO_PROXY;
+        }
 
         final InetSocketAddress sa = new InetSocketAddress(cVurlProxy.getHost(), cVurlProxy.getPort());
+
         return new Proxy(cVurlProxy.getType(), sa);
     }
 

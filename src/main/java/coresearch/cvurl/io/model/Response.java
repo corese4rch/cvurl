@@ -18,7 +18,7 @@ import java.util.Set;
  */
 public class Response<T> {
 
-    private HttpResponse<T> rawResponse;
+    private final HttpResponse<T> rawResponse;
 
     /**
      * Creates an instance of the {@link Response} class from the specified {@link HttpResponse} instance.
