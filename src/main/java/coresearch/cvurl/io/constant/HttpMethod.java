@@ -35,19 +35,9 @@ public enum HttpMethod {
     PATCH,
 
     /**
-     * The TRACE method performs a message loop-back test along the path to the target resource.
-     */
-    TRACE,
-
-    /**
      * The OPTIONS method is used to describe the communication options for the target resource.
      */
     OPTIONS,
-
-    /**
-     * The CONNECT method establishes a tunnel to the server identified by the target resource.
-     */
-    CONNECT,
 
     /**
      * The HEAD method asks for a response identical to that of a GET request, but without the response body.

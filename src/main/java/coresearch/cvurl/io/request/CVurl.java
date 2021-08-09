@@ -71,7 +71,7 @@ public class CVurl {
      * @return an instance of the {@link RequestBuilder} class
      */
     public RequestBuilder<?> get(String url) {
-        return createGetRequest(url);
+        return createRequestWithoutBody(url, HttpMethod.GET);
     }
 
     /**
@@ -81,7 +81,7 @@ public class CVurl {
      * @return an instance of the {@link RequestBuilder} class
      */
     public RequestBuilder<?> get(URL url) {
-        return createGetRequest(url.toString());
+        return createRequestWithoutBody(url.toString(), HttpMethod.GET);
     }
 
     /**
@@ -91,7 +91,7 @@ public class CVurl {
      * @return an instance of the {@link RequestBuilder} class
      */
     public RequestWithBodyBuilder post(String url) {
-        return createRequestWBody(url, HttpMethod.POST);
+        return createRequestWithBody(url, HttpMethod.POST);
     }
 
     /**
@@ -101,7 +101,7 @@ public class CVurl {
      * @return an instance of the {@link RequestBuilder} class
      */
     public RequestWithBodyBuilder post(URL url) {
-        return createRequestWBody(url.toString(), HttpMethod.POST);
+        return createRequestWithBody(url.toString(), HttpMethod.POST);
     }
 
     /**
@@ -111,7 +111,7 @@ public class CVurl {
      * @return an instance of the {@link RequestBuilder} class
      */
     public RequestWithBodyBuilder put(String url) {
-        return createRequestWBody(url, HttpMethod.PUT);
+        return createRequestWithBody(url, HttpMethod.PUT);
     }
 
     /**
@@ -121,7 +121,7 @@ public class CVurl {
      * @return an instance of the {@link RequestBuilder} class
      */
     public RequestWithBodyBuilder put(URL url) {
-        return createRequestWBody(url.toString(), HttpMethod.PUT);
+        return createRequestWithBody(url.toString(), HttpMethod.PUT);
     }
 
     /**
@@ -131,7 +131,7 @@ public class CVurl {
      * @return an instance of the {@link RequestBuilder} class
      */
     public RequestWithBodyBuilder delete(String url) {
-        return createRequestWBody(url, HttpMethod.DELETE);
+        return createRequestWithBody(url, HttpMethod.DELETE);
     }
 
     /**
@@ -141,7 +141,7 @@ public class CVurl {
      * @return an instance of the {@link RequestBuilder} class
      */
     public RequestWithBodyBuilder delete(URL url) {
-        return createRequestWBody(url.toString(), HttpMethod.DELETE);
+        return createRequestWithBody(url.toString(), HttpMethod.DELETE);
     }
 
     /**
@@ -151,7 +151,7 @@ public class CVurl {
      * @return an instance of the {@link RequestBuilder} class
      */
     public RequestWithBodyBuilder patch(String url) {
-        return createRequestWBody(url, HttpMethod.PATCH);
+        return createRequestWithBody(url, HttpMethod.PATCH);
     }
 
     /**
@@ -161,7 +161,7 @@ public class CVurl {
      * @return an instance of the {@link RequestBuilder} class
      */
     public RequestWithBodyBuilder patch(URL url) {
-        return createRequestWBody(url.toString(), HttpMethod.PATCH);
+        return createRequestWithBody(url.toString(), HttpMethod.PATCH);
     }
 
     /**
@@ -170,8 +170,8 @@ public class CVurl {
      * @param url - the specified URL.
      * @return an instance of the {@link RequestBuilder} class
      */
-    public RequestWithBodyBuilder head(String url) {
-        return createRequestWBody(url, HttpMethod.HEAD);
+    public RequestBuilder<?> head(String url) {
+        return createRequestWithoutBody(url, HttpMethod.HEAD);
     }
 
     /**
@@ -180,15 +180,35 @@ public class CVurl {
      * @param url - the specified URL.
      * @return an instance of the {@link RequestBuilder} class
      */
-    public RequestWithBodyBuilder head(URL url) {
-        return createRequestWBody(url.toString(), HttpMethod.HEAD);
+    public RequestBuilder<?> head(URL url) {
+        return createRequestWithoutBody(url.toString(), HttpMethod.HEAD);
     }
 
-    private RequestBuilder<?> createGetRequest(String url) {
-        return new RequestBuilder<>(url, HttpMethod.GET, cvurlConfig);
+    /**
+     * Creates an instance of the {@link RequestBuilder} class with the specified URL for the HTTP OPTIONS method.
+     *
+     * @param url - the specified URL.
+     * @return an instance of the {@link RequestBuilder} class
+     */
+    public RequestBuilder<?> options(String url) {
+        return createRequestWithoutBody(url, HttpMethod.OPTIONS);
     }
 
-    private RequestWithBodyBuilder createRequestWBody(String url, HttpMethod httpMethod) {
+    /**
+     * Creates an instance of the {@link RequestBuilder} class with the specified URL for the HTTP OPTIONS method.
+     *
+     * @param url - the specified URL.
+     * @return an instance of the {@link RequestBuilder} class
+     */
+    public RequestBuilder<?> options(URL url) {
+        return createRequestWithoutBody(url.toString(), HttpMethod.OPTIONS);
+    }
+
+    private RequestBuilder<?> createRequestWithoutBody(String url, HttpMethod httpMethod) {
+        return new RequestBuilder<>(url, httpMethod, cvurlConfig);
+    }
+
+    private RequestWithBodyBuilder createRequestWithBody(String url, HttpMethod httpMethod) {
         return new RequestWithBodyBuilder(url, httpMethod, cvurlConfig);
     }
 }
