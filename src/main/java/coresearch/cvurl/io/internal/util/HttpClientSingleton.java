@@ -1,4 +1,4 @@
-package coresearch.cvurl.io.request;
+package coresearch.cvurl.io.internal.util;
 
 import java.net.http.HttpClient;
 

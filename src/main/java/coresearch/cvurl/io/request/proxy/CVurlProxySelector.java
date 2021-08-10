@@ -1,4 +1,6 @@
-package coresearch.cvurl.io.request;
+package coresearch.cvurl.io.request.proxy;
+
+import coresearch.cvurl.io.model.CVurlProxy;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -53,7 +55,7 @@ public final class CVurlProxySelector extends ProxySelector {
 
     @Override
     public void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
-        // ignore for now
+        // ignored
     }
 
     public void addProxy(String uri, CVurlProxy cVurlProxy) {
@@ -75,13 +77,13 @@ public final class CVurlProxySelector extends ProxySelector {
     }
 
     private Proxy toProxy(CVurlProxy cVurlProxy) {
-        if (cVurlProxy.getType() == Proxy.Type.DIRECT) {
+        if (cVurlProxy.getHost() == null && cVurlProxy.getPort() == -1) {
             return Proxy.NO_PROXY;
         }
 
         final InetSocketAddress sa = new InetSocketAddress(cVurlProxy.getHost(), cVurlProxy.getPort());
 
-        return new Proxy(cVurlProxy.getType(), sa);
+        return new Proxy(Proxy.Type.HTTP, sa);
     }
 
 }

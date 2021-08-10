@@ -5,8 +5,8 @@ import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
 import coresearch.cvurl.io.internal.configuration.RequestConfigurer;
 import coresearch.cvurl.io.mapper.GenericMapper;
 import coresearch.cvurl.io.mapper.MapperFactory;
-import coresearch.cvurl.io.request.CVurlProxySelector;
-import coresearch.cvurl.io.request.HttpClientSingleton;
+import coresearch.cvurl.io.request.proxy.CVurlProxySelector;
+import coresearch.cvurl.io.internal.util.HttpClientSingleton;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;

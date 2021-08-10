@@ -1,6 +1,6 @@
-package coresearch.cvurl.io.request;
+package coresearch.cvurl.io.model;
 
-import java.net.Proxy;
+import static coresearch.cvurl.io.internal.util.Validation.notNullParam;
 
 /**
  * The helper class for proxy configuration.
@@ -9,12 +9,10 @@ import java.net.Proxy;
  */
 public class CVurlProxy {
 
-    private final Proxy.Type type;
     private final String host;
     private final int port;
 
-    private CVurlProxy(Proxy.Type type, String host, int port) {
-        this.type = type;
+    private CVurlProxy(String host, int port) {
         this.host = host;
         this.port = port;
     }
@@ -34,22 +32,17 @@ public class CVurlProxy {
     }
 
     /**
-     * Returns the {@code type} value.
-     */
-    public Proxy.Type getType() {
-        return type;
-    }
-
-    /**
      * Creates a new instance of the {@link CVurlProxy} class
      *
-     * @param type - the type of the proxy
      * @param host - the proxy host
      * @param port - the proxy port
      * @return an instance of the {@link CVurlProxy} class
      */
-    public static CVurlProxy of(Proxy.Type type, String host, int port) {
-        return new CVurlProxy(type, host, port);
+    public static CVurlProxy of(String host, int port) {
+        notNullParam(host, "host");
+        notNullParam(port, "port");
+
+        return new CVurlProxy(host, port);
     }
 
     /**
@@ -58,7 +51,7 @@ public class CVurlProxy {
      * @return an instance of the {@link CVurlProxy} class
      */
     public static CVurlProxy noProxy() {
-        return new CVurlProxy(Proxy.Type.DIRECT, null, -1);
+        return new CVurlProxy(null, -1);
     }
 
 }

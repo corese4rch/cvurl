@@ -4,7 +4,7 @@ import coresearch.cvurl.io.constant.HttpClientMode;
 import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
 import coresearch.cvurl.io.mapper.MapperFactory;
 import coresearch.cvurl.io.mapper.impl.JacksonMapper;
-import coresearch.cvurl.io.request.CVurlProxySelector;
+import coresearch.cvurl.io.request.proxy.CVurlProxySelector;
 import coresearch.cvurl.io.utils.MockHttpClient;
 import coresearch.cvurl.io.utils.MockProxySelector;
 import org.junit.jupiter.api.Test;

@@ -3,6 +3,8 @@ package coresearch.cvurl.io.request;
 import coresearch.cvurl.io.constant.HttpMethod;
 import coresearch.cvurl.io.mapper.MapperFactory;
 import coresearch.cvurl.io.model.CVurlConfig;
+import coresearch.cvurl.io.model.CVurlProxy;
+import coresearch.cvurl.io.request.proxy.CVurlProxySelector;
 
 import java.net.ProxySelector;
 import java.net.URL;
@@ -45,7 +47,7 @@ public class CVurl {
      * Creates an instance of the {@link CVurl} class with the specified {@link HttpClient} using
      * the default mapper created by the {@link MapperFactory#createDefault()} method, and
      * the request timeout is null.
-     * In order for the {@link RequestBuilder#withProxy(CVurlProxy)} method to work, one should specify {@link CVurlProxySelector}
+     * In order for the {@link RequestBuilder#proxy(CVurlProxy)} method to work, one should specify {@link CVurlProxySelector}
      * as a proxy selector for {@link HttpClient} using the {@link HttpClient.Builder#proxy(ProxySelector)} method.
      *
      * @param httpClient - the instance of the {@link HttpClient} class
