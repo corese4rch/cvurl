@@ -9,7 +9,7 @@
 
 ## Requirements 
  **cVurl** is written in Java 11 and can be used with any JDK 11.0.2 or newer
- (mainly because of this [issue](https://bugs.openjdk.java.net/browse/JDK-8211437))
+ (mainly because of this [issue](https://bugs.openjdk.java.net/browse/JDK-8211437)).
  
 ## Dependencies
  **cVurl** is built purely with Java 11, and one of our goals was to bring as few dependencies to your project as possible. The only dependencies that will be added to your project are:
@@ -375,7 +375,7 @@ try {
 We've tried our best to overcome these dozens of lines of code, and here's what we've created for you.
 ###### cVurl multipart example 
 ```java
-PostMapping("/photos") // we are using Spring to represent the multipart example
+@PostMapping("/photos") // we are using Spring to represent the multipart example
 public ResponseEntity uploadPhoto(@RequestParam MultipartFile photo, @RequestParam String title) throws IOException {
     Response<String> response = cVurl.post(HOST + PHOTOS)
         .body(MultipartBody.create()
@@ -410,7 +410,7 @@ compile group: 'com.github.corese4rch', name: 'cvurl-io', version: '1.5'
 Examples can be found on our [Wiki page](https://github.com/corese4rch/cvurl/wiki).
  
 ## Changelog
-Please see the [changelog](https://github.com/corese4rch/cvurl/wiki/Change-Log) page to see what's recently changed.
+Please see the [changelog](https://github.com/corese4rch/cvurl/wiki/Changelog) page to see what's recently changed.
    
 ## License
  >  Copyright 2019-2021 Avenga. Licensed under GNU GPLv3 

@@ -277,9 +277,10 @@ public class CVurlConfig {
          * @return the builder
          */
         @Override
-        public ConfigurationBuilder requestTimeout(Duration requestTimeout) {
+        @SuppressWarnings("unchecked")
+        public T requestTimeout(Duration requestTimeout) {
             this.requestConfigurationBuilder.requestTimeout(requestTimeout);
-            return this;
+            return (T) this;
         }
 
         /**
@@ -290,9 +291,10 @@ public class CVurlConfig {
          * @return the builder
          */
         @Override
-        public ConfigurationBuilder acceptCompressed(boolean acceptCompressed) {
+        @SuppressWarnings("unchecked")
+        public T acceptCompressed(boolean acceptCompressed) {
             this.requestConfigurationBuilder.acceptCompressed(acceptCompressed);
-            return this;
+            return (T) this;
         }
 
         /**
@@ -302,9 +304,10 @@ public class CVurlConfig {
          * @return the builder
          */
         @Override
-        public ConfigurationBuilder logEnabled(boolean logEnabled) {
+        @SuppressWarnings("unchecked")
+        public T logEnabled(boolean logEnabled) {
             this.requestConfigurationBuilder.logEnabled(logEnabled);
-            return this;
+            return (T) this;
         }
 
         protected HttpClient getHttpClient() {
