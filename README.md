@@ -410,7 +410,7 @@ compile group: 'com.github.corese4rch', name: 'cvurl-io', version: '1.5'
 Examples can be found on our [Wiki page](https://github.com/corese4rch/cvurl/wiki).
  
 ## Changelog
-Please see the [changelog](https://github.com/corese4rch/cvurl/wiki/Change-Log) page to see what's recently changed.
+Please see the [changelog](https://github.com/corese4rch/cvurl/wiki/Changelog) page to see what's recently changed.
    
 ## License
  >  Copyright 2019-2021 Avenga. Licensed under GNU GPLv3 
