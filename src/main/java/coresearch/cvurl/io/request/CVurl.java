@@ -1,262 +1,216 @@
 package coresearch.cvurl.io.request;
 
 import coresearch.cvurl.io.constant.HttpMethod;
-import coresearch.cvurl.io.mapper.GenericMapper;
 import coresearch.cvurl.io.mapper.MapperFactory;
 import coresearch.cvurl.io.model.CVurlConfig;
+import coresearch.cvurl.io.model.CVurlProxy;
+import coresearch.cvurl.io.request.proxy.CVurlProxySelector;
 
+import java.net.ProxySelector;
 import java.net.URL;
 import java.net.http.HttpClient;
-import java.time.Duration;
 
 import static coresearch.cvurl.io.internal.util.Validation.notNullParam;
 
 /**
- * Central part of the lib. Used to initiate {@link Request} creation with proper {@link GenericMapper} and
- * {@link HttpClient}.
+ * An HTTP Client.
+ *
+ * The central part of the lib. The instance of the {@link CVurl} class can be used to send HTTP requests and retrieve their responses.
+ *
+ * @since 0.9
  */
 public class CVurl {
 
-    private CVurlConfig cvurlConfig;
+    private final CVurlConfig cVurlConfig;
 
     /**
-     * Creates CVurl with default mapper created by {@link MapperFactory#createDefault()}, default {@link HttpClient} created
-     * by {@link HttpClient#newHttpClient()} and request timeout set to null.
+     * Creates an instance of the {@link CVurl} class
+     * with the default mapper created by the {@link MapperFactory#createDefault()} method,
+     * the default client created by the {@link HttpClient#newHttpClient()} method, and the request timeout is null.
      */
     public CVurl() {
-        this.cvurlConfig = CVurlConfig.defaultConfiguration();
+        this.cVurlConfig = CVurlConfig.defaultConfiguration();
     }
 
     /**
-     * Creates CVurl with specified {@link CVurlConfig} and
-     * default mapper created by {@link MapperFactory#createDefault()}.
+     * Creates an instance of the {@link CVurl} class with the specified {@link CVurlConfig} and
+     * the default mapper created by the {@link MapperFactory#createDefault()} method.
      *
-     * @param cvurlConfig configuration with which CVurl will be created.
+     * @param cVurlConfig - the configuration
      */
-    public CVurl(CVurlConfig cvurlConfig) {
-        notNullParam(cvurlConfig);
-        this.cvurlConfig = cvurlConfig;
+    public CVurl(CVurlConfig cVurlConfig) {
+        notNullParam(cVurlConfig);
+        this.cVurlConfig = cVurlConfig;
     }
 
     /**
-     * Creates CVurl with specified {@link HttpClient} using
-     * default mapper created by {@link MapperFactory#createDefault()} and
-     * request timeout set to null.
+     * Creates an instance of the {@link CVurl} class with the specified {@link HttpClient} using
+     * the default mapper created by the {@link MapperFactory#createDefault()} method, and
+     * the request timeout is null.
+     * In order for the {@link RequestBuilder#proxy(CVurlProxy)} method to work, one should specify {@link CVurlProxySelector}
+     * as a proxy selector for {@link HttpClient} using the {@link HttpClient.Builder#proxy(ProxySelector)} method.
      *
-     * @param httpClient httpClient with which CVurl will be created.
+     * @param httpClient - the instance of the {@link HttpClient} class
+     * @deprecated You should use {@link #CVurl()} if you want to create CVurl with default configuration,
+     *             or {@link #CVurl(CVurlConfig)} to build customized {@link CVurl}.
      */
+    @Deprecated(since = "1.5", forRemoval = true)
     public CVurl(HttpClient httpClient) {
-        this.cvurlConfig = CVurlConfig.builder(httpClient).build();
+        this.cVurlConfig = CVurlConfig.builder(httpClient).build();
     }
 
     /**
-     * Creates CVurl with specified {@link GenericMapper}, default {@link HttpClient} created
-     * by {@link HttpClient#newHttpClient()} and request timeout set to null.
-     *
-     * @param genericMapper mapper with which CVurl will be created.
-     * @deprecated You should use {@link #CVurl()} if you want to create CVurl with default configuration,
-     * or {@link #CVurl(CVurlConfig)} to build customized CVurl, or {@link #CVurl(HttpClient)} if
-     * you want to create {@link CVurl} with given HttpClient.
+     * Returns the {@code cvurlConfig} value.
      */
-    @Deprecated(since = "1.2", forRemoval = true)
-    public CVurl(GenericMapper genericMapper) {
-        this.cvurlConfig = CVurlConfig.builder().genericMapper(genericMapper).build();
-    }
-
-    /**
-     * Creates CVurl with specified {@link GenericMapper} and {@link CVurlConfig}
-     *
-     * @param genericMapper mapper with which CVurl will be created.
-     * @param cvurlConfig configuration with which CVurl will be created.
-     * @deprecated You should use {@link #CVurl()} if you want to create CVurl with default configuration,
-     * or {@link #CVurl(CVurlConfig)} to build customized CVurl, or {@link #CVurl(HttpClient)} if
-     * you want to create {@link CVurl} with given HttpClient.
-     */
-    @Deprecated(since = "1.2", forRemoval = true)
-    public CVurl(GenericMapper genericMapper, CVurlConfig cvurlConfig) {
-        notNullParam(cvurlConfig);
-        this.cvurlConfig = cvurlConfig.preconfiguredBuilder().genericMapper(genericMapper).build();
-    }
-
-    /**
-     * Creates CVurl with specified {@link HttpClient} and request timeout using
-     * default mapper created by {@link MapperFactory#createDefault()}.
-     *
-     * @param httpClient     httpClient with which CVurl will be created.
-     * @param requestTimeout requestTimeout with which CVurl will be created.
-     * @deprecated You should use {@link #CVurl()} if you want to create CVurl with default configuration,
-     * or {@link #CVurl(CVurlConfig)} to build customized CVurl, or {@link #CVurl(HttpClient)} if
-     * you want to create {@link CVurl} with given HttpClient.
-     */
-    @Deprecated(since = "1.2", forRemoval = true)
-    public CVurl(HttpClient httpClient, Duration requestTimeout) {
-        this.cvurlConfig = CVurlConfig.builder(httpClient).requestTimeout(requestTimeout).build();
-    }
-
-    /**
-     * Creates CVurl with specified {@link HttpClient} and {@link GenericMapper}.
-     * Timeout duration is set to null.
-     *
-     * @param genericMapper mapper with which CVurl will be created.
-     * @param httpClient    httpClient with which CVurl will be created.
-     * @deprecated You should use {@link #CVurl()} if you want to create CVurl with default configuration,
-     * or {@link #CVurl(CVurlConfig)} to build customized CVurl, or {@link #CVurl(HttpClient)} if
-     * you want to create {@link CVurl} with given HttpClient.
-     */
-    @Deprecated(since = "1.2", forRemoval = true)
-    public CVurl(GenericMapper genericMapper, HttpClient httpClient) {
-        this.cvurlConfig = CVurlConfig.builder(httpClient).genericMapper(genericMapper).build();
-    }
-
-    /**
-     * Creates CVurl with specified {@link HttpClient}, {@link GenericMapper} and
-     * timeout duration.
-     *
-     * @param genericMapper  mapper with which CVurl will be created.
-     * @param httpClient     httpClient with which CVurl will be created.
-     * @param requestTimeout requestTimeout with which CVurl will be created.
-     * @deprecated You should use {@link #CVurl()} if you want to create CVurl with default configuration,
-     * or {@link #CVurl(CVurlConfig)} to build customized CVurl, or {@link #CVurl(HttpClient)} if
-     * you want to create {@link CVurl} with given HttpClient.
-     */
-    @Deprecated(since = "1.2", forRemoval = true)
-    public CVurl(GenericMapper genericMapper, HttpClient httpClient, Duration requestTimeout) {
-        this.cvurlConfig = CVurlConfig.builder(httpClient)
-                .genericMapper(genericMapper)
-                .requestTimeout(requestTimeout)
-                .build();
-    }
-
     public CVurlConfig getCvurlConfig() {
-        return cvurlConfig;
+        return cVurlConfig;
     }
 
     /**
-     * Creates RequestBuilder with specified url and HttpMethod.GET.
+     * Creates an instance of the {@link RequestBuilder} class with the specified URL for the HTTP GET method.
      *
-     * @param url specified url.
-     * @return RequestBuilder
+     * @param url - the specified URL.
+     * @return an instance of the {@link RequestBuilder} class
      */
     public RequestBuilder<?> get(String url) {
-        return createGetRequest(url);
+        return createRequestWithoutBody(url, HttpMethod.GET);
     }
 
     /**
-     * Creates RequestBuilder with specified url and HttpMethod.GET.
+     * Creates an instance of the {@link RequestBuilder} class with the specified URL for the HTTP GET method.
      *
-     * @param url specified url.
-     * @return RequestBuilder
+     * @param url - the specified URL.
+     * @return an instance of the {@link RequestBuilder} class
      */
-
     public RequestBuilder<?> get(URL url) {
-        return createGetRequest(url.toString());
+        return createRequestWithoutBody(url.toString(), HttpMethod.GET);
     }
 
     /**
-     * Creates RequestBuilder with specified url and HttpMethod.POST.
+     * Creates an instance of the {@link RequestBuilder} class with the specified URL for the HTTP POST method.
      *
-     * @param url specified url.
-     * @return RequestBuilder
+     * @param url - the specified URL.
+     * @return an instance of the {@link RequestBuilder} class
      */
     public RequestWithBodyBuilder post(String url) {
-        return createRequestWBody(url, HttpMethod.POST);
+        return createRequestWithBody(url, HttpMethod.POST);
     }
 
     /**
-     * Creates RequestBuilder with specified url and HttpMethod.POST.
+     * Creates an instance of the {@link RequestBuilder} class with the specified URL for the HTTP POST method.
      *
-     * @param url specified url.
-     * @return RequestBuilder
+     * @param url - the specified URL.
+     * @return an instance of the {@link RequestBuilder} class
      */
     public RequestWithBodyBuilder post(URL url) {
-        return createRequestWBody(url.toString(), HttpMethod.POST);
+        return createRequestWithBody(url.toString(), HttpMethod.POST);
     }
 
     /**
-     * Creates RequestBuilder with specified url and HttpMethod.PUT.
+     * Creates an instance of the {@link RequestBuilder} class with the specified URL for the HTTP PUT method.
      *
-     * @param url specified url.
-     * @return RequestBuilder
+     * @param url - the specified URL.
+     * @return an instance of the {@link RequestBuilder} class
      */
     public RequestWithBodyBuilder put(String url) {
-        return createRequestWBody(url, HttpMethod.PUT);
+        return createRequestWithBody(url, HttpMethod.PUT);
     }
 
     /**
-     * Creates RequestBuilder with specified url and HttpMethod.PUT.
+     * Creates an instance of the {@link RequestBuilder} class with the specified URL for the HTTP PUT method.
      *
-     * @param url specified url.
-     * @return RequestBuilder
+     * @param url - the specified URL.
+     * @return an instance of the {@link RequestBuilder} class
      */
     public RequestWithBodyBuilder put(URL url) {
-        return createRequestWBody(url.toString(), HttpMethod.PUT);
+        return createRequestWithBody(url.toString(), HttpMethod.PUT);
     }
 
     /**
-     * Creates RequestBuilder with specified url and HttpMethod.DELETE.
+     * Creates an instance of the {@link RequestBuilder} class with the specified URL for the HTTP DELETE method.
      *
-     * @param url specified url.
-     * @return RequestBuilder
+     * @param url - the specified URL.
+     * @return an instance of the {@link RequestBuilder} class
      */
     public RequestWithBodyBuilder delete(String url) {
-        return createRequestWBody(url, HttpMethod.DELETE);
+        return createRequestWithBody(url, HttpMethod.DELETE);
     }
 
     /**
-     * Creates RequestBuilder with specified url and HttpMethod.DELETE.
+     * Creates an instance of the {@link RequestBuilder} class with the specified URL for the HTTP DELETE method.
      *
-     * @param url specified url.
-     * @return RequestBuilder
+     * @param url - the specified URL.
+     * @return an instance of the {@link RequestBuilder} class
      */
     public RequestWithBodyBuilder delete(URL url) {
-        return createRequestWBody(url.toString(), HttpMethod.DELETE);
+        return createRequestWithBody(url.toString(), HttpMethod.DELETE);
     }
 
     /**
-     * Creates RequestBuilder with specified url and HttpMethod.PATCH.
+     * Creates an instance of the {@link RequestBuilder} class with the specified URL for the HTTP PATCH method.
      *
-     * @param url specified url.
-     * @return RequestBuilder
+     * @param url - the specified URL.
+     * @return an instance of the {@link RequestBuilder} class
      */
     public RequestWithBodyBuilder patch(String url) {
-        return createRequestWBody(url, HttpMethod.PATCH);
+        return createRequestWithBody(url, HttpMethod.PATCH);
     }
 
     /**
-     * Creates RequestBuilder with specified url and HttpMethod.PATCH.
+     * Creates an instance of the {@link RequestBuilder} class with the specified URL for the HTTP PATCH method.
      *
-     * @param url specified url.
-     * @return RequestBuilder
+     * @param url - the specified URL.
+     * @return an instance of the {@link RequestBuilder} class
      */
     public RequestWithBodyBuilder patch(URL url) {
-        return createRequestWBody(url.toString(), HttpMethod.PATCH);
+        return createRequestWithBody(url.toString(), HttpMethod.PATCH);
     }
 
     /**
-     * Creates RequestBuilder with specified url and HttpMethod.HEAD.
+     * Creates an instance of the {@link RequestBuilder} class with the specified URL for the HTTP HEAD method.
      *
-     * @param url specified url.
-     * @return RequestBuilder
+     * @param url - the specified URL.
+     * @return an instance of the {@link RequestBuilder} class
      */
-    public RequestWithBodyBuilder head(String url) {
-        return createRequestWBody(url, HttpMethod.HEAD);
+    public RequestBuilder<?> head(String url) {
+        return createRequestWithoutBody(url, HttpMethod.HEAD);
     }
 
     /**
-     * Creates RequestBuilder with specified url and HttpMethod.HEAD.
+     * Creates an instance of the {@link RequestBuilder} class with the specified URL for the HTTP HEAD method.
      *
-     * @param url specified url.
-     * @return RequestBuilder
+     * @param url - the specified URL.
+     * @return an instance of the {@link RequestBuilder} class
      */
-    public RequestWithBodyBuilder head(URL url) {
-        return createRequestWBody(url.toString(), HttpMethod.HEAD);
+    public RequestBuilder<?> head(URL url) {
+        return createRequestWithoutBody(url.toString(), HttpMethod.HEAD);
     }
 
-    private RequestBuilder<?> createGetRequest(String url) {
-        return new RequestBuilder<>(url, HttpMethod.GET, cvurlConfig);
+    /**
+     * Creates an instance of the {@link RequestBuilder} class with the specified URL for the HTTP OPTIONS method.
+     *
+     * @param url - the specified URL.
+     * @return an instance of the {@link RequestBuilder} class
+     */
+    public RequestBuilder<?> options(String url) {
+        return createRequestWithoutBody(url, HttpMethod.OPTIONS);
     }
 
-    private RequestWithBodyBuilder createRequestWBody(String url, HttpMethod httpMethod) {
-        return new RequestWithBodyBuilder(url, httpMethod, cvurlConfig);
+    /**
+     * Creates an instance of the {@link RequestBuilder} class with the specified URL for the HTTP OPTIONS method.
+     *
+     * @param url - the specified URL.
+     * @return an instance of the {@link RequestBuilder} class
+     */
+    public RequestBuilder<?> options(URL url) {
+        return createRequestWithoutBody(url.toString(), HttpMethod.OPTIONS);
+    }
+
+    private RequestBuilder<?> createRequestWithoutBody(String url, HttpMethod httpMethod) {
+        return new RequestBuilder<>(url, httpMethod, cVurlConfig);
+    }
+
+    private RequestWithBodyBuilder createRequestWithBody(String url, HttpMethod httpMethod) {
+        return new RequestWithBodyBuilder(url, httpMethod, cVurlConfig);
     }
 }

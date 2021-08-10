@@ -22,8 +22,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 /**
- * Class responsible for sending HTTP requests and parsing responses.
- * Can be created by using {@link RequestBuilder#create()}
+ * The class is responsible for sending HTTP requests and parsing HTTP responses.
+ * Can be created by using the {@link RequestBuilder#create()} method.
+ *
+ * @since 0.9
  */
 public final class CVurlRequest implements Request {
 
@@ -33,7 +35,7 @@ public final class CVurlRequest implements Request {
     private final RequestConfiguration requestConfiguration;
     private final HttpClient httpClient;
 
-    private HttpRequest httpRequest;
+    private final HttpRequest httpRequest;
 
     CVurlRequest(HttpRequest httpRequest, CVurlConfig cvurlConfig,
                  RequestConfiguration requestConfiguration) {
@@ -190,7 +192,9 @@ public final class CVurlRequest implements Request {
         if (requestConfiguration.isLogEnabled()) {
             LOGGER.info("Sending request {}", this.httpRequest);
         }
+
         HttpResponse<U> response = httpClient.send(this.httpRequest, bodyHandler);
+
         return responseMapper.apply(response);
     }
 }

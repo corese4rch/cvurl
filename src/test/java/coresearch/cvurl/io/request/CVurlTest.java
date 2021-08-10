@@ -1,55 +1,57 @@
 package coresearch.cvurl.io.request;
 
 import coresearch.cvurl.io.constant.HttpClientMode;
-import coresearch.cvurl.io.mapper.MapperFactory;
 import coresearch.cvurl.io.model.CVurlConfig;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 import java.net.http.HttpClient;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CVurlTest {
+class CVurlTest {
 
     @Test
-    public void createCVurlWithPrototypeHttpClientTest() {
+    void shouldReturnNewHttpClientForEachCVurlConfigWhenHttpClientModeIsPrototype() {
         //given
         var configuration1 = CVurlConfig.builder().httpClientMode(HttpClientMode.PROTOTYPE).build();
         var configuration2 = CVurlConfig.builder().httpClientMode(HttpClientMode.PROTOTYPE).build();
 
         //when
-        var cvurl1 = new CVurl(configuration1);
-        var cvurl2 = new CVurl(configuration2);
+        var cVurl1 = new CVurl(configuration1);
+        var cVurl2 = new CVurl(configuration2);
 
         //then
-        assertNotSame(getHttpClient(cvurl1), getHttpClient(cvurl2));
+        assertNotSame(getHttpClient(cVurl1), getHttpClient(cVurl2));
     }
 
     @Test
-    public void createCVurlWithSingletoneHttpClientTest() {
+    void shouldReturnSameHttpClientForEachCVurlConfigWhenHttpClientModeIsSingleton() {
         //given
         var configuration1 = CVurlConfig.builder().httpClientMode(HttpClientMode.SINGLETON).build();
         var configuration2 = CVurlConfig.builder().httpClientMode(HttpClientMode.SINGLETON).build();
 
         //when
-        var cvurl1 = new CVurl(configuration1);
-        var cvurl2 = new CVurl(configuration2);
+        var cVurl1 = new CVurl(configuration1);
+        var cVurl2 = new CVurl(configuration2);
 
         //then
-        assertSame(getHttpClient(cvurl1), getHttpClient(cvurl2));
+        assertSame(getHttpClient(cVurl1), getHttpClient(cVurl2));
     }
 
     @Test
-    public void createCVurlWithNullConfigShouldThrowNPE() {
+    void shouldThrowNullPointerExceptionWhenCVurlConfigIsNull() {
         //given
-        CVurlConfig cvurlConfig = null;
+        CVurlConfig cVurlConfig = null;
+
+        //when
+        Executable executable = () -> new CVurl(cVurlConfig);
 
         //then
-        assertThrows(NullPointerException.class, () -> new CVurl(cvurlConfig));
-        assertThrows(NullPointerException.class, () -> new CVurl(MapperFactory.createDefault(), cvurlConfig));
+        assertThrows(NullPointerException.class, executable);
     }
 
-    private HttpClient getHttpClient(CVurl cvurl) {
-        return cvurl.getCvurlConfig().getHttpClient();
+    private HttpClient getHttpClient(CVurl cVurl) {
+        return cVurl.getCvurlConfig().getHttpClient();
     }
 }

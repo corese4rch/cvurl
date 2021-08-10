@@ -1,10 +1,7 @@
 package coresearch.cvurl.io.request;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.tomakehurst.wiremock.client.WireMock;
 import coresearch.cvurl.io.helper.ObjectGenerator;
-import coresearch.cvurl.io.helper.model.User;
-import coresearch.cvurl.io.model.Response;
 import coresearch.cvurl.io.constant.HttpHeader;
 import coresearch.cvurl.io.constant.HttpStatus;
 import org.junit.jupiter.api.Test;
@@ -12,105 +9,97 @@ import org.junit.jupiter.api.Test;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CVurlPatchRequestTest extends AbstractRequestTest {
+class CVurlPatchRequestTest extends AbstractRequestTest {
 
     private static final String TEST_BODY_FOR_TEST = "Test body for test";
 
     @Test
-    public void sendPATCHTest() {
-
+    void shouldReturnStatusCodeOkWhenRequestIsValid() {
         //given
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
-        //when
-        wiremock.stubFor(WireMock.patch(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(patch(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.patch(url)
+        //when
+        var response = cVurl.patch(url)
                 .body("")
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
         //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.patchRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
+        verify(exactly(1), patchRequestedFor(urlEqualTo(TEST_ENDPOINT)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
-    public void sendPATCH_URLTest() throws MalformedURLException {
-
+    void shouldReturnStatusCodeOkWhenUrlIsValid() throws MalformedURLException {
         //given
-        String strURL = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
-        URL url = new URL(strURL);
+        var strURL = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        var url = new URL(strURL);
 
-        //when
-        wiremock.stubFor(WireMock.patch(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(patch(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.patch(url)
+        //when
+        var response = cVurl.patch(url)
                 .body("")
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
         //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.patchRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
+        verify(exactly(1), patchRequestedFor(urlEqualTo(TEST_ENDPOINT)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
-    public void sendPATCH_QueryParamTest() {
-
+    void shouldReturnStatusCodeOkWhenQueryParameterIsSpecified() {
         //given
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
-        String testParam = "param";
+        var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        var testParam = "param";
 
-        //when
-        wiremock.stubFor(WireMock.patch(WireMock.urlEqualTo(TEST_ENDPOINT + "?param=param"))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(patch(urlEqualTo(TEST_ENDPOINT + "?param=param"))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.patch(url)
+        //when
+        var response = cVurl.patch(url)
                 .queryParam(testParam, testParam)
                 .body("")
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
         //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.patchRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT + "?param=param")));
+        verify(exactly(1), patchRequestedFor(urlEqualTo(TEST_ENDPOINT + "?param=param")));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
-    public void sendPATCH_QueryParamsTest() {
-
+    void shouldReturnStatusCodeOkWhenQueryParametersAreSpecified() {
         //given
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
-        String testParam = "param";
-        String testParam2 = "param2";
+        var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        var testParam = "param";
+        var testParam2 = "param2";
 
-        //when
-        wiremock.stubFor(WireMock.patch(WireMock.urlEqualTo(TEST_ENDPOINT + "?param=param&param2=param2"))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(patch(urlEqualTo(TEST_ENDPOINT + "?param=param&param2=param2"))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.patch(url)
+        //when
+        var response = cVurl.patch(url)
                 .queryParam(testParam, testParam)
                 .queryParam(testParam2, testParam2)
                 .body("")
@@ -118,89 +107,82 @@ public class CVurlPatchRequestTest extends AbstractRequestTest {
                 .orElseThrow(RuntimeException::new);
 
         //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.patchRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT + "?param=param&param2=param2")));
+        verify(exactly(1), patchRequestedFor(urlEqualTo(TEST_ENDPOINT + "?param=param&param2=param2")));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
-    public void sendPATCH_HeaderRequiredTest() {
-
+    void shouldReturnStatusCodeOkWhenHeaderIsProvided() {
         //given
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
-        //when
-        wiremock.stubFor(WireMock.patch(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .withHeader(HttpHeader.AUTHORIZATION, WireMock.equalTo(TEST_TOKEN))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(patch(urlEqualTo(TEST_ENDPOINT))
+                .withHeader(HttpHeader.AUTHORIZATION, equalTo(TEST_TOKEN))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.patch(url)
+        //when
+        var response = cVurl.patch(url)
                 .header(HttpHeader.AUTHORIZATION, TEST_TOKEN)
                 .body("")
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
         //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.patchRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT))
-                        .withHeader(HttpHeader.AUTHORIZATION, WireMock.equalTo(TEST_TOKEN)));
+        verify(exactly(1),
+                patchRequestedFor(urlEqualTo(TEST_ENDPOINT)).withHeader(HttpHeader.AUTHORIZATION, equalTo(TEST_TOKEN)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
-    public void sendPATCH_HeadersRequiredTest() {
-
+    void shouldReturnStatusCodeOkWhenHeadersAreProvided() {
         //given
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
-        Map<String, String> headers = new HashMap<>();
+        var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        var headers = new HashMap<String, String>();
         headers.put(HttpHeader.AUTHORIZATION, TEST_TOKEN);
         headers.put(HttpHeader.ACCEPT, "xml");
 
-        //when
-        wiremock.stubFor(WireMock.patch(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .withHeader(HttpHeader.AUTHORIZATION, WireMock.equalTo(TEST_TOKEN))
-                .withHeader(HttpHeader.ACCEPT, WireMock.equalTo("xml"))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(patch(urlEqualTo(TEST_ENDPOINT))
+                .withHeader(HttpHeader.AUTHORIZATION, equalTo(TEST_TOKEN))
+                .withHeader(HttpHeader.ACCEPT, equalTo("xml"))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.patch(url)
+        //when
+        var response = cVurl.patch(url)
                 .headers(headers)
                 .body("")
                 .asString()
                 .orElseThrow(RuntimeException::new);
         //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.patchRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
+        verify(exactly(1), patchRequestedFor(urlEqualTo(TEST_ENDPOINT)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
-    public void sendPATCH_checkResponseHeaderTest() {
-
+    void shouldReturnAuthorizationHeaderWhenRequestIsValid() {
         //given
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
-        //when
-        wiremock.stubFor(WireMock.patch(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(patch(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withHeader(HttpHeader.AUTHORIZATION, TEST_TOKEN)
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.patch(url)
+        //when
+        var response = cVurl.patch(url)
                 .body("")
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
         //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.patchRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
+        verify(exactly(1), patchRequestedFor(urlEqualTo(TEST_ENDPOINT)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
@@ -209,132 +191,121 @@ public class CVurlPatchRequestTest extends AbstractRequestTest {
     }
 
     @Test
-    public void sendPATCH_StringResponseTest() {
-
+    void shouldReturnStringBodyWhenRequestIsValid() {
         //given
-        String body = TEST_BODY_FOR_TEST;
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        var body = TEST_BODY_FOR_TEST;
+        var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
-        //when
-        wiremock.stubFor(WireMock.patch(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(patch(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)
                         .withBody(body)));
 
-        Response<String> response = cvurl.patch(url)
+        //when
+        var response = cVurl.patch(url)
                 .body("")
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
         //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.patchRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
+        verify(exactly(1), patchRequestedFor(urlEqualTo(TEST_ENDPOINT)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
         assertEquals(body, response.getBody());
     }
 
-
     @Test
-    public void sendPATCH_StringRequestBodyTest() {
-
+    void shouldReturnStatusCodeOkWhenStringRequestBody() {
         //given
-        String body = TEST_BODY_FOR_TEST;
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        var body = TEST_BODY_FOR_TEST;
+        var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
-        //when
-        wiremock.stubFor(WireMock.patch(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .withRequestBody(WireMock.equalTo(body))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(patch(urlEqualTo(TEST_ENDPOINT))
+                .withRequestBody(equalTo(body))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.patch(url)
+        //when
+        var response = cVurl.patch(url)
                 .body(body)
                 .asString()
                 .orElseThrow(RuntimeException::new);
         //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.patchRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
+        verify(exactly(1), patchRequestedFor(urlEqualTo(TEST_ENDPOINT)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
-    public void sendPATCH_BytesRequestBodyTest() {
-
+    void shouldReturnStatusCodeOkWhenBodyInBytesIsSpecified() {
         //given
-        String body = TEST_BODY_FOR_TEST;
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        var body = TEST_BODY_FOR_TEST;
+        var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
-        //when
-        wiremock.stubFor(WireMock.patch(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .withRequestBody(WireMock.equalTo(body))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(patch(urlEqualTo(TEST_ENDPOINT))
+                .withRequestBody(equalTo(body))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.patch(url)
+        //when
+        var response = cVurl.patch(url)
                 .body(body.getBytes())
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
         //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.patchRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
+        verify(exactly(1), patchRequestedFor(urlEqualTo(TEST_ENDPOINT)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
-    public void sendPATCH_CollectionsRequestBodyTest() throws JsonProcessingException {
-
+    void shouldReturnStatusCodeOkWhenBodyIsList() throws JsonProcessingException {
         //given
-        List<User> users = ObjectGenerator.generateListOfTestObjects();
+        var users = ObjectGenerator.generateListOfTestObjects();
 
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
-        //when
-        wiremock.stubFor(WireMock.patch(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .withRequestBody(WireMock.equalTo(mapper.writeValueAsString(users)))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(patch(urlEqualTo(TEST_ENDPOINT))
+                .withRequestBody(equalTo(mapper.writeValueAsString(users)))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.patch(url)
+        //when
+        var response = cVurl.patch(url)
                 .body(users)
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
         //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.patchRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
+        verify(exactly(1), patchRequestedFor(urlEqualTo(TEST_ENDPOINT)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
     }
 
     @Test
-    public void sendPATCH_ObjectRequestBodyTest() throws JsonProcessingException {
-
+    void shouldReturnStatusCodeOkWhenBodyIsObject() throws JsonProcessingException {
         //given
-        User user = ObjectGenerator.generateTestObject();
-        String url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+        var user = ObjectGenerator.generateTestObject();
+        var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
-        //when
-        wiremock.stubFor(WireMock.patch(WireMock.urlEqualTo(TEST_ENDPOINT))
-                .withRequestBody(WireMock.equalTo(mapper.writeValueAsString(user)))
-                .willReturn(WireMock.aResponse()
+        wireMockServer.stubFor(patch(urlEqualTo(TEST_ENDPOINT))
+                .withRequestBody(equalTo(mapper.writeValueAsString(user)))
+                .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
 
-        Response<String> response = cvurl.patch(url)
+        //when
+        var response = cVurl.patch(url)
                 .body(user)
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
         //then
-        WireMock.verify(WireMock.exactly(1),
-                WireMock.patchRequestedFor(WireMock.urlEqualTo(TEST_ENDPOINT)));
+        verify(exactly(1), patchRequestedFor(urlEqualTo(TEST_ENDPOINT)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());

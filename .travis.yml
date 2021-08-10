@@ -2,10 +2,10 @@ language: java
 jdk:
   - oraclejdk11
   - openjdk11
-  - openjdk15
+  - openjdk16
 
 after_success:
   - |
-    if [ "${JAVA_HOME}" = "/home/travis/openjdk12" ]; then
+    if [ "${JAVA_HOME}" = "/home/travis/openjdk16" ]; then
       mvn jacoco:report coveralls:report
     fi

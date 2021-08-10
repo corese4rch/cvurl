@@ -13,7 +13,9 @@ import static coresearch.cvurl.io.internal.util.Validation.notNullParam;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * Class for building multipart request body.
+ * The class for building a multipart request body.
+ *
+ * @since 1.0
  */
 public class MultipartBody {
 
@@ -21,9 +23,9 @@ public class MultipartBody {
     private static final String CONTENT_DISPOSITION_WITH_FILENAME_TEMPLATE = CONTENT_DISPOSITION_TEMPLATE + "; filename=\"%s\"";
     private static final String BOUNDARY_DELIMITER = "--";
 
-    private String boundary;
+    private final String boundary;
     private String multipartType;
-    private List<Part> parts;
+    private final List<Part> parts;
 
     private MultipartBody(String boundary, String multipartType, List<Part> parts) {
         this.boundary = boundary;
@@ -32,18 +34,19 @@ public class MultipartBody {
     }
 
     /**
-     * Creates new instance of {@link MultipartBody} with randomly generated boundary.
+     * Creates a new instance of the {@link MultipartBody} class with a randomly generated boundary.
      *
-     * @return new instance of {@link MultipartBody}
+     * @return an instance of the {@link MultipartBody} class
      */
     public static MultipartBody create() {
         return create(UUID.randomUUID().toString());
     }
 
     /**
-     * Creates new instance of {@link MultipartBody} with provided boundary.
+     * Creates a new instance of the {@link MultipartBody} class with the provided boundary.
      *
-     * @return new instance of {@link MultipartBody}
+     * @param boundary - the value used as the border
+     * @return an instance of the {@link MultipartBody} class
      */
     public static MultipartBody create(String boundary) {
         notNullParam(boundary, "boundary");
@@ -52,41 +55,39 @@ public class MultipartBody {
     }
 
     /**
-     * Generate multipart body as byte array later to be used by {@link coresearch.cvurl.io.request.RequestWithBodyBuilder}
+     * Generates a multipart body as a list of byte arrays.
      *
-     * @return list of byte arrays
+     * @return the list of byte arrays
      */
     public List<byte[]> asByteArrays() {
         var result = parts.stream()
                 .flatMap(part -> (Stream<byte[]>) part.asByteArrays(boundary).stream())
                 .collect(Collectors.toList());
+
         result.add((BOUNDARY_DELIMITER + boundary + BOUNDARY_DELIMITER).getBytes(UTF_8));
+
         return result;
     }
 
     /**
-     * Returns multipart type of {@link MultipartBody}
-     *
-     * @return multipart type
+     * Returns the {@code multipartType} value.
      */
     public String getMultipartType() {
         return multipartType;
     }
 
     /**
-     * Returns boundary of {@link MultipartBody}
-     *
-     * @return boundary
+     * Returns the {@code boundary} value.
      */
     public String getBoundary() {
         return boundary;
     }
 
     /**
-     * Sets multipart type of {@link MultipartBody}
+     * Sets the multipart type.
      *
-     * @param multipartType multipart type to be set.
-     * @return this {@link MultipartBody}
+     * @param multipartType - the type to be set.
+     * @return the same instance of the {@link MultipartBody} class
      */
     public MultipartBody type(String multipartType) {
         notNullParam(multipartType, "multipartType");
@@ -96,10 +97,10 @@ public class MultipartBody {
     }
 
     /**
-     * Add a part to the body.
+     * Adds an instance of the {@link Part} class to the body.
      *
-     * @param part part to add
-     * @return this {@link MultipartBody}
+     * @param part - the instance of the {@link Part} class
+     * @return the same instance of the {@link MultipartBody} class
      */
     public MultipartBody part(Part part) {
         notNullParam(part, "part");
@@ -109,11 +110,11 @@ public class MultipartBody {
     }
 
     /**
-     * Add a form data part to the body with provided part name.
+     * Adds an instance of the {@link Part} class to the body with the provided name.
      *
-     * @param name part name
-     * @param part part to add
-     * @return this {@link MultipartBody}
+     * @param name - the name of the part
+     * @param part - the instance of the {@link Part} class
+     * @return the same instance of the {@link MultipartBody} class
      */
     public MultipartBody formPart(String name, Part part) {
         notNullParam(name, "name");
@@ -124,11 +125,11 @@ public class MultipartBody {
     }
 
     /**
-     * Add a file form data part to the body with provided part name.
+     * Adds an instance of the {@link PartWithFileContent} class to the body with the provided name.
      *
-     * @param name part name
-     * @param part part to add
-     * @return this {@link MultipartBody}
+     * @param name - the name of the part
+     * @param part - the instance of the {@link PartWithFileContent} class
+     * @return the same instance of the {@link MultipartBody} class
      */
     public MultipartBody formPart(String name, PartWithFileContent part) {
         notNullParam(name, "name");
@@ -136,6 +137,7 @@ public class MultipartBody {
 
         part.header(HttpHeader.CONTENT_DISPOSITION, getContentDispositionHeader(name, part.getFileName()));
         this.parts.add(part);
+
         return this;
     }
 

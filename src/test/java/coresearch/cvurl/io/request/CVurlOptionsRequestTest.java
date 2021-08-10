@@ -12,24 +12,22 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class CVurlHeadRequestTest extends AbstractRequestTest {
+class CVurlOptionsRequestTest extends AbstractRequestTest {
 
     @Test
     void shouldReturnStatusCodeOkWhenRequestIsValid() {
         //given
         var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
-        wireMockServer.stubFor(head(urlEqualTo(TEST_ENDPOINT))
+        wireMockServer.stubFor(options(urlEqualTo(TEST_ENDPOINT))
                 .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
 
         //when
-        var response = cVurl.head(url)
-                .asString()
-                .orElseThrow(RuntimeException::new);
+        var response = cVurl.options(url).asString().orElseThrow(RuntimeException::new);
 
         //then
-        verify(exactly(1), headRequestedFor(urlEqualTo(TEST_ENDPOINT)));
+        verify(exactly(1), optionsRequestedFor(urlEqualTo(TEST_ENDPOINT)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
@@ -41,16 +39,14 @@ class CVurlHeadRequestTest extends AbstractRequestTest {
         var strURL = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
         var url = new URL(strURL);
 
-        wireMockServer.stubFor(head(urlEqualTo(TEST_ENDPOINT))
+        wireMockServer.stubFor(options(urlEqualTo(TEST_ENDPOINT))
                 .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
         //when
-        var response = cVurl.head(url)
-                .asString()
-                .orElseThrow(RuntimeException::new);
+        var response = cVurl.options(url).asString().orElseThrow(RuntimeException::new);
 
         //then
-        verify(exactly(1), headRequestedFor(urlEqualTo(TEST_ENDPOINT)));
+        verify(exactly(1), optionsRequestedFor(urlEqualTo(TEST_ENDPOINT)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
@@ -62,18 +58,15 @@ class CVurlHeadRequestTest extends AbstractRequestTest {
         var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
         var testParam = "param";
 
-        wireMockServer.stubFor(head(urlEqualTo(TEST_ENDPOINT + "?param=param"))
+        wireMockServer.stubFor(options(urlEqualTo(TEST_ENDPOINT + "?param=param"))
                 .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
-
         //when
-        var response = cVurl.head(url)
+        var response = cVurl.options(url)
                 .queryParam(testParam, testParam)
-                .asString()
-                .orElseThrow(RuntimeException::new);
-
+                .asString().orElseThrow(RuntimeException::new);
         //then
-        verify(exactly(1), headRequestedFor(urlEqualTo(TEST_ENDPOINT + "?param=param")));
+        verify(exactly(1), optionsRequestedFor(urlEqualTo(TEST_ENDPOINT + "?param=param")));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
@@ -86,19 +79,18 @@ class CVurlHeadRequestTest extends AbstractRequestTest {
         var testParam = "param";
         var testParam2 = "param2";
 
-        wireMockServer.stubFor(head(urlEqualTo(TEST_ENDPOINT + "?param=param&param2=param2"))
+        wireMockServer.stubFor(options(urlEqualTo(TEST_ENDPOINT + "?param=param&param2=param2"))
                 .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
-
         //when
-        var response = cVurl.head(url)
+        var response = cVurl.options(url)
                 .queryParam(testParam, testParam)
                 .queryParam(testParam2, testParam2)
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
         //then
-        verify(exactly(1), headRequestedFor(urlEqualTo(TEST_ENDPOINT + "?param=param&param2=param2")));
+        verify(exactly(1), optionsRequestedFor(urlEqualTo(TEST_ENDPOINT + "?param=param&param2=param2")));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
@@ -109,20 +101,20 @@ class CVurlHeadRequestTest extends AbstractRequestTest {
         //given
         var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
-        wireMockServer.stubFor(head(urlEqualTo(TEST_ENDPOINT))
+        wireMockServer.stubFor(options(urlEqualTo(TEST_ENDPOINT))
                 .withHeader(HttpHeader.AUTHORIZATION, equalTo(TEST_TOKEN))
                 .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
 
         //when
-        var response = cVurl.head(url)
+        var response = cVurl.options(url)
                 .header(HttpHeader.AUTHORIZATION, TEST_TOKEN)
                 .asString()
                 .orElseThrow(RuntimeException::new);
 
         //then
         verify(exactly(1),
-                headRequestedFor(urlEqualTo(TEST_ENDPOINT)).withHeader(HttpHeader.AUTHORIZATION, equalTo(TEST_TOKEN)));
+                optionsRequestedFor(urlEqualTo(TEST_ENDPOINT)).withHeader(HttpHeader.AUTHORIZATION, equalTo(TEST_TOKEN)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
@@ -136,19 +128,20 @@ class CVurlHeadRequestTest extends AbstractRequestTest {
         headers.put(HttpHeader.AUTHORIZATION, TEST_TOKEN);
         headers.put(HttpHeader.ACCEPT, "xml");
 
-        wireMockServer.stubFor(head(urlEqualTo(TEST_ENDPOINT))
+        wireMockServer.stubFor(options(urlEqualTo(TEST_ENDPOINT))
                 .withHeader(HttpHeader.AUTHORIZATION, equalTo(TEST_TOKEN))
                 .withHeader(HttpHeader.ACCEPT, equalTo("xml"))
                 .willReturn(aResponse()
                         .withStatus(HttpStatus.OK)));
 
         //when
-        var response = cVurl.head(url)
+        var response = cVurl.options(url)
                 .headers(headers)
                 .asString()
                 .orElseThrow(RuntimeException::new);
+
         //then
-        verify(exactly(1), headRequestedFor(urlEqualTo(TEST_ENDPOINT)));
+        verify(exactly(1), optionsRequestedFor(urlEqualTo(TEST_ENDPOINT)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
@@ -159,22 +152,41 @@ class CVurlHeadRequestTest extends AbstractRequestTest {
         //given
         var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
 
-        wireMockServer.stubFor(head(urlEqualTo(TEST_ENDPOINT))
+        wireMockServer.stubFor(options(urlEqualTo(TEST_ENDPOINT))
                 .willReturn(aResponse()
                         .withHeader(HttpHeader.AUTHORIZATION, TEST_TOKEN)
                         .withStatus(HttpStatus.OK)));
-
         //when
-        var response = cVurl.head(url)
-                .asString()
-                .orElseThrow(RuntimeException::new);
+        var response = cVurl.options(url).asString().orElseThrow(RuntimeException::new);
 
         //then
-        verify(exactly(1), headRequestedFor(urlEqualTo(TEST_ENDPOINT)));
+        verify(exactly(1), optionsRequestedFor(urlEqualTo(TEST_ENDPOINT)));
 
         assertTrue(response.isSuccessful());
         assertEquals(HttpStatus.OK, response.status());
         assertTrue(response.headersNames().contains(HttpHeader.AUTHORIZATION));
         assertEquals(TEST_TOKEN, response.getHeaderValue(HttpHeader.AUTHORIZATION).orElseThrow());
+    }
+
+    @Test
+    void shouldReturnStringBodyWhenRequestIsValid() {
+        //given
+        var body = "Test body for test";
+        var url = String.format(URL_PATTERN, PORT, TEST_ENDPOINT);
+
+
+        wireMockServer.stubFor(options(urlEqualTo(TEST_ENDPOINT))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.OK)
+                        .withBody(body)));
+        //when
+        var response = cVurl.options(url).asString().orElseThrow(RuntimeException::new);
+
+        //then
+        verify(exactly(1), optionsRequestedFor(urlEqualTo(TEST_ENDPOINT)));
+
+        assertTrue(response.isSuccessful());
+        assertEquals(HttpStatus.OK, response.status());
+        assertEquals(body, response.getBody());
     }
 }

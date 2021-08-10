@@ -11,21 +11,23 @@ import static java.lang.String.format;
 
 public class ObjectGenerator {
 
-    private static Random random = new Random();
+    private static final Random RANDOM = new Random();
 
     private ObjectGenerator() {
-        throw new IllegalStateException(format("Creating of class %s is forbidden", ObjectGenerator.class.getName()));
+        throw new IllegalStateException(format("The creation of the %s class is prohibited", ObjectGenerator.class.getName()));
     }
 
     public static User generateTestObject() {
-        return new User(UUID.randomUUID().toString(), random.nextInt(100));
+        return new User(UUID.randomUUID().toString(), RANDOM.nextInt(100));
     }
 
     public static List<User> generateListOfTestObjects() {
-        List<User> userList = new ArrayList<>(3);
+        var userList = new ArrayList<User>(3);
+
         userList.add(generateTestObject());
         userList.add(generateTestObject());
         userList.add(generateTestObject());
+
         return userList;
     }
 }

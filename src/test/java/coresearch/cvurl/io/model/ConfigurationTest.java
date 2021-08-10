@@ -4,6 +4,7 @@ import coresearch.cvurl.io.constant.HttpClientMode;
 import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
 import coresearch.cvurl.io.mapper.MapperFactory;
 import coresearch.cvurl.io.mapper.impl.JacksonMapper;
+import coresearch.cvurl.io.request.proxy.CVurlProxySelector;
 import coresearch.cvurl.io.utils.MockHttpClient;
 import coresearch.cvurl.io.utils.MockProxySelector;
 import org.junit.jupiter.api.Test;
@@ -19,12 +20,15 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ConfigurationTest {
+class ConfigurationTest {
 
     @Test
-    public void builderTest() throws NoSuchAlgorithmException {
+    void shouldReturnValidCVurlConfigWhenBuilderIsUsed() throws NoSuchAlgorithmException {
         //given
         var authenticator = new Authenticator() {};
         var connectTimeout = Duration.ofSeconds(1);
@@ -57,100 +61,60 @@ public class ConfigurationTest {
         assertSame(cookieHandler, conf.getCookieHandler().orElseThrow(RuntimeException::new));
         assertSame(executor, conf.getExecutor().orElseThrow(RuntimeException::new));
         assertSame(followRedirects, conf.getFollowRedirects());
-        assertSame(proxySelector, conf.getProxySelector().orElseThrow(RuntimeException::new));
+        assertEquals(new CVurlProxySelector(proxySelector), conf.getProxySelector().orElseThrow(RuntimeException::new));
         assertSame(sslContext, conf.getSslContext());
         assertArrayEquals(sslParameters.getCipherSuites(), conf.getSslParameters().getCipherSuites());
         assertSame(version, conf.getVersion());
     }
 
     @Test
-    public void createHttpClientTest() throws NoSuchAlgorithmException {
-        //given
-        var authenticator = new Authenticator() {};
-        var connectTimeout = Duration.ofSeconds(1);
-        var cookieHandler = new CookieManager();
-        var executor = Executors.newFixedThreadPool(1);
-        var followRedirects = HttpClient.Redirect.NEVER;
-        var proxySelector = MockProxySelector.create();
-        var sslContext = SSLContext.getDefault();
-        var sslParameters = new SSLParameters(new String[]{"test"});
-        var priority = 1;
-        var version = HttpClient.Version.HTTP_1_1;
-
-        var conf = CVurlConfig.builder()
-                .authenticator(authenticator)
-                .connectTimeout(connectTimeout)
-                .cookieHandler(cookieHandler)
-                .executor(executor)
-                .followRedirects(followRedirects)
-                .proxySelector(proxySelector)
-                .sslContext(sslContext)
-                .sslParameters(sslParameters)
-                .priority(priority)
-                .version(version)
-                .build();
-
-        //when
-        var httpClient = conf.createHttpClient();
-        //then
-        assertSame(authenticator, httpClient.authenticator().get());
-        assertSame(connectTimeout, httpClient.connectTimeout().get());
-        assertSame(cookieHandler, httpClient.cookieHandler().get());
-        assertSame(executor, httpClient.executor().get());
-        assertSame(followRedirects, httpClient.followRedirects());
-        assertSame(proxySelector, httpClient.proxy().get());
-        assertSame(sslContext, httpClient.sslContext());
-        assertArrayEquals(sslParameters.getCipherSuites(), httpClient.sslParameters().getCipherSuites());
-        assertSame(version, httpClient.version());
-    }
-
-    @Test
-    public void httpClientBasedBuilderTest() {
+    void shouldReturnValidCVurlConfigWhenBuilderWithHttpClientIsUsed() {
         //given
         var httpClient = MockHttpClient.create();
         var genericMapper = MapperFactory.createDefault();
         var requestTimeout = Duration.ofSeconds(42);
-        var acceptCompressed = true;
 
         //when
         var configuration = CVurlConfig.builder(httpClient)
                 .genericMapper(genericMapper)
                 .requestTimeout(requestTimeout)
-                .acceptCompressed(acceptCompressed)
+                .acceptCompressed(true)
                 .build();
 
         //then
-        assertSame(configuration.getHttpClient(), httpClient);
-        assertSame(configuration.getGenericMapper(), genericMapper);
-        assertSame(configuration.getGlobalRequestConfiguration().getRequestTimeout().orElseThrow(RuntimeException::new),
-                requestTimeout);
-        assertEquals(configuration.getGlobalRequestConfiguration().isAcceptCompressed(), acceptCompressed);
+        assertSame(httpClient, configuration.getHttpClient());
+        assertSame(genericMapper, configuration.getGenericMapper());
+        assertSame(requestTimeout, configuration.getGlobalRequestConfiguration().getRequestTimeout().orElseThrow(RuntimeException::new));
+        assertTrue(configuration.getGlobalRequestConfiguration().isAcceptCompressed());
     }
 
     @Test
-    public void defaultConfigurationTest() {
+    void shouldReturnValidCVurlConfigurationWhenDefaultConfigurationMethodIsUsed() {
+        //given
+        final HttpClient httpClient = HttpClient.newBuilder()
+                .proxy(new CVurlProxySelector())
+                .build();
+
         //when
         var configuration = CVurlConfig.defaultConfiguration();
 
         //then
-        assertTrue(httpClientsEquals(configuration.getHttpClient(), HttpClient.newHttpClient()));
-        assertSame(configuration.getGenericMapper().getClass(), JacksonMapper.class);
-        assertSame(configuration.getHttpClientMode(), HttpClientMode.PROTOTYPE);
+        assertTrue(httpClientsEquals(configuration.getHttpClient(), httpClient));
+        assertSame(JacksonMapper.class, configuration.getGenericMapper().getClass());
+        assertSame(HttpClientMode.PROTOTYPE, configuration.getHttpClientMode());
         assertTrue(requestConfigurationsEquals(
                 configuration.getGlobalRequestConfiguration(), RequestConfiguration.defaultConfiguration()));
     }
 
     @Test
-    public void preconfiguredBuilderTest() {
+    void shouldReturnValidCVurlConfigurationWhenPreconfiguredBuilderMethodIsUsed() {
         //given
         var configuration = CVurlConfig.defaultConfiguration();
 
         //when
-        var configurationBuilder = configuration.preconfiguredBuilder();
+        var resultConfiguration = configuration.preconfiguredBuilder().build();
 
         //then
-        var resultConfiguration = configurationBuilder.build();
-
         assertTrue(httpClientsEquals(configuration.getHttpClient(), resultConfiguration.getHttpClient()));
         assertSame(configuration.getGenericMapper().getClass(), resultConfiguration.getGenericMapper().getClass());
         assertSame(configuration.getHttpClientMode(), resultConfiguration.getHttpClientMode());
@@ -159,7 +123,7 @@ public class ConfigurationTest {
     }
 
     @Test
-    public void setLogEnabledIsMutableTest() {
+    void shouldChangeLogEnabledValueToTrueUsingDeprecatedMethod() {
         //given
         var configuration = CVurlConfig.defaultConfiguration();
 
@@ -171,31 +135,41 @@ public class ConfigurationTest {
     }
 
     @Test
-    public void configurationBuilderTest() {
+    void shouldChangeLogEnabledValueToTrue() {
+        //given
+        var configuration = CVurlConfig.defaultConfiguration();
+
+        //when
+        configuration.setLogEnabled(true);
+
+        //then
+        assertTrue(configuration.getGlobalRequestConfiguration().isLogEnabled());
+    }
+
+    @Test
+    void shouldReturnValidCVurlConfigWhenBuilderWithHttpClientIsUsedAndClientModeIsPrototype() {
         //given
         var httpClient = MockHttpClient.create();
         var genericMapper = MapperFactory.createDefault();
         var clientMode = HttpClientMode.PROTOTYPE;
         var timeout = Duration.ofSeconds(1);
-        var acceptCompressed = true;
-        var logEnabled = true;
 
         //when
         var configuration = CVurlConfig.builder(httpClient)
                 .genericMapper(genericMapper)
                 .httpClientMode(clientMode)
                 .requestTimeout(timeout)
-                .acceptCompressed(acceptCompressed)
-                .logEnabled(logEnabled)
+                .acceptCompressed(true)
+                .logEnabled(true)
                 .build();
 
         //then
-        assertSame(configuration.getHttpClient(), httpClient);
-        assertSame(configuration.getGenericMapper(), genericMapper);
-        assertEquals(configuration.getGlobalRequestConfiguration().getRequestTimeout()
-                .orElseThrow(RuntimeException::new), timeout);
-        assertEquals(configuration.getGlobalRequestConfiguration().isAcceptCompressed(), acceptCompressed);
-        assertEquals(configuration.getGlobalRequestConfiguration().isLogEnabled(), logEnabled);
+        assertSame(httpClient, configuration.getHttpClient());
+        assertSame(genericMapper, configuration.getGenericMapper());
+        assertEquals(timeout, configuration.getGlobalRequestConfiguration().getRequestTimeout()
+                .orElseThrow(RuntimeException::new));
+        assertTrue(configuration.getGlobalRequestConfiguration().isAcceptCompressed());
+        assertTrue(configuration.getGlobalRequestConfiguration().isLogEnabled());
     }
 
     private boolean httpClientsEquals(HttpClient client1, HttpClient client2) {
@@ -218,7 +192,7 @@ public class ConfigurationTest {
     }
 
     private <T> boolean optionalsEqual(Optional<T> opt1, Optional<T> opt2) {
-        return opt1.map(t -> t.equals(opt2.get()))
-                .orElseGet(() -> !opt2.isPresent());
+        return opt1.map(t -> opt2.isPresent() && t.equals(opt2.get()))
+                .orElseGet(opt2::isEmpty);
     }
 }

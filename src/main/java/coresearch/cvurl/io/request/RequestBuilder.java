@@ -3,13 +3,16 @@ package coresearch.cvurl.io.request;
 import coresearch.cvurl.io.constant.HttpContentEncoding;
 import coresearch.cvurl.io.constant.HttpHeader;
 import coresearch.cvurl.io.constant.HttpMethod;
+import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
 import coresearch.cvurl.io.internal.configuration.RequestConfigurer;
 import coresearch.cvurl.io.mapper.BodyType;
 import coresearch.cvurl.io.model.CVurlConfig;
-import coresearch.cvurl.io.internal.configuration.RequestConfiguration;
+import coresearch.cvurl.io.model.CVurlProxy;
 import coresearch.cvurl.io.model.Response;
+import coresearch.cvurl.io.request.proxy.CVurlProxySelector;
 
 import java.io.InputStream;
+import java.net.ProxySelector;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpRequest;
@@ -25,11 +28,12 @@ import java.util.stream.Collector;
 import static java.util.stream.Collectors.joining;
 
 /**
- * Builder used to build {@link Request}
+ * The builder class used to build an instance of the {@link Request} class.
  *
- * @param <T>
+ * @param <T> the type of the builder
+ * @since 0.9
  */
-public class RequestBuilder<T extends RequestBuilder<T>> implements Request, RequestConfigurer<RequestBuilder> {
+public class RequestBuilder<T extends RequestBuilder<T>> implements Request, RequestConfigurer<RequestBuilder<T>> {
 
     protected final CVurlConfig cvurlConfig;
     protected final RequestConfiguration.Builder requestConfigurationBuilder;
@@ -37,9 +41,9 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
     protected HttpMethod method;
     protected HttpRequest.BodyPublisher bodyPublisher = HttpRequest.BodyPublishers.noBody();
 
-    private String uri;
-    private Map<String, String> queryParams = new HashMap<>();
-    private Map<String, String> headers = new HashMap<>();
+    private final String uri;
+    private final Map<String, String> queryParams = new HashMap<>();
+    private final Map<String, String> headers = new HashMap<>();
 
     RequestBuilder(String uri, HttpMethod method, CVurlConfig cvurlConfig) {
         this.method = method;
@@ -49,11 +53,11 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
     }
 
     /**
-     * Add request header.
+     * Adds a header.
      *
-     * @param key   header key
-     * @param value header value
-     * @return this builder
+     * @param key - the header key
+     * @param value - the header value
+     * @return the builder
      */
     @SuppressWarnings("unchecked")
     public T header(String key, String value) {
@@ -62,10 +66,10 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
     }
 
     /**
-     * Add request headers.
+     * Adds headers.
      *
-     * @param headers headers name/value map
-     * @return this builder
+     * @param headers - the name/value map
+     * @return the builder
      */
     @SuppressWarnings("unchecked")
     public T headers(Map<String, String> headers) {
@@ -74,11 +78,11 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
     }
 
     /**
-     * Adds query parameter.
+     * Adds a query parameter.
      *
-     * @param name  query parameter name
-     * @param value query parameter value
-     * @return this builder
+     * @param name - the query parameter name
+     * @param value - the query parameter value
+     * @return the builder
      */
     @SuppressWarnings("unchecked")
     public T queryParam(String name, String value) {
@@ -89,8 +93,8 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
     /**
      * Adds query parameters.
      *
-     * @param queryParams query parameters name/value map
-     * @return this builder
+     * @param queryParams - the name/value map
+     * @return the builder
      */
     @SuppressWarnings("unchecked")
     public T queryParams(Map<String, String> queryParams) {
@@ -99,21 +103,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
     }
 
     /**
-     * Sets request timeout. Overlaps global timeout set for {@link CVurl}
-     *
-     * @param timeout request timeout
-     * @return this builder
-     * @deprecated Use {@link #requestTimeout(Duration)} instead
-     */
-    @SuppressWarnings("unchecked")
-    @Deprecated(since = "1.2", forRemoval = true)
-    public T timeout(Duration timeout) {
-        this.requestConfigurationBuilder.requestTimeout(timeout);
-        return (T) this;
-    }
-
-    /**
-     * Sets whether this client should accept compressed response body.
+     * Sets whether the client should accept the compressed response body or not.
      *
      * @return this builder
      */
@@ -145,13 +135,38 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
     }
 
     /**
-     * Builds new {@link Request}.
+     * Sets a proxy.
      *
-     * @return new {@link Request}
+     * @param cVurlProxy - the instance of the {@link CVurlProxy} class
+     * @return this builder
+     */
+    @SuppressWarnings("unchecked")
+    public T proxy(CVurlProxy cVurlProxy) {
+        final Optional<ProxySelector> proxySelector = cvurlConfig.getProxySelector();
+
+        if (proxySelector.isEmpty()) {
+            return (T) this;
+        }
+
+        final ProxySelector selector = proxySelector.get();
+
+        if (selector instanceof CVurlProxySelector) {
+            ((CVurlProxySelector) selector).addProxy(uri, cVurlProxy);
+        }
+
+        return (T) this;
+    }
+
+    /**
+     * Builds a new instance of the {@link Request} class.
+     *
+     * @return a new instance of the {@link Request} class.
      */
     public Request create() {
-        RequestConfiguration requestConfiguration = requestConfigurationBuilder.build();
-        return new CVurlRequest(setUpHttpRequestBuilder(requestConfiguration).build(), cvurlConfig, requestConfiguration);
+        final RequestConfiguration requestConfiguration = requestConfigurationBuilder.build();
+        final HttpRequest httpRequest = setUpHttpRequestBuilder(requestConfiguration).build();
+
+        return new CVurlRequest(httpRequest, cvurlConfig, requestConfiguration);
     }
 
     private HttpRequest.Builder setUpHttpRequestBuilder(RequestConfiguration requestConfiguration) {
@@ -234,7 +249,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
     }
 
     @Override
-    public <T> CompletableFuture<Response<T>> asyncAs(HttpResponse.BodyHandler<T> bodyHandler, HttpResponse.PushPromiseHandler<T> pph) {
+    public <U> CompletableFuture<Response<U>> asyncAs(HttpResponse.BodyHandler<U> bodyHandler, HttpResponse.PushPromiseHandler<U> pph) {
         return create().asyncAs(bodyHandler, pph);
     }
 
@@ -254,7 +269,7 @@ public class RequestBuilder<T extends RequestBuilder<T>> implements Request, Req
     }
 
     @Override
-    public <T> T asObject(BodyType<T> type) {
+    public <U> U asObject(BodyType<U> type) {
         return create().asObject(type);
     }
 

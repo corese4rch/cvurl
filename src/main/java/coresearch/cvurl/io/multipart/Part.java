@@ -14,15 +14,17 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;
 
 /**
- * Represent part of multipart data.
+ * Represent a part of multipart data.
+ *
+ * @since 1.0
  */
 public class Part<T extends Part<T>> {
 
     private static final String CRLF = "\r\n";
     private static final String BOUNDARY_DELIMITER = "--";
     private static final String CONTENT_ARGUMENT = "content";
-    private Map<String, String> headers;
-    private byte[] content;
+    private final Map<String, String> headers;
+    private final byte[] content;
 
     protected Part(byte[] content) {
         this.headers = new HashMap<>();
@@ -30,10 +32,10 @@ public class Part<T extends Part<T>> {
     }
 
     /**
-     * Creates new instance of {@link Part}
+     * Creates a new instance of the {@link Part} class
      *
-     * @param content content part
-     * @return this {@link Part}
+     * @param content - the content in bytes
+     * @return an instance of the {@link Part} class
      */
     public static Part of(byte[] content) {
         notNullParam(content, CONTENT_ARGUMENT);
@@ -42,10 +44,10 @@ public class Part<T extends Part<T>> {
     }
 
     /**
-     * Creates new instance of {@link Part}
+     * Creates a new instance of the {@link Part} class
      *
-     * @param content content part
-     * @return this {@link Part}
+     * @param content - the content as string
+     * @return an instance of the {@link Part} class
      */
     public static Part of(String content) {
         notNullParam(content, CONTENT_ARGUMENT);
@@ -54,26 +56,27 @@ public class Part<T extends Part<T>> {
     }
 
     /**
-     * Creates new instance of {@link Part} using file from provided filePath
-     * Throws {@link MultipartFileFormException} in case {@link IOException} happens
-     * while reading from the file. If file content type can be autodetected then it will
-     * be set as part header, otherwise part won't have content type header.
+     * Creates a new instance of the {@link Part} class using the file at the specified path.
+     * If the content type of the file can be detected automatically, it will be added to headers.
+     * Otherwise, the part will not have the Content-Type header.
      *
-     * @param filePath path to file that will be used as content.
-     * @return this {@link Part}
+     * @param filePath - the path to the file to be used as content
+     * @return an instance of the {@link Part} class
+     * @throws MultipartFileFormException in case {@link IOException} happens while reading from the file.
      */
     public static PartWithFileContent of(Path filePath) {
         return of(filePath.getFileName().toString(), filePath);
     }
 
     /**
-     * Creates new instance of {@link Part} using file from provided filePath and filename
-     * Throws {@link MultipartFileFormException} in case {@link IOException} happens
-     * while reading from the file. If file content type can be autodetected then it will
-     * be set as part header, otherwise part won't have content type header.
+     * Creates a new instance of the {@link Part} class using the file at the specified path.
+     * If the content type of the file can be detected automatically, it will be added to headers.
+     * Otherwise, the part will not have the Content-Type header.
      *
-     * @param filePath path to file that will be used as content.
-     * @return this {@link Part}
+     * @param fileName - the name of the file
+     * @param filePath - the path to the file to be used as content
+     * @return an instance of the {@link Part} class
+     * @throws MultipartFileFormException in case {@link IOException} happens while reading from the file.
      */
     public static PartWithFileContent of(String fileName, Path filePath) {
         notNullParam(fileName, "fileName");
@@ -83,6 +86,7 @@ public class Part<T extends Part<T>> {
             PartWithFileContent part = new PartWithFileContent(fileName, Files.readAllBytes(filePath));
             Optional.ofNullable(Files.probeContentType(filePath))
                     .ifPresent(part::contentType);
+
             return part;
         } catch (IOException e) {
             throw new MultipartFileFormException(e.getMessage(), e);
@@ -90,9 +94,12 @@ public class Part<T extends Part<T>> {
     }
 
     /**
-     * Creates new instance of {@link Part} using provided fileName, content and content type.
+     * Creates a new instance of the {@link Part} class using the specified file name, content type, and content in bytes.
      *
-     * @return this {@link Part}
+     * @param fileName - the name of the file
+     * @param contentType - the content type of the file
+     * @param content - the content in bytes
+     * @return an instance of the {@link Part} class
      */
     public static PartWithFileContent of(String fileName, String contentType, byte[] content) {
         notNullParam(fileName, "filePath");
@@ -103,11 +110,11 @@ public class Part<T extends Part<T>> {
     }
 
     /**
-     * Add a header to the part.
+     * Adds a header.
      *
-     * @param name  header name
-     * @param value header value
-     * @return this {@link Part}
+     * @param name - the header name
+     * @param value - the header value
+     * @return an instance of the {@link Part} class
      */
     @SuppressWarnings("unchecked")
     public T header(String name, String value) {
@@ -119,10 +126,10 @@ public class Part<T extends Part<T>> {
     }
 
     /**
-     * Add headers to the part.
+     * Adds headers.
      *
-     * @param headers headers to add
-     * @return this {@link Part}
+     * @param headers - the headers to add
+     * @return an instance of the {@link Part} class
      */
     @SuppressWarnings("unchecked")
     public T headers(Map<String, String> headers) {
@@ -137,10 +144,10 @@ public class Part<T extends Part<T>> {
     }
 
     /**
-     * Set a content-type header of the part.
+     * Set the value of the Content-Type header.
      *
-     * @param mimeType value to be set as content-type header.
-     * @return this {@link Part}
+     * @param mimeType - the value to be set as the value of the Content-Type header
+     * @return an instance of the {@link Part} class
      */
     @SuppressWarnings("unchecked")
     public T contentType(String mimeType) {

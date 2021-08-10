@@ -8,9 +8,14 @@ import coresearch.cvurl.io.mapper.GenericMapper;
 
 import java.io.IOException;
 
+/**
+ * The default implementation of the {@link GenericMapper} class. It uses an instance of {@link ObjectMapper} as a converter.
+ *
+ * @since 0.9
+ */
 public class JacksonMapper extends GenericMapper {
 
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     public JacksonMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;

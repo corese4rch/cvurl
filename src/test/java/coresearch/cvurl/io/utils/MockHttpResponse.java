@@ -18,8 +18,6 @@ public class MockHttpResponse implements HttpResponse<String> {
     private String body;
     private HttpClient.Version version;
 
-    private MockHttpResponse() { }
-
     public static MockHttpResponse create() {
         return new MockHttpResponse();
     }

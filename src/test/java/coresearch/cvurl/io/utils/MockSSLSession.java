@@ -1,6 +1,5 @@
 package coresearch.cvurl.io.utils;
 
-import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSessionContext;
 import javax.security.cert.X509Certificate;
@@ -8,9 +7,6 @@ import java.security.Principal;
 import java.security.cert.Certificate;
 
 public class MockSSLSession implements SSLSession {
-
-    private MockSSLSession() {
-    }
 
     public static MockSSLSession create() {
         return new MockSSLSession();
@@ -42,6 +38,11 @@ public class MockSSLSession implements SSLSession {
     }
 
     @Override
+    public X509Certificate[] getPeerCertificateChain() {
+        return new X509Certificate[0];
+    }
+
+    @Override
     public boolean isValid() {
         return false;
     }
@@ -67,7 +68,7 @@ public class MockSSLSession implements SSLSession {
     }
 
     @Override
-    public Certificate[] getPeerCertificates() throws SSLPeerUnverifiedException {
+    public Certificate[] getPeerCertificates() {
         return new Certificate[0];
     }
 
@@ -77,12 +78,7 @@ public class MockSSLSession implements SSLSession {
     }
 
     @Override
-    public X509Certificate[] getPeerCertificateChain() throws SSLPeerUnverifiedException {
-        return new X509Certificate[0];
-    }
-
-    @Override
-    public Principal getPeerPrincipal() throws SSLPeerUnverifiedException {
+    public Principal getPeerPrincipal() {
         return null;
     }
 

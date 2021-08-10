@@ -10,8 +10,7 @@
 
     <name>cVurl</name>
     <description>
-        cVurl is an open-source java wrapper for an HTTP/2 Client. Written in Java11 and can be used with any
-        jdk11.0.2 and higher
+        cVurl is an open-source wrapper for the Java HTTP client. It is written in Java 11 and can be used with any JDK 11.0.2 or newer.
     </description>
     <url>https://github.com/corese4rch/cvurl</url>
 
@@ -28,26 +27,24 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- main -->
-        <slf4j-api.version>2.0.0-alpha1</slf4j-api.version>
-        <jackson.core.version>2.11.0</jackson.core.version>
+        <slf4j-api.version>2.0.0-alpha2</slf4j-api.version>
+        <jackson.core.version>2.12.4</jackson.core.version>
         <!-- test -->
-        <mockito.version>3.3.3</mockito.version>
-        <wiremock.version>2.23.2</wiremock.version>
-        <hamcrest.version>2.1</hamcrest.version>
-        <junit-jupiter.version>5.6.0</junit-jupiter.version>
-        <mockito-extension.version>1.2.1</mockito-extension.version>
+        <mockito.version>3.11.2</mockito.version>
+        <wiremock.version>2.27.2</wiremock.version>
+        <junit-jupiter.version>5.8.0-M1</junit-jupiter.version>
         <!-- plugins -->
-        <maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
-        <maven-failsafe-plugin.version>3.0.0-M4</maven-failsafe-plugin.version>
-        <jacoco-plugin.version>0.8.5</jacoco-plugin.version>
-        <sonar-plugin.version>3.6.0.1398</sonar-plugin.version>
-        <source-plugin.version>3.2.0</source-plugin.version>
-        <release-plugin.version>2.5.3</release-plugin.version>
-        <maven-enforcer-plugin.version>3.0.0-M2</maven-enforcer-plugin.version>
-        <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
+        <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
+        <maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
+        <jacoco-plugin.version>0.8.7</jacoco-plugin.version>
+        <sonar-plugin.version>3.9.0.2155</sonar-plugin.version>
+        <source-plugin.version>3.2.1</source-plugin.version>
+        <release-plugin.version>3.0.0.M1</release-plugin.version>
+        <maven-enforcer-plugin.version>3.0.0</maven-enforcer-plugin.version>
+        <maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
         <coveralls-plugin.version>4.3.0</coveralls-plugin.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
-        <javadoc-plugin.version>3.2.0</javadoc-plugin.version>
+        <javadoc-plugin.version>3.3.0</javadoc-plugin.version>
         <nexus-staging-plugin.version>1.6.8</nexus-staging-plugin.version>
     </properties>
 
@@ -70,18 +67,6 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <version>${mockito.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-core</artifactId>
-            <version>${hamcrest.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>name.falgout.jeffrey.testing.junit5</groupId>
-            <artifactId>mockito-extension</artifactId>
-            <version>${mockito-extension.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -150,9 +135,14 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
-                    <!--suppress UnresolvedMavenProperty -->
-                    <argLine>${argLine} --add-opens
-                        coresearch.cvurl.io/coresearch.cvurl.io.helper.model=com.fasterxml.jackson.databind
+                    <argLine>
+                        --add-opens coresearch.cvurl.io/coresearch.cvurl.io.model=ALL-UNNAMED
+                        --add-opens coresearch.cvurl.io/coresearch.cvurl.io.request=ALL-UNNAMED
+                        --add-opens coresearch.cvurl.io/coresearch.cvurl.io.multipart=ALL-UNNAMED
+                        --add-opens coresearch.cvurl.io/coresearch.cvurl.io.helper.model=com.fasterxml.jackson.databind
+                        --add-opens coresearch.cvurl.io/coresearch.cvurl.io.mapper.impl=ALL-UNNAMED
+                        --add-opens coresearch.cvurl.io/coresearch.cvurl.io.util.urlbuilder=ALL-UNNAMED
+                        --add-opens coresearch.cvurl.io/coresearch.cvurl.io.request.proxy=ALL-UNNAMED
                     </argLine>
                 </configuration>
             </plugin>
@@ -301,13 +291,12 @@
         </profile>
     </profiles>
 
-
     <developers>
         <developer>
             <id>0</id>
             <name>Andrew Petryk</name>
             <email>andrew.petryk@avenga.com</email>
-            <organization>CoreValue powered by Avenga</organization>
+            <organization>Avenga</organization>
             <roles>
                 <role>Product Owner/Team Lead</role>
             </roles>
@@ -316,7 +305,7 @@
             <id>1</id>
             <name>Mykhailo Voloshchuk</name>
             <email>mykhailo.voloshchuk@avenga.com</email>
-            <organization>CoreValue powered by Avenga</organization>
+            <organization>Avenga</organization>
             <roles>
                 <role>Developer</role>
             </roles>
@@ -325,7 +314,7 @@
             <id>2</id>
             <name>Ivan Mahlatii</name>
             <email>ivan.mahlatii@avenga.com</email>
-            <organization>CoreValue powered by Avenga</organization>
+            <organization>Avenga</organization>
             <roles>
                 <role>Developer</role>
             </roles>
@@ -334,7 +323,7 @@
             <id>3</id>
             <name>Yurii Kaplun</name>
             <email>yurii.kaplun@avenga.com</email>
-            <organization>CoreValue powered by Avenga</organization>
+            <organization>Avenga</organization>
             <roles>
                 <role>Developer</role>
             </roles>
@@ -343,7 +332,16 @@
             <id>4</id>
             <name>Dmytro Tarianyk</name>
             <email>dmytro.tarianyk@avenga.com</email>
-            <organization>CoreValue powered by Avenga</organization>
+            <organization>Avenga</organization>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>5</id>
+            <name>Ievgenii Ishchenko</name>
+            <email>ievgenii.ishchenko@avenga.com</email>
+            <organization>Avenga</organization>
             <roles>
                 <role>Developer</role>
             </roles>

@@ -9,7 +9,7 @@ public final class Resources {
     private static final String RESOURCE_PATH = "src/test/resources";
 
     private Resources() {
-        throw new IllegalStateException(format("Creating of class %s is forbidden", Resources.class.getName()));
+        throw new IllegalStateException(format("The creation of the %s class is prohibited", Resources.class.getName()));
     }
 
     public static Path get(String resource) {
