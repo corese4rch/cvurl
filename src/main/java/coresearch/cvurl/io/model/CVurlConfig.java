@@ -202,9 +202,19 @@ public class CVurlConfig {
     /**
      * Sets the value of the {@code logEnabled} field.
      * @param enabled - the value of the logEnabled field
+     * @deprecated use the {@link CVurlConfig#setLogEnabled(boolean)} method instead
      */
+    @Deprecated(since = "1.5", forRemoval = true)
     public void setIsLogEnable(boolean enabled) {
         this.getGlobalRequestConfiguration().setLogEnabled(enabled);
+    }
+
+    /**
+     * Sets the value of the {@code logEnabled} field.
+     * @param isEnabled - the value of the logEnabled field
+     */
+    public void setLogEnabled(boolean isEnabled) {
+        this.getGlobalRequestConfiguration().setLogEnabled(isEnabled);
     }
 
     /**
