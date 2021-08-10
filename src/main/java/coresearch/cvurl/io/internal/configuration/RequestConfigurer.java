@@ -3,33 +3,34 @@ package coresearch.cvurl.io.internal.configuration;
 import java.time.Duration;
 
 /**
- * Interface that defines protocol for {@link RequestConfiguration} building.
+ * The interface defines a contract for the {@link RequestConfiguration} class building.
  *
- * @param <T>
+ * @since 1.2
+ * @param <T> - the builder class type
  */
 public interface RequestConfigurer<T> {
 
     /**
-     * Sets requestTimeout of request.
+     * Sets the request timeout.
      *
-     * @param duration request timeout
-     * @return this builder
+     * @param duration - the request timeout
+     * @return the builder
      */
     T requestTimeout(Duration duration);
 
     /**
-     * Sets whether client should accept compressed response body.
+     * Sets whether the client should accept the compressed response body or not.
      *
-     * @param acceptCompressed whether accept compressed
-     * @return this builder
+     * @param acceptCompressed - whether to accept compressed or not
+     * @return the builder
      */
     T acceptCompressed(boolean acceptCompressed);
 
     /**
-     * Sets flag that defines if request body and url should be logged with level INFO.
+     * Sets whether the client should enable logging or not.
      *
-     * @param logEnabled whether accept compressed
-     * @return this builder
+     * @param logEnabled - whether to enable logging or not
+     * @return the builder
      */
     T logEnabled(boolean logEnabled);
 }

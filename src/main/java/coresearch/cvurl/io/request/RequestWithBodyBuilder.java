@@ -15,7 +15,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
 
 /**
- * Builder used to build {@link Request} with body. Used for all methods except GET.
+ * The builder class used to build an instance of the {@link Request} class with body.
+ *
+ * @since 0.9
  */
 public class RequestWithBodyBuilder extends RequestBuilder<RequestWithBodyBuilder> {
 
@@ -26,10 +28,10 @@ public class RequestWithBodyBuilder extends RequestBuilder<RequestWithBodyBuilde
     }
 
     /**
-     * Sets request body.
+     * Sets the request body as a string.
      *
-     * @param body request body
-     * @return this builder
+     * @param body - the request body
+     * @return the builder
      */
     public RequestWithBodyBuilder body(String body) {
         bodyPublisher = HttpRequest.BodyPublishers.ofString(body);
@@ -37,10 +39,10 @@ public class RequestWithBodyBuilder extends RequestBuilder<RequestWithBodyBuilde
     }
 
     /**
-     * Sets request body.
+     * Sets the request body as a byte array.
      *
-     * @param body request body
-     * @return this builder
+     * @param body - the request body
+     * @return the builder
      */
     public RequestWithBodyBuilder body(byte[] body) {
         bodyPublisher = HttpRequest.BodyPublishers.ofByteArray(body);
@@ -48,10 +50,10 @@ public class RequestWithBodyBuilder extends RequestBuilder<RequestWithBodyBuilde
     }
 
     /**
-     * Sets request body.
+     * Sets the request body as an object.
      *
-     * @param body request body
-     * @return this builder
+     * @param body - the request body
+     * @return the builder
      */
     public RequestWithBodyBuilder body(Object body) {
         bodyPublisher = HttpRequest.BodyPublishers.ofString(cvurlConfig.getGenericMapper().writeValue(body));
@@ -60,10 +62,10 @@ public class RequestWithBodyBuilder extends RequestBuilder<RequestWithBodyBuilde
     }
 
     /**
-     * Sets request body as multipart data. Sets content-type header as multipart/{multipartType}
+     * Sets the request body as multipart data. Sets the value of the Content-Type header to multipart/{multipartType}
      *
-     * @param multipartBody request body
-     * @return this builder
+     * @param multipartBody - the request body
+     * @return the builder
      */
     public RequestWithBodyBuilder body(MultipartBody multipartBody) {
         bodyPublisher = HttpRequest.BodyPublishers.ofByteArrays(multipartBody.asByteArrays());
@@ -73,11 +75,11 @@ public class RequestWithBodyBuilder extends RequestBuilder<RequestWithBodyBuilde
     }
 
     /**
-     * Sets request body as application/x-www-form-urlencoded. Sets Content-type header
-     * to application/x-www-form-urlencoded.
+     * Sets the request body as an application/x-www-form-urlencoded content.
+     * Sets the value of the Content-Type header to application/x-www-form-urlencoded.
      *
-     * @param body request body
-     * @return this builder
+     * @param body - the request body
+     * @return the builder
      */
     public RequestWithBodyBuilder formData(Map<?, ?> body) {
         if (body.isEmpty()) {

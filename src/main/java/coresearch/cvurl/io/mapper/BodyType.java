@@ -4,28 +4,33 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 /**
- * Class that describes type with generics. Used as parameter to some of {@link coresearch.cvurl.io.request.Request}
- * methods to provide ability to parse response to body to class with generics.
+ * The class helps to describe a generic type. Used as a parameter in some
+ * {@link coresearch.cvurl.io.request.Request} methods to provide the ability to parse the response body into a specific type.
  * Usage example: <br/>
  * {@code cvurl.get(url).asObject(new BodyType<List<Users>() {});} <br/>
- * this code snippet would parse response body to {@code List<User>}
+ * this code snippet could be used to parse a response body to {@code List<User>}
+ *
+ * @since 1.2
+ * @param <T> the data type in response body
  */
 public abstract class BodyType<T> {
 
-    private static final String ERROR_MESSAGE = "Type should be direct child type of BodyType";
+    private static final String ERROR_MESSAGE = "The type must be a direct child of the BodyType class.";
 
-    private Type type;
+    private final Type type;
 
     protected BodyType() {
         ParameterizedType superclass = (ParameterizedType) this.getClass().getGenericSuperclass();
+
         if (superclass.getRawType() != BodyType.class) {
             throw new IllegalStateException(ERROR_MESSAGE);
         }
+
         this.type = superclass.getActualTypeArguments()[0];
     }
 
     /**
-     * @return actual type
+     * @return the actual type
      */
     public Type getType() {
         return type;

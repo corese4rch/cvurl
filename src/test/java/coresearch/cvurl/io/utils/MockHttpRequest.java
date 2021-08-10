@@ -9,9 +9,6 @@ import java.util.Optional;
 
 public class MockHttpRequest extends HttpRequest {
 
-    private MockHttpRequest() {
-    }
-
     public static MockHttpRequest create() {
         return new MockHttpRequest();
     }

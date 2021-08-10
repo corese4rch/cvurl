@@ -10,10 +10,12 @@ import java.util.regex.Pattern;
 import static coresearch.cvurl.io.internal.util.Validation.notNullParam;
 
 /**
- * Class for building urls. Its only purpose is to build url endpoint and it doesn't handle query params.
- * If you want to add query params to your request use
+ * Class for building URLs. Its sole purpose is to create a URL object. It does not process query parameters.
+ * If you want to add query params to your request, use the
  * {@link coresearch.cvurl.io.request.RequestBuilder#queryParam(String, String)} or
- * {@link coresearch.cvurl.io.request.RequestBuilder#queryParams(Map)} method.
+ * {@link coresearch.cvurl.io.request.RequestBuilder#queryParams(Map)} methods.
+ *
+ * @since 0.9
  */
 public class Url {
 
@@ -27,10 +29,10 @@ public class Url {
     }
 
     /**
-     * Creates new Url object from provided url.
+     * Creates a new {@link Url} object based on the provided URL.
      *
-     * @param url provided endpoint url
-     * @return new Url object
+     * @param url - the provided URL
+     * @return the {@link Url} object
      */
     public static Url of(String url) {
         notNullParam(url, "url");
@@ -38,11 +40,11 @@ public class Url {
     }
 
     /**
-     * Creates new Url object with given endpoint schema and host.
+     * Creates a new {@link Url} object based on the provided schema and host.
      *
-     * @param schema provided endpoint schema
-     * @param host provided endpoint host
-     * @return new Url object
+     * @param schema - the provided schema
+     * @param host - the provided host
+     * @return the {@link Url} object
      */
     public static Url of(String schema, String host) {
         notNullParam(schema, "schema");
@@ -51,10 +53,10 @@ public class Url {
     }
 
     /**
-     * Adds path to url and returns new Url object.
+     * Adds a URL path and returns a new {@link Url} object.
      *
-     * @param path provided path
-     * @return new Url object build out of current url + "/" + path
+     * @param path - the provided path
+     * @return the {@link Url} object created based on current URL + "/" + path
      */
     public Url path(String path) {
         notNullParam(path, "path");
@@ -62,10 +64,10 @@ public class Url {
     }
 
     /**
-     * Returns url as {@link URL}. Removes from url redundant whitespaces and slashes.
-     * In case of malformed url throws {@link BadUrlException}.
+     * Returns the {@link Url} as a {@link URL} object. Removes extra spaces and slashes from the URL.
      *
-     * @return url as {@link URL}
+     * @return the {@link Url} as a {@link URL} object
+     * @throws BadUrlException in case of invalid URL
      */
     public URL create() {
         try {
