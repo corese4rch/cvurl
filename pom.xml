@@ -44,7 +44,7 @@
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <coveralls-plugin.version>4.3.0</coveralls-plugin.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
-        <javadoc-plugin.version>3.3.0</javadoc-plugin.version>
+        <javadoc-plugin.version>3.3.1</javadoc-plugin.version>
         <nexus-staging-plugin.version>1.6.8</nexus-staging-plugin.version>
     </properties>
 
