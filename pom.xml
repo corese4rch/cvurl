@@ -32,7 +32,7 @@
         <!-- test -->
         <mockito.version>3.11.2</mockito.version>
         <wiremock.version>2.27.2</wiremock.version>
-        <junit-jupiter.version>5.8.0-M1</junit-jupiter.version>
+        <junit-jupiter.version>5.8.2</junit-jupiter.version>
         <!-- plugins -->
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
