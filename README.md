@@ -397,13 +397,13 @@ Well, as simple as everything else about cVurl.
     <dependency>
         <groupId>com.github.corese4rch</groupId>
         <artifactId>cvurl-io</artifactId>
-        <version>1.5</version>
+        <version>1.5.1</version>
     </dependency>
 </dependencies>
 ```
  **Gradle**
 ```groovy
-compile group: 'com.github.corese4rch', name: 'cvurl-io', version: '1.5'
+compile group: 'com.github.corese4rch', name: 'cvurl-io', version: '1.5.1'
 ```
    
 ## Examples
@@ -413,5 +413,5 @@ Examples can be found on our [Wiki page](https://github.com/corese4rch/cvurl/wik
 Please see the [changelog](https://github.com/corese4rch/cvurl/wiki/Changelog) page to see what's recently changed.
    
 ## License
- >  Copyright 2019-2021 Avenga. Licensed under GNU GPLv3 
+ >  Copyright 2019-2022 Avenga. Licensed under GNU GPLv3 
   
